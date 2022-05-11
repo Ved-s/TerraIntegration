@@ -60,7 +60,7 @@ namespace TerraIntegration.Variables
 
         public virtual string PropertyDescription => "";
 
-        public abstract VariableValue GetProperty(PositionedComponent c, HashSet<Error> errors);
+        public abstract VariableValue GetProperty(PositionedComponent c, List<Error> errors);
 
         public virtual PropertyVariable CreateVariable(PositionedComponent c)
         {
@@ -71,7 +71,7 @@ namespace TerraIntegration.Variables
             return pv;
         }
 
-        public override VariableValue GetValue(ComponentSystem system, HashSet<Error> errors)
+        public override VariableValue GetValue(ComponentSystem system, List<Error> errors)
         {
             Component c = system.GetComponent(ComponentPos, ComponentType, errors);
             if (c is null) return null;
@@ -176,10 +176,10 @@ namespace TerraIntegration.Variables
             }
         }
 
-        public abstract VariableValue GetProperty(TComponent component, Point16 pos, HashSet<Error> errors);
+        public abstract VariableValue GetProperty(TComponent component, Point16 pos, List<Error> errors);
         public virtual PropertyVariable CreateVariable(TComponent component, Point16 pos) => (PropertyVariable)Activator.CreateInstance(GetType());
 
-        public sealed override VariableValue GetProperty(PositionedComponent c, HashSet<Error> errors)
+        public sealed override VariableValue GetProperty(PositionedComponent c, List<Error> errors)
         {
             return GetProperty(c.Component as TComponent, ComponentPos, errors);
         }

@@ -9,7 +9,7 @@ using Terraria.ModLoader;
 
 namespace TerraIntegration.Items
 {
-    public class VarStore : ModItem
+    public class WireIO : ModItem
     {
         public override string Texture => $"{nameof(TerraIntegration)}/Assets/Tiles/{Name}";
 
@@ -26,7 +26,7 @@ namespace TerraIntegration.Items
             Item.consumable = true;
             Item.rare = ItemRarityID.White;
             Item.value = Item.sellPrice(copper: 20);
-            Item.createTile = ModContent.TileType<Components.VarStore>();
+            Item.createTile = ModContent.TileType<Components.WireIO>();
         }
     }
 }

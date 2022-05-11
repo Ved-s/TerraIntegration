@@ -83,7 +83,7 @@ namespace TerraIntegration
 					if (updated.Contains(new(x, y))) continue;
 
 					ComponentSystem system = ComponentSystem.UpdateSystem(new(x, y));
-					updated.UnionWith(system.Components.Select(c => c.Pos));
+					updated.UnionWith(system.ComponentsByPos.Keys);
 				}
 		}
 

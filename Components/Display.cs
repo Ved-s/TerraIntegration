@@ -56,9 +56,12 @@ namespace TerraIntegration.Components
         public override string ComponentType => "display";
         public override bool HasRightClickInterface => true;
 
+        public override ushort DefaultUpdateFrequency => 15;
+
         public override int VariableSlots => 1;
 
         private UIComponentVariable Slot = new();
+        private List<Error> Errors = new();
 
         public override void SetStaticDefaults()
         {
@@ -126,15 +129,19 @@ namespace TerraIntegration.Components
                 data.Master.DisplayTextCache = null;
                 return;
             }
+            Errors.Clear();
 
-            HashSet<Error> errors = new();
+            Values.VariableValue value = data.Variables[0].Var.GetValue(data.System, Errors);
 
-            Values.VariableValue value = data.Variables[0].Var.GetValue(data.System, errors);
-
-            if (errors.Count > 0)
+            if (Errors.Count > 0)
             {
-                data.Master.DisplayTextCache = $"Errors:\n{string.Join('\n', errors)}";
+                data.Master.DisplayTextCache = $"Errors:\n{string.Join('\n', Errors)}";
                 data.Master.DisplayColorCache = Color.OrangeRed;
+                return;
+            }
+            if (value is null) 
+            {
+                data.Master.DisplayTextCache = null;
                 return;
             }
 

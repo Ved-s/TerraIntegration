@@ -69,7 +69,8 @@ namespace TerraIntegration.Items
 
             string returns;
 
-            if (Values.VariableValue.ByType.TryGetValue(Var.VariableReturnType, out Values.VariableValue val))
+            if (Var.VariableReturnType is null) returns = null;
+            else if (Values.VariableValue.ByType.TryGetValue(Var.VariableReturnType, out Values.VariableValue val))
             {
                 returns = Util.ColorTag(val.DisplayColor, val.TypeDisplay);
             }
@@ -83,7 +84,8 @@ namespace TerraIntegration.Items
             else returns = $"[c/ffaaaa:unregistered type {Var.VariableReturnType.Name}]";
 
             tooltips.Add(new(Mod, "TIVarType", $"[c/aaaa00:Type:] {Var.TypeDisplay}"));
-            tooltips.Add(new(Mod, "TIVarReturn", $"[c/aaaa00:Returns:] {returns}"));
+            if (returns is not null)
+                tooltips.Add(new(Mod, "TIVarReturn", $"[c/aaaa00:Returns:] {returns}"));
             tooltips.Add(new(Mod, "TIVarID", $"[c/aaaa00:ID:] {Var.ShortId}"));
 
             if (Var.TypeDescription is not null)
@@ -165,7 +167,7 @@ namespace TerraIntegration.Items
                 spriteBatch.Draw(variable.Value, pos, null, color, rotation, origin, scale, SpriteEffects.None, 0);
             }
 
-            if (Values.VariableValue.ByType.TryGetValue(returnType, out var val))
+            if (returnType is not null && Values.VariableValue.ByType.TryGetValue(returnType, out var val))
             {
                 if (VariableValueOverlays.TryGetValue(val.Type.Replace('.', '_'), out var valueOverlay))
                 {
@@ -178,11 +180,20 @@ namespace TerraIntegration.Items
                 }
             }
 
-
+            string typeOrig = type;
             if (type is not null)
                 type = type.Replace('.', '_');
 
-            if (VariableTypeOverlays.TryGetValue(type, out var typeOverlay))
+            if (!VariableTypeOverlays.TryGetValue(type, out var typeOverlay))
+            {
+                if (Variables.Variable.ByTypeName.TryGetValue(typeOrig, out var variable) && variable is Variables.PropertyVariable pv) 
+                {
+                    if (!VariableTypeOverlays.TryGetValue(pv.ComponentType, out typeOverlay))
+                        VariableTypeOverlays.TryGetValue(pv.ComponentProperty, out typeOverlay);
+                }
+            }
+
+            if (typeOverlay is not null) 
             {
                 if (!typeOverlay.IsLoaded)
                     typeOverlay.Wait();

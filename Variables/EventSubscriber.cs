@@ -9,48 +9,45 @@ using Terraria.ModLoader;
 
 namespace TerraIntegration.Variables
 {
-    public class Reference : Variable
+    public class EventSubscriber : Variable
     {
-        public override string Type => "ref";
-        public override string TypeDisplay => "Reference";
+        public override string Type => "eventsub";
+        public override string TypeDisplay => "Event Subscriber";
+        public override string TypeDescription => EventId == default ? null : $"[c/aaaa00:Event ID:] {World.Guids.GetShortGuid(EventId)}";
 
-        public override string TypeDescription => RefId == default ? null : $"[c/aaaa00:Referenced ID:] {World.Guids.GetShortGuid(RefId)}";
+        public override Type VariableReturnType => typeof(Values.Boolean);
 
-        public override Type VariableReturnType => returnType;
+        public Guid EventId { get; set; }
+        public bool Triggered { get; set; }
 
-        public Guid RefId { get; set; }
-
-        private Type returnType = typeof(VariableValue);
-
-        public Reference() { }
-        public Reference(Guid refId)
+        public EventSubscriber() { }
+        public EventSubscriber(Guid eventId) 
         {
-            RefId = refId;
+            EventId = eventId;
         }
 
         public override VariableValue GetValue(ComponentSystem system, List<Error> errors)
         {
-            VariableValue val = system.GetVariableValue(RefId, errors);
-            if (val is not null && errors.Count == 0)
-                returnType = val.GetType();
-            return val;
+            VariableValue v = new Values.Boolean(Triggered);
+            Triggered = false;
+            return v;
         }
 
         protected override void SaveCustomData(BinaryWriter writer)
         {
-            writer.Write(RefId.ToByteArray());
+            writer.Write(EventId.ToByteArray());
         }
 
         protected override Variable LoadCustomData(BinaryReader reader)
         {
-            return new Reference(new Guid(reader.ReadBytes(16)));
+            return new EventSubscriber(new Guid(reader.ReadBytes(16)));
         }
 
         public override Variable GetFromCommand(CommandCaller caller, List<string> args)
         {
             if (args.Count < 1)
             {
-                caller.Reply("Argument required: variable id");
+                caller.Reply("Argument required: event variable id");
                 return null;
             }
 
@@ -63,7 +60,7 @@ namespace TerraIntegration.Variables
             }
             args.RemoveAt(0);
 
-            return new Reference(id.Value);
+            return new EventSubscriber(id.Value);
         }
     }
 }

@@ -38,6 +38,8 @@ namespace TerraIntegration
         public Item HoverItem = null;
         public string HoverText = null;
 
+        public readonly List<DelayedWireTrip> WireTrips = new();
+
         private UserInterface Interface = new();
         private PositionedComponent InterfaceComponent;
         private Vector2 InterfaceOffset = default;
@@ -115,12 +117,18 @@ namespace TerraIntegration
 
         public override void PostUpdateEverything()
         {
+            Statistics.ResetUpdates();
+            Statistics.Start(Statistics.UpdateTime.FullUpdate);
+            Statistics.Start(Statistics.UpdateTime.Components);
             foreach (KeyValuePair<Point16, Component> kvp in ComponentUpdates) 
             {
                 ComponentData data = GetData(kvp.Key, kvp.Value);
+                if (data.UpdateFrequency == 0) continue;
                 if (UpdateCounter % data.UpdateFrequency == 0)
                     kvp.Value.OnUpdate(kvp.Key);
+                Statistics.UpdatedComponents++;
             }
+            Statistics.Stop(Statistics.UpdateTime.Components);
 
             if (Main.netMode != NetmodeID.Server && !Main.LocalPlayer.mouseInterface)
             {
@@ -133,6 +141,22 @@ namespace TerraIntegration
                         HoverText = hover;
                 }
             }
+
+            List<DelayedWireTrip> tripped = new();
+            foreach (DelayedWireTrip trip in WireTrips) 
+            {
+                if (trip.Delay <= 0)
+                {
+                    Wiring.TripWire(trip.X, trip.Y, trip.Width, trip.Height);
+                    tripped.Add(trip);
+                }
+                else trip.Delay--;
+            }
+            foreach (DelayedWireTrip trip in tripped)
+                WireTrips.Remove(trip);
+
+            UpdateCounter++;
+            Statistics.Stop(Statistics.UpdateTime.FullUpdate);
         }
 
         public void SetInterfaceComponent(Point16 pos, Component c) 
@@ -238,7 +262,7 @@ namespace TerraIntegration
 
                 foreach (PropertyVariable v in props)
                 {
-                    var def = new UiComponentVariableDefinition()
+                    var def = new UIComponentVariableDefinition()
                     {
                         Top = new(y, 0),
                         Left = new(0, 0),
@@ -417,6 +441,20 @@ namespace TerraIntegration
                     ComponentData[pos] = data;
                 }
             }
+        }
+    }
+
+    public class DelayedWireTrip
+    {
+        public int Delay, X, Y, Width, Height;
+
+        public DelayedWireTrip(int x, int y, int width, int height, int delay)
+        {
+            X = x;
+            Y = y;
+            Width = width;
+            Height = height;
+            Delay = delay;
         }
     }
 }

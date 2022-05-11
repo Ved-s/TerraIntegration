@@ -27,7 +27,7 @@ namespace TerraIntegration.Variables
             Value = value;
         }
 
-        public override VariableValue GetValue(ComponentSystem system, HashSet<Error> errors)
+        public override VariableValue GetValue(ComponentSystem system, List<Error> errors)
         {
             return Value;
         }

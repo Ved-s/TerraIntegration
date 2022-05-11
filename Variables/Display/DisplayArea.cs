@@ -15,7 +15,7 @@ namespace TerraIntegration.Variables.Display
 
         public override Type VariableReturnType => typeof(Integer);
 
-        public override VariableValue GetProperty(Components.Display component, Point16 pos, HashSet<Error> errors)
+        public override VariableValue GetProperty(Components.Display component, Point16 pos, List<Error> errors)
         {
             DisplayData data = component.GetData(pos);
             return new Integer(data.DisplaySize.X * data.DisplaySize.Y);

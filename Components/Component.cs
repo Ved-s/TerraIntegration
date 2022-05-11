@@ -52,7 +52,7 @@ namespace TerraIntegration.Components
         }
         public virtual Vector2 InterfaceOffset { get; protected set; }
 
-        public virtual bool NeedsAutoUpdates => false;
+        public virtual ushort DefaultUpdateFrequency => 0;
         
         public virtual int VariableSlots => 0;
 
@@ -86,8 +86,8 @@ namespace TerraIntegration.Components
         public virtual void OnPlaced(Point16 pos)
         {
             ComponentSystem.UpdateSystem(pos);
-            if (NeedsAutoUpdates)
-                World.ComponentUpdates.Add(pos, this);
+            if (DefaultUpdateFrequency > 0)
+                World.ComponentUpdates[pos] = this;
         }
         public virtual void OnKilled(Point16 pos)
         {
@@ -96,8 +96,8 @@ namespace TerraIntegration.Components
         }
         public virtual void OnLoaded(Point16 pos)
         {
-            if (NeedsAutoUpdates)
-                World.ComponentUpdates.Add(pos, this);
+            if (DefaultUpdateFrequency > 0)
+                World.ComponentUpdates[pos] = this;
 
             ComponentData data = GetData(pos);
             foreach (var var in data.Variables)
@@ -105,6 +105,7 @@ namespace TerraIntegration.Components
                     World.Guids.AddToDictionary(var.Var.Id);
         }
         public virtual void OnUpdate(Point16 pos) { }
+        public virtual void OnEvent(Point16 pos, int variableIndex) { }
         public virtual void OnSystemUpdate(Point16 pos) { }
         public virtual void OnVariableChanged(Point16 pos, int varIndex) 
         {
@@ -142,6 +143,13 @@ namespace TerraIntegration.Components
         {
             if (updates) World.ComponentUpdates[pos] = this;
             else World.ComponentUpdates.Remove(pos);
+        }
+        public void SetUpdates(Point16 pos, ushort rate)
+        {
+            ComponentData data = GetData(pos);
+            data.UpdateFrequency = rate;
+
+            SetUpdates(pos, rate > 0);
         }
 
         public ComponentData GetData(Point16 pos) => ModContent.GetInstance<ComponentWorld>().GetData(pos, this);
@@ -205,12 +213,16 @@ namespace TerraIntegration.Components
         //        data = c.LoadDataInternal(reader, dataLength, component);
         //        data.Init(c);
         //    }
-        //    data.Variables = vars;
-
+        //    for (int i = 0; i < vars.Count; i++)
+        //    {
+        //        if (i >= data.Variables.Length) break;
+        //        data.Variables[i] = vars[i];
+        //    }
+        //
         //    return data;
         //}
 
-        internal virtual TagCompound SaveTag(ComponentData data)
+    internal virtual TagCompound SaveTag(ComponentData data)
         {
             TagCompound tag = new();
 
@@ -280,8 +292,12 @@ namespace TerraIntegration.Components
                 data.Init(c);
             }
 
-            data.Variables = vars.ToArray();
-            
+            for (int i = 0; i < vars.Count; i++)
+            {
+                if (i >= data.Variables.Length) break;
+                data.Variables[i] = vars[i];
+            }
+
             return data;
         }
 
@@ -315,6 +331,7 @@ namespace TerraIntegration.Components
         {
             Component = c;
             Variables = new Items.Variable[c.VariableSlots];
+            UpdateFrequency = c.DefaultUpdateFrequency;
             CustomInit(c);
         }
 

@@ -13,7 +13,10 @@ namespace TerraIntegration
         public static TerraIntegration Mod => ModContent.GetInstance<TerraIntegration>();
         public static ComponentWorld World => ModContent.GetInstance<ComponentWorld>();
 
-        public HashSet<PositionedComponent> Components { get; } = new();
+        public HashSet<PositionedComponent> AllComponents { get; } = new();
+        public HashSet<PositionedComponent> ComponentsWithVariables { get; } = new();
+        public Dictionary<string, HashSet<PositionedComponent>> ComponentsByType { get; } = new();
+        public Dictionary<Point16, Component> ComponentsByPos { get; } = new();
 
         private HashSet<Guid> GetVariableSet = new();
 
@@ -43,10 +46,24 @@ namespace TerraIntegration
 
             foreach (PositionedComponent component in ComponentRunner(pos))
             {
-                system.Components.Add(component);
+                system.AllComponents.Add(component);
+
+                if (component.Component.VariableSlots > 0)
+                    system.ComponentsWithVariables.Add(component);
+
+                string type = component.Component.ComponentType;
+                if (!system.ComponentsByType.TryGetValue(type, out var componentsByType))
+                {
+                    componentsByType = new();
+                    system.ComponentsByType[type] = componentsByType;
+                }
+                componentsByType.Add(component);
+
+                system.ComponentsByPos[component.Pos] = component.Component;
+
                 component.Component.GetData(component.Pos).System = system;
             }
-            foreach (PositionedComponent component in system.Components)
+            foreach (PositionedComponent component in system.AllComponents)
                 component.Component.OnSystemUpdate(component.Pos);
 
             return system;
@@ -114,7 +131,7 @@ namespace TerraIntegration
                 yield return check;
         }
 
-        public VariableValue GetVariableValue(Guid varId, HashSet<Error> errors)
+        public VariableValue GetVariableValue(Guid varId, List<Error> errors)
         {
             Variable var = GetVariable(varId, errors);
             if (var is null) return null;
@@ -131,62 +148,78 @@ namespace TerraIntegration
             return val;
         }
 
-        public Variable GetVariable(Guid varId, HashSet<Error> errors)
+        public Variable GetVariable(Guid varId, List<Error> errors)
         {
-            if (GetVariableSet.Contains(varId))
+            Statistics.VariableRequests++;
+            Statistics.Start(Statistics.UpdateTime.VariableRequests);
+            try
             {
-                errors.Add(new(ErrorType.RecursiveReference, World.Guids.GetShortGuid(varId)));
+                if (GetVariableSet.Contains(varId))
+                {
+                    errors.Add(new(ErrorType.RecursiveReference, World.Guids.GetShortGuid(varId)));
+                    return null;
+                }
+
+                bool found = false;
+                Variable result = null;
+
+                foreach (PositionedComponent c in ComponentsWithVariables)
+                {
+                    ComponentData d = c.GetData();
+                    foreach (Items.Variable var in d.Variables)
+                        if (var is not null)
+                            if (var.Var.Id == varId)
+                            {
+                                if (var.Var is UnloadedVariable)
+                                {
+                                    errors.Add(new(ErrorType.VariableUnloaded, World.Guids.GetShortGuid(varId)));
+                                    return null;
+                                }
+                                if (found)
+                                {
+                                    errors.Add(new(ErrorType.MultipleVariablesSameID, World.Guids.GetShortGuid(varId)));
+                                    return null;
+                                }
+                                found = true;
+                                result = var.Var;
+                            }
+                }
+                if (result is not null)
+                    return result;
+
+                errors.Add(new(ErrorType.VariableNotFound, World.Guids.GetShortGuid(varId)));
                 return null;
             }
-
-            bool found = false;
-            Variable result = null;
-
-            foreach (PositionedComponent c in Components)
+            finally
             {
-                ComponentData d = c.GetData();
-                foreach (Items.Variable var in d.Variables)
-                    if (var is not null)
-                        if (var.Var.Id == varId)
-                        {
-                            if (var.Var is UnloadedVariable)
-                            {
-                                errors.Add(new(ErrorType.VariableUnloaded, World.Guids.GetShortGuid(varId)));
-                                return null;
-                            }
-                            if (found)
-                            {
-                                errors.Add(new(ErrorType.MultipleVariablesSameID, World.Guids.GetShortGuid(varId)));
-                                return null;
-                            }
-                            found = true;
-                            result = var.Var;
-                        }
+                Statistics.Stop(Statistics.UpdateTime.VariableRequests);
             }
-            if (result is not null)
-                return result;
-
-            errors.Add(new(ErrorType.VariableNotFound, World.Guids.GetShortGuid(varId)));
-            return null;
         }
 
-        public Component GetComponent(Point16 pos, string type, HashSet<Error> errors) 
+        public Component GetComponent(Point16 pos, string type, List<Error> errors)
         {
-            foreach (PositionedComponent c in Components)
+            Statistics.ComponentRequests++;
+            Statistics.Start(Statistics.UpdateTime.ComponentRequests);
+            try
             {
-                if (c.Pos == pos)
+                if (ComponentsByPos.TryGetValue(pos, out Component c))
                 {
-                    if (type is not null && c.Component.ComponentType != type)
+                    if (type is not null && c.ComponentType != type)
                     {
-                        errors.Add(new(ErrorType.WrongComponentAtPos, pos.X, pos.Y, c.Component.Type, type));
+                        errors.Add(new(ErrorType.WrongComponentAtPos, pos.X, pos.Y, c.Type, type));
                         return null;
                     }
-                    return c.Component;
+                    return c;
                 }
-            }
 
-            errors.Add(new(ErrorType.NoComponentAtPos, pos.X, pos.Y, type));
-            return null;
+                errors.Add(new(ErrorType.NoComponentAtPos, pos.X, pos.Y, type));
+
+                return null;
+            }
+            finally
+            {
+                Statistics.Stop(Statistics.UpdateTime.ComponentRequests);
+            }
         }
     }
 }

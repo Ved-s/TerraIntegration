@@ -14,7 +14,7 @@ using Terraria.UI;
 
 namespace TerraIntegration.UI
 {
-    public class UiComponentVariableDefinition : UIPanel
+    public class UIComponentVariableDefinition : UIPanel
     {
         public string VariableType { get; set; } = "any";
 
@@ -23,7 +23,7 @@ namespace TerraIntegration.UI
         private UIText TextName;
         private UIVariableSlot Slot;
 
-        public UiComponentVariableDefinition()
+        public UIComponentVariableDefinition()
         {
             Height = new(58, 0);
 
@@ -78,7 +78,8 @@ namespace TerraIntegration.UI
             {
                 string returns;
 
-                if (Values.VariableValue.ByType.TryGetValue(var.VariableReturnType, out Values.VariableValue val))
+                if (var.VariableReturnType is null) returns = null;
+                else if (Values.VariableValue.ByType.TryGetValue(var.VariableReturnType, out Values.VariableValue val))
                 {
                     returns = Util.ColorTag(val.DisplayColor, val.TypeDisplay);
                 }
@@ -92,8 +93,8 @@ namespace TerraIntegration.UI
                 else returns = $"[c/ffaaaa:unregistered type ({var.VariableReturnType.Name})]";
 
                 ModContent.GetInstance<ComponentWorld>().HoverText =
-                    $"[c/aaaa00:Type:] {var.TypeDisplay}\n" +
-                    $"[c/aaaa00:Returns:] {returns}" +
+                    $"[c/aaaa00:Type:] {var.TypeDisplay}" +
+                    (returns is null ? "" : $"\n[c/aaaa00:Returns:] {returns}") +
                     (var.TypeDescription is null ? "" : "\n" + var.TypeDescription);
             }
         }

@@ -56,11 +56,11 @@ namespace TerraIntegration.Variables
                 Id = Guid.NewGuid();
         }
 
-        public virtual VariableValue GetValue(ComponentSystem system, HashSet<Error> errors)
+        public virtual VariableValue GetValue(ComponentSystem system, List<Error> errors)
         {
             return new();
         }
-        public virtual Variable GetFromCommand(CommandCaller caller, List<string> args) { return new(); }
+        public virtual Variable GetFromCommand(CommandCaller caller, List<string> args) => (Variable)Activator.CreateInstance(GetType());
 
         public void SaveData(BinaryWriter writer) 
         {
@@ -244,7 +244,7 @@ namespace TerraIntegration.Variables
             UnloadedTag = tag;
         }
 
-        public override VariableValue GetValue(ComponentSystem system, HashSet<Error> errors)
+        public override VariableValue GetValue(ComponentSystem system, List<Error> errors)
         {
             return new UnloadedVariableValue();
         }

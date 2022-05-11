@@ -1,4 +1,6 @@
-﻿namespace TerraIntegration.UI
+﻿using TerraIntegration.Components;
+
+namespace TerraIntegration.UI
 {
     public class UIComponentVariable : UIVariable
     {
@@ -6,17 +8,27 @@
         {
             get
             {
-                if (Component.Component.VariableSlots <= VariableSlot)
+                if (Component.Component is null)
                     return null;
 
-                return Component.Component.GetData(Component.Pos).Variables[VariableSlot];
+                ComponentData data = Component.Component.GetData(Component.Pos);
+
+                if (data.Variables.Length <= VariableSlot)
+                    return null;
+
+                return data.Variables[VariableSlot];
             }
             set
             {
-                if (Component.Component.VariableSlots <= VariableSlot)
+                if (Component.Component is null)
                     return;
 
-                Component.Component.GetData(Component.Pos).Variables[VariableSlot] = value;
+                ComponentData data = Component.Component.GetData(Component.Pos);
+
+                if (data.Variables.Length <= VariableSlot)
+                    return;
+
+                data.Variables[VariableSlot] = value;
                 Component.Component.OnVariableChanged(Component.Pos, VariableSlot);
             }
         }
