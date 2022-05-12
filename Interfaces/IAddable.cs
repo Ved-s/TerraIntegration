@@ -1,0 +1,15 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using TerraIntegration.Values;
+
+namespace TerraIntegration.Interfaces
+{
+    public interface IAddable
+    {
+        public Type[] ValidAddTypes { get; }
+        public VariableValue Add(VariableValue value, List<Error> errors);
+    }
+}

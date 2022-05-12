@@ -40,7 +40,7 @@ namespace TerraIntegration
                 return LanguageManager.Instance.GetTextValue(langKeyPath, Args);
             }
 
-            return $"{Type}: {string.Join(" ,", Args)}";
+            return $"{Type}: {string.Join(", ", Args)}";
         }
     }
 
@@ -52,6 +52,12 @@ namespace TerraIntegration
         ValueUnloaded,
         VariableUnloaded,
         WrongComponentAtPos,
-        NoComponentAtPos
+        NoComponentAtPos,
+        ExpectedValue,
+        ExpectedValueWithId,
+        ExpectedValues,
+        ExpectedValuesWithId,
+        ValueTooBigForType,
+        ValueTooSmallForType,
     }
 }

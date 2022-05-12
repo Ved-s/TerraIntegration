@@ -76,6 +76,30 @@ namespace TerraIntegration.Values
 
         protected virtual void SaveCustomData(BinaryWriter writer) { }
         protected virtual VariableValue LoadCustomData(BinaryReader reader) { return (VariableValue)Activator.CreateInstance(GetType()); }
+
+        public static string TypeToName(Type type, out Color color) 
+        {
+            if (type is null) 
+            {
+                color = Color.White;
+                return null;
+            }
+            if (ByType.TryGetValue(type, out Values.VariableValue val))
+            {
+                color = val.DisplayColor;
+                return val.TypeDisplay;
+            }
+            if (type.IsInterface)
+            {
+                string i = type.Name;
+                if (i.StartsWith('I')) i = i[1..];
+
+                color = new(0xaa, 0xbb, 0x00);
+                return i;
+            }
+            color = new(0xff, 0xaa, 0xaa);
+            return $"unregistered type {type.Name}";
+        }
     }
 
     public class UnloadedVariableValue : VariableValue

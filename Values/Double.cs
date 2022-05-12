@@ -10,20 +10,17 @@ using Terraria.ModLoader;
 
 namespace TerraIntegration.Values
 {
-    public class Boolean : VariableValue, IToString
+    public class Double : VariableValue, IToString
     {
-        public override string Type => "bool";
-        public override string TypeDisplay => "Boolean";
+        public override string Type => "double";
+        public override string TypeDisplay => "Double";
 
-        public override Color DisplayColor => Color.CadetBlue;
+        public override Color DisplayColor => Color.Lime;
 
-        public bool Value { get; set; }
+        public double Value { get; set; }
 
-        public Boolean() { }
-        public Boolean(bool value) { Value = value; }
-
-        private static HashSet<string> TrueValues = new() { "true", "1", "yes", "t" };
-        private static HashSet<string> FalseValues = new() { "false", "0", "no", "f" };
+        public Double() { }
+        public Double(double value) { Value = value; }
 
         public override string Display()
         {
@@ -32,7 +29,7 @@ namespace TerraIntegration.Values
 
         protected override VariableValue LoadCustomData(BinaryReader reader)
         {
-            return new Boolean(reader.ReadBoolean());
+            return new Double(reader.ReadDouble());
         }
 
         protected override void SaveCustomData(BinaryWriter writer)
@@ -44,23 +41,18 @@ namespace TerraIntegration.Values
         {
             if (args.Count < 1)
             {
-                caller.Reply("Argument required: true/false value");
+                caller.Reply("Argument required: double value");
                 return null;
             }
 
-            bool v;
-            string arg = args[0].ToLower();
-
-            if (TrueValues.Contains(arg)) v = true;
-            else if (FalseValues.Contains(arg)) v = false;
-            else 
+            if (!double.TryParse(args[0], out double val))
             {
-                caller.Reply($"Value is not a boolean: {args[0]}");
+                caller.Reply($"Value is not a double: {args[0]}");
                 return null;
             }
             args.RemoveAt(0);
 
-            return new Boolean(v);
+            return new Double(val);
         }
 
         public override string ToString()

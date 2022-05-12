@@ -5,11 +5,12 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TerraIntegration.Interfaces;
 using Terraria.ModLoader;
 
 namespace TerraIntegration.Values
 {
-    public class Integer : VariableValue
+    public class Integer : VariableValue, IAddable, INumeric, IToString
     {
         public override string Type => "int";
         public override string TypeDisplay => "Integer";
@@ -17,6 +18,9 @@ namespace TerraIntegration.Values
         public override Color DisplayColor => Color.Orange;
 
         public int Value { get; set; }
+        public long NumericValue => Value;
+
+        public Type[] ValidAddTypes => new[] { typeof(INumeric) };
 
         public Integer() { }
         public Integer(int value) { Value = value; }
@@ -52,6 +56,33 @@ namespace TerraIntegration.Values
             args.RemoveAt(0);
 
             return new Integer(val);
+        }
+
+        public VariableValue Add(VariableValue value, List<Error> errors)
+        {
+            if (value is INumeric numeric)
+            {
+                long num = numeric.NumericValue;
+                if (num > int.MaxValue)
+                {
+                    errors.Add(new(ErrorType.ValueTooBigForType, num, TypeDisplay));
+                    return null;
+                }
+                if (num < int.MinValue)
+                {
+                    errors.Add(new(ErrorType.ValueTooSmallForType, num, TypeDisplay));
+                    return null;
+                }
+                return new Integer(Value + (int)num);
+            }
+
+            errors.Add(new(ErrorType.ExpectedValue, TypeToName(typeof(INumeric), out _)));
+            return null;
+        }
+
+        public override string ToString()
+        {
+            return Value.ToString();
         }
     }
 }

@@ -1,21 +1,15 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using ReLogic.Graphics;
+using ReLogic.Content;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using TerraIntegration.Components;
 using TerraIntegration.UI;
 using TerraIntegration.Variables;
 using Terraria;
 using Terraria.Audio;
-using Terraria.DataStructures;
+using Terraria.GameContent;
 using Terraria.GameContent.UI.Elements;
-using Terraria.Graphics;
 using Terraria.ID;
 using Terraria.ModLoader;
 using Terraria.ModLoader.IO;
@@ -30,7 +24,6 @@ namespace TerraIntegration
         public ShortGuids Guids { get; } = new(2);
 
         public Dictionary<Point16, ComponentData> ComponentData = new();
-
         public Dictionary<Point16, Component> ComponentUpdates = new();
 
         public uint UpdateCounter = 0;
@@ -40,9 +33,30 @@ namespace TerraIntegration
 
         public readonly List<DelayedWireTrip> WireTrips = new();
 
-        private UserInterface Interface = new();
-        private PositionedComponent InterfaceComponent;
-        private Vector2 InterfaceOffset = default;
+        private Texture2D HighlightTexture;
+
+        public UserInterface Interface = new();
+        public PositionedComponent InterfaceComponent;
+        public Vector2 InterfaceOffset = default;
+        public int CurrentTab;
+        public List<UITab> Tabs = new()
+        {
+            new UITab("Interface",
+                () => true,
+                (p) => ModContent.GetInstance<ComponentWorld>().SetupInterface(p)),
+
+            new UITab(
+                "Properties",
+                () => PropertyVariable.ByComponentType.ContainsKey(ModContent.GetInstance<ComponentWorld>().InterfaceComponent.Component.ComponentType),
+                (p) => ModContent.GetInstance<ComponentWorld>().SetupProperties(p)),
+
+            new UITab("Config",
+                () => ModContent.GetInstance<ComponentWorld>().InterfaceComponent.Component.DefaultUpdateFrequency > 0,
+                (p) => ModContent.GetInstance<ComponentWorld>().SetupComponentConfig(p)),
+        };
+
+        public readonly HashSet<string> TypeHighlights = new();
+        public readonly HashSet<Type> ReturnTypeHighlights = new();
 
         private int ReloadButtonHeight = 30;
 #if DEBUG
@@ -69,7 +83,6 @@ namespace TerraIntegration
             ComponentData[pos] = newData;
             return newData;
         }
-
         public ComponentData GetData(Point16 pos, Component c)
         {
             if (ComponentData.TryGetValue(pos, out ComponentData data))
@@ -82,7 +95,6 @@ namespace TerraIntegration
             ComponentData[pos] = newData;
             return newData;
         }
-
         public ComponentData GetDataOrNull(Point16 pos)
         {
             if (ComponentData.TryGetValue(pos, out ComponentData data))
@@ -92,6 +104,7 @@ namespace TerraIntegration
 
             return null;
         }
+
 
         public void RemoveAll(Point16 pos)
         {
@@ -103,24 +116,26 @@ namespace TerraIntegration
             ComponentUpdates.Remove(pos);
         }
 
+        public override void Load()
+        {
+            HighlightTexture = ModContent.Request<Texture2D>($"{Mod.Name}/Assets/UI/SlotHighlight", AssetRequestMode.ImmediateLoad).Value;
+        }
         public override void OnWorldUnload()
         {
             ComponentData.Clear();
             Guids.Clear();
         }
-
         public override void ModifyInterfaceLayers(List<GameInterfaceLayer> layers)
         {
-            int ind = layers.FindIndex(l => l.Name == "Vanilla: Mouse Text");
+            int ind = layers.FindIndex(l => l.Name == "Vanilla: Inventory");
             if (ind >= 0) layers.Insert(ind, new LegacyGameInterfaceLayer($"{Mod.Name}: UI", DrawUI, InterfaceScaleType.UI));
         }
-
         public override void PostUpdateEverything()
         {
             Statistics.ResetUpdates();
             Statistics.Start(Statistics.UpdateTime.FullUpdate);
             Statistics.Start(Statistics.UpdateTime.Components);
-            foreach (KeyValuePair<Point16, Component> kvp in ComponentUpdates) 
+            foreach (KeyValuePair<Point16, Component> kvp in ComponentUpdates)
             {
                 ComponentData data = GetData(kvp.Key, kvp.Value);
                 if (data.UpdateFrequency == 0) continue;
@@ -143,7 +158,7 @@ namespace TerraIntegration
             }
 
             List<DelayedWireTrip> tripped = new();
-            foreach (DelayedWireTrip trip in WireTrips) 
+            foreach (DelayedWireTrip trip in WireTrips)
             {
                 if (trip.Delay <= 0)
                 {
@@ -158,28 +173,6 @@ namespace TerraIntegration
             UpdateCounter++;
             Statistics.Stop(Statistics.UpdateTime.FullUpdate);
         }
-
-        public void SetInterfaceComponent(Point16 pos, Component c) 
-        {
-            if (!CheckReach(c.GetInterfaceReachCheckPos(pos))) return;
-
-            if (InterfaceComponent.Pos == pos)
-            {
-                CloseUI();
-                return;
-            }
-
-            InterfaceComponent = new(pos, c);
-            if (Interface.CurrentState is null)
-                Interface.SetState(new());
-            Interface.CurrentState.RemoveAllChildren();
-            UIPanel interf = c.Interface;
-            c.UpdateInterface(InterfaceComponent.Pos);
-            SetupUI(interf);
-
-            SoundEngine.PlaySound(SoundID.MenuOpen);
-        }
-
         public override void PostDrawTiles()
         {
             if (InterfaceComponent.Component is not null)
@@ -214,6 +207,24 @@ namespace TerraIntegration
             }
         }
 
+        public void SetInterfaceComponent(Point16 pos, Component c)
+        {
+            if (!CheckReach(c.GetInterfaceReachCheckPos(pos))) return;
+
+            if (InterfaceComponent.Pos == pos)
+            {
+                CloseUI();
+                return;
+            }
+
+            InterfaceComponent = new(pos, c);
+            if (Interface.CurrentState is null)
+                Interface.SetState(new());
+            SetupUI();
+
+            SoundEngine.PlaySound(SoundID.MenuOpen);
+        }
+
         private bool CheckReach(Vector2 pos)
         {
             Vector2 diff = pos - Main.LocalPlayer.Center;
@@ -222,63 +233,6 @@ namespace TerraIntegration
 
             diff /= 16;
             return diff.X <= Main.LocalPlayer.lastTileRangeX && diff.Y <= Main.LocalPlayer.lastTileRangeY;
-        }
-
-        private void SetupUI(UIPanel p)
-        {
-            UIState s = Interface.CurrentState;
-            InterfaceOffset = Vector2.Zero;
-
-            s.PaddingTop = 0;
-            s.PaddingLeft = 0;
-            s.PaddingRight = 0;
-            s.PaddingBottom = 0;
-
-            p.Top = new(0, 0);
-            p.Left = new(0, 0);
-
-            s.Append(p);
-            SetupReloadButton();
-
-            IEnumerable<PropertyVariable> props = InterfaceComponent.Component.GetProperties();
-            if (props is not null)
-            {
-                int y = (int)(p.Top.Pixels + p.Height.Pixels) + 8;
-
-                s.Append(new UITextPanel<string>("Properties") 
-                {
-                    Top = new(y, 0),
-                    Left = new(0, 0),
-                    Width = new(250, 0),
-                    Height = new(24, 0),
-
-                    MarginTop = 0,
-                    MarginBottom = 0,
-                    PaddingTop = 4,
-                    PaddingBottom = 0,
-                });
-
-                y += 28;
-
-                foreach (PropertyVariable v in props)
-                {
-                    var def = new UIComponentVariableDefinition()
-                    {
-                        Top = new(y, 0),
-                        Left = new(0, 0),
-                        Width = new(0, 1),
-
-                        VariableType = v.Type,
-                        DefineVariable = (var) => var.Var = v.CreateVariable(InterfaceComponent)
-                    };
-                    s.Append(def);
-
-                    y += (int)(def.Height.Pixels) + 4;
-                }
-            }
-
-            FitUI();
-            s.Activate();
         }
 
         private void SetupReloadButton()
@@ -311,54 +265,205 @@ namespace TerraIntegration
             };
             btn.OnClick += (s, e) =>
             {
-                Interface.CurrentState.RemoveAllChildren();
                 InterfaceComponent.Component.ReloadInterface();
-                UIPanel interf = InterfaceComponent.Component.Interface;
-                InterfaceComponent.Component.UpdateInterface(InterfaceComponent.Pos);
-                SetupUI(interf);
+                SetupUI();
                 SoundEngine.PlaySound(SoundID.MenuTick);
             };
             s.Append(btn);
         }
+        private void SetupComponentConfig(Vector2 pos)
+        {
+            ComponentData data = InterfaceComponent.GetData();
 
+            UIPanel panel = new()
+            {
+                Top = new(pos.Y, 0),
+                Left = new(pos.X, 0),
+
+                Width = new(0, 1),
+                Height = new(32, 0),
+
+                PaddingTop = 0,
+                PaddingLeft = 0,
+                PaddingRight = 0,
+                PaddingBottom = 0,
+            };
+            UIText freq = new("Frequency: " + data.UpdateFrequency)
+            {
+                Top = new(8, 0),
+                Left = new(8, 0),
+                Height = new(20, 0),
+            };
+            UIStepButton freqStep = new()
+            {
+                Top = new(4, 0),
+                Left = new(-28, 1),
+            };
+
+            freqStep.OnStep += (s) =>
+            {
+                ComponentData data = InterfaceComponent.GetData();
+                data.UpdateFrequency = (ushort)Math.Max(0, s + data.UpdateFrequency);
+                freq.SetText("Frequency: " + data.UpdateFrequency);
+            };
+
+            panel.Append(freq);
+            panel.Append(freqStep);
+            Interface.CurrentState.Append(panel);
+        }
+        private void SetupProperties(Vector2 pos)
+        {
+            IEnumerable<PropertyVariable> props = InterfaceComponent.Component.GetProperties();
+            if (props is not null)
+            {
+                int y = (int)pos.Y;
+
+                foreach (PropertyVariable v in props)
+                {
+                    var def = new UIComponentVariableDefinition()
+                    {
+                        Top = new(y, 0),
+                        Left = new(pos.X, 0),
+                        Width = new(0, 1),
+
+                        VariableType = v.Type,
+                        DefineVariable = (var) => var.Var = v.CreateVariable(InterfaceComponent)
+                    };
+                    Interface.CurrentState.Append(def);
+
+                    y += (int)(def.Height.Pixels) + 4;
+                }
+            }
+        }
+        private void SetupInterface(Vector2 pos)
+        {
+            UIPanel p = InterfaceComponent.Component.Interface;
+            p.Top = new(pos.Y, 0);
+            p.Left = new(pos.X, 0);
+
+            Interface.CurrentState.Append(p);
+        }
+        public void SetupTabSwitch()
+        {
+            if (GetTabsAvailable() < 2) return;
+
+            int x = 0;
+            for (int i = 0; i < Tabs.Count; i++)
+            {
+                UITab tab = Tabs[i];
+                if (!tab.IsAvailable())
+                    continue;
+
+                int tabind = i;
+
+                UITextPanel<string> tabpanel = new(tab.Name)
+                {
+                    Left = new(x, 0),
+                    Height = new(24, 0),
+
+                    PaddingTop = 5,
+                    PaddingBottom = 0,
+                };
+                tabpanel.OnClick += (s, e) =>
+                {
+                    CurrentTab = tabind;
+                    SetupUI();
+                };
+                Interface.CurrentState.Append(tabpanel);
+                x += (int)tabpanel.MinWidth.Pixels + 4;
+            }
+        }
+
+        public int GetTabsAvailable()
+        {
+            int tabs = 0;
+            for (int i = 0; i < Tabs.Count; i++)
+            {
+                if (Tabs[i].IsAvailable())
+                    tabs++;
+            }
+            return tabs;
+        }
+
+        private void SetupUI()
+        {
+            InterfaceComponent.Component.SetupInterfaceIfNeeded();
+            InterfaceComponent.Component.UpdateInterface(InterfaceComponent.Pos);
+
+            UIState s = Interface.CurrentState;
+
+            s.RemoveAllChildren();
+
+            s.PaddingTop = 0;
+            s.PaddingLeft = 0;
+            s.PaddingRight = 0;
+            s.PaddingBottom = 0;
+
+            if (CurrentTab >= Tabs.Count || !Tabs[CurrentTab].IsAvailable())
+                for (int i = 0; i < Tabs.Count; i++)
+                {
+                    if (Tabs[i].IsAvailable())
+                    {
+                        CurrentTab = i;
+                        break;
+                    }
+                }
+
+            SetupTabSwitch();
+            SetupReloadButton();
+
+            GetMinUISize(out _, out float height);
+
+            height += 4;
+
+            InterfaceOffset = new(0, -height);
+
+            Tabs[CurrentTab].Setup(new(0, height));
+            FitUI();
+            s.Activate();
+        }
         public void MoveUI(float x, float y)
         {
             UIState s = Interface.CurrentState;
             s.Width.Pixels += x;
             s.Height.Pixels += y;
 
-            foreach (UIElement child in s.Children) 
+            foreach (UIElement child in s.Children)
             {
                 child.Top.Pixels += y;
                 child.Left.Pixels += x;
             }
-            
-        }
 
+        }
         public void FitUI()
         {
-            float minWidth = 0;
-            float minHeight = 0;
-
-            foreach (UIElement child in Interface.CurrentState.Children)
-            {
-                float childFitWidth = child.Left.Pixels + child.Width.Pixels;
-                float childFitHeight = child.Top.Pixels + child.Height.Pixels;
-
-                if (childFitWidth > minWidth)
-                    minWidth = childFitWidth;
-                if (childFitHeight > minHeight)
-                    minHeight = childFitHeight;
-            }
+            float minWidth, minHeight;
+            GetMinUISize(out minWidth, out minHeight);
 
             Interface.CurrentState.Width = new(minWidth, 0);
             Interface.CurrentState.Height = new(minHeight, 0);
 
             Interface.CurrentState.Recalculate();
         }
-
-        public bool DrawUI() 
+        private void GetMinUISize(out float minWidth, out float minHeight)
         {
+            minWidth = 0;
+            minHeight = 0;
+            foreach (UIElement child in Interface.CurrentState.Children)
+            {
+                float childFitWidth = child.Left.Pixels + Math.Max(child.MinWidth.Pixels, child.Width.Pixels);
+                float childFitHeight = child.Top.Pixels + Math.Max(child.MinHeight.Pixels, child.Height.Pixels);
+
+                if (childFitWidth > minWidth)
+                    minWidth = childFitWidth;
+                if (childFitHeight > minHeight)
+                    minHeight = childFitHeight;
+            }
+        }
+        public bool DrawUI()
+        {
+            ProgrammerInterface.Draw();
+
             if (HoverItem is not null)
             {
                 ItemSlot.MouseHover(ref HoverItem, 0);
@@ -372,7 +477,6 @@ namespace TerraIntegration
 
             return true;
         }
-
         public void CloseUI()
         {
             InterfaceComponent = default;
@@ -383,6 +487,10 @@ namespace TerraIntegration
 
         public override void UpdateUI(GameTime gameTime)
         {
+            TypeHighlights.Clear();
+            ReturnTypeHighlights.Clear();
+
+            ProgrammerInterface.Update();
             if (InterfaceComponent.Component is not null)
             {
                 Interface.Update(Main.gameTimeCache);
@@ -417,7 +525,6 @@ namespace TerraIntegration
 
             tag["components"] = components;
         }
-
         public override void LoadWorldData(TagCompound tag)
         {
             if (tag.ContainsKey("components"))
@@ -428,9 +535,9 @@ namespace TerraIntegration
                 {
                     Point16 pos = new();
 
-                    if (component.ContainsKey("x")) 
+                    if (component.ContainsKey("x"))
                         pos.X = component.GetShort("x");
-                    if (component.ContainsKey("y")) 
+                    if (component.ContainsKey("y"))
                         pos.Y = component.GetShort("y");
 
                     if (!component.ContainsKey("data")) continue;
@@ -440,6 +547,39 @@ namespace TerraIntegration
 
                     ComponentData[pos] = data;
                 }
+            }
+        }
+
+        public void HighlightItem(SpriteBatch spriteBatch, Item item, Texture2D back, Vector2 position, float scale)
+        {
+            if (item.type != ModContent.ItemType<Items.Variable>()) return;
+            Items.Variable var = item.ModItem as Items.Variable;
+
+            bool needsHighlight = TypeHighlights.Contains(var.Var.Type) || ReturnTypeHighlights.Contains(var.Var.VariableReturnType);
+            if (!needsHighlight && var.Highlight == 0) return;
+
+            if (needsHighlight && var.Highlight < 255)
+                var.Highlight = (byte)Math.Min(255, var.Highlight + 16);
+            else if (!needsHighlight && var.Highlight > 0)
+                var.Highlight = (byte)Math.Max(0, var.Highlight - 16);
+
+            Vector2 backSize = back.Size() * scale;
+            Vector2 hlScale = backSize / HighlightTexture.Size();
+
+            spriteBatch.Draw(HighlightTexture, position, null, Color.White * (var.Highlight / 255f), 0f, Vector2.Zero, hlScale, SpriteEffects.None, 0);
+        }
+
+        public class UITab
+        {
+            public string Name { get; set; }
+            public Func<bool> IsAvailable { get; set; }
+            public Action<Vector2> Setup { get; set; }
+
+            public UITab(string name, Func<bool> isAvailable, Action<Vector2> setup)
+            {
+                Name = name;
+                IsAvailable = isAvailable;
+                Setup = setup;
             }
         }
     }

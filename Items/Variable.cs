@@ -8,6 +8,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TerraIntegration.Values;
 using Terraria;
 using Terraria.GameContent;
 using Terraria.ModLoader;
@@ -21,6 +22,7 @@ namespace TerraIntegration.Items
 
         private const string VarTagKey = "var";
         public Variables.Variable Var = new();
+        public byte Highlight;
 
         public static Dictionary<string, Asset<Texture2D>> VariableTypeOverlays = new();
         public static Dictionary<string, Asset<Texture2D>> VariableValueOverlays = new();
@@ -67,21 +69,8 @@ namespace TerraIntegration.Items
 
             if (Var.IsEmpty) return;
 
-            string returns;
-
-            if (Var.VariableReturnType is null) returns = null;
-            else if (Values.VariableValue.ByType.TryGetValue(Var.VariableReturnType, out Values.VariableValue val))
-            {
-                returns = Util.ColorTag(val.DisplayColor, val.TypeDisplay);
-            }
-            else if (Var.VariableReturnType?.IsInterface ?? false)
-            {
-                string i = Var.VariableReturnType.Name;
-                if (i.StartsWith('I')) i = i[1..];
-
-                returns = $"[c/aabb00:{i}]";
-            }
-            else returns = $"[c/ffaaaa:unregistered type {Var.VariableReturnType.Name}]";
+            string returns = VariableValue.TypeToName(Var.VariableReturnType, out Color c);
+            returns = Util.ColorTag(c, returns);
 
             tooltips.Add(new(Mod, "TIVarType", $"[c/aaaa00:Type:] {Var.TypeDisplay}"));
             if (returns is not null)

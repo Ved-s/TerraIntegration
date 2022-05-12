@@ -88,6 +88,9 @@ namespace TerraIntegration
 
 		public static string ColorTag(Color color, string text) 
 		{
+			if (text is null)
+				return null;
+
 			uint v = color.PackedValue; // AABBGGRR
 
 			v = (v & 0xff0000) >> 16 | (v & 0x00ff00) | (v & 0x0000ff) << 16; // RRGGBB

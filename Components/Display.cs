@@ -184,7 +184,7 @@ namespace TerraIntegration.Components
         {
             UIPanel p = new()
             {
-                Width = new(56, 0),
+                Width = new(0, 1),
                 Height = new(58, 0),
                 PaddingTop = 0,
                 PaddingLeft = 0,

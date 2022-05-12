@@ -43,13 +43,13 @@ namespace TerraIntegration.Components
         public virtual bool HasRightClickInterface => false;
         public UIPanel Interface
         {
-            get 
+            get
             {
-                if (@interface is null && HasRightClickInterface) 
-                    @interface = SetupInterface();
+                SetupInterfaceIfNeeded();
                 return @interface;
             }
         }
+
         public virtual Vector2 InterfaceOffset { get; protected set; }
 
         public virtual ushort DefaultUpdateFrequency => 0;
@@ -81,6 +81,12 @@ namespace TerraIntegration.Components
             TileObjectData.newTile.HookCheckIfCanPlace = new PlacementHook((_, _, _, _, _, _) => 0, -1, 0, true);
             TileObjectData.newTile.UsesCustomCanPlace = true;
             TileObjectData.newTile.HookPostPlaceMyPlayer = new PlacementHook((x, y, _, _, _, _) => { OnPlaced(new(x, y)); return 0; }, -1, 0, true);
+        }
+
+        public void SetupInterfaceIfNeeded()
+        {
+            if (@interface is null && HasRightClickInterface)
+                @interface = SetupInterface();
         }
 
         public virtual void OnPlaced(Point16 pos)
@@ -222,7 +228,7 @@ namespace TerraIntegration.Components
         //    return data;
         //}
 
-    internal virtual TagCompound SaveTag(ComponentData data)
+        internal virtual TagCompound SaveTag(ComponentData data)
         {
             TagCompound tag = new();
 
@@ -241,6 +247,8 @@ namespace TerraIntegration.Components
                 variables.Add(vartag);
             }
             tag["var"] = variables;
+            if (DefaultUpdateFrequency > 0)
+                tag["freq"] = data.UpdateFrequency;
             object @internal = SaveTagInternal(data);
             if (@internal is not null)
             {
@@ -290,6 +298,11 @@ namespace TerraIntegration.Components
             {
                 data = c.LoadTagInternal(@internal);
                 data.Init(c);
+            }
+
+            if (tag.ContainsKey("freq"))
+            {
+                data.UpdateFrequency = (ushort)tag.GetShort("freq");
             }
 
             for (int i = 0; i < vars.Count; i++)
@@ -342,7 +355,7 @@ namespace TerraIntegration.Components
             for (int i = 0; i < Variables.Length; i++)
                 if (Variables[i] is not null)
                 {
-                    Util.DropItemInWorld(Variables[0].Item, pos.X * 16, pos.Y * 16);
+                    Util.DropItemInWorld(Variables[i].Item, pos.X * 16, pos.Y * 16);
                     Variables[i] = null;
                 }
         }

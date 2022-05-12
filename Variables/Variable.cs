@@ -119,6 +119,8 @@ namespace TerraIntegration.Variables
             long pos = reader.BaseStream.Position;
             var = var.LoadCustomData(reader);
             var.Id = id;
+            World.Guids.AddToDictionary(var.Id);
+
             long diff = (reader.BaseStream.Position - pos) - length;
             pos = reader.BaseStream.Position;
             if (diff != 0)
@@ -212,6 +214,8 @@ namespace TerraIntegration.Variables
                 newVar = var.LoadCustomData(reader);
             } 
             else newVar = (Variable)Activator.CreateInstance(var.GetType());
+
+            World.Guids.AddToDictionary(newVar.Id);
 
             newVar.Id = id;
             return newVar;

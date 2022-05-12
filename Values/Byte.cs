@@ -10,20 +10,18 @@ using Terraria.ModLoader;
 
 namespace TerraIntegration.Values
 {
-    public class Boolean : VariableValue, IToString
+    public class Byte : VariableValue, INumeric, IToString
     {
-        public override string Type => "bool";
-        public override string TypeDisplay => "Boolean";
+        public override string Type => "byte";
+        public override string TypeDisplay => "Byte";
 
-        public override Color DisplayColor => Color.CadetBlue;
+        public override Color DisplayColor => Color.Blue;
 
-        public bool Value { get; set; }
+        public byte Value { get; set; }
+        public long NumericValue => Value;
 
-        public Boolean() { }
-        public Boolean(bool value) { Value = value; }
-
-        private static HashSet<string> TrueValues = new() { "true", "1", "yes", "t" };
-        private static HashSet<string> FalseValues = new() { "false", "0", "no", "f" };
+        public Byte() { }
+        public Byte(byte value) { Value = value; }
 
         public override string Display()
         {
@@ -32,7 +30,7 @@ namespace TerraIntegration.Values
 
         protected override VariableValue LoadCustomData(BinaryReader reader)
         {
-            return new Boolean(reader.ReadBoolean());
+            return new Byte(reader.ReadByte());
         }
 
         protected override void SaveCustomData(BinaryWriter writer)
@@ -44,23 +42,18 @@ namespace TerraIntegration.Values
         {
             if (args.Count < 1)
             {
-                caller.Reply("Argument required: true/false value");
+                caller.Reply("Argument required: byte value");
                 return null;
             }
 
-            bool v;
-            string arg = args[0].ToLower();
-
-            if (TrueValues.Contains(arg)) v = true;
-            else if (FalseValues.Contains(arg)) v = false;
-            else 
+            if (!byte.TryParse(args[0], out byte val))
             {
-                caller.Reply($"Value is not a boolean: {args[0]}");
+                caller.Reply($"Value is not a byte: {args[0]}");
                 return null;
             }
             args.RemoveAt(0);
 
-            return new Boolean(v);
+            return new Byte(val);
         }
 
         public override string ToString()
