@@ -15,7 +15,7 @@ namespace TerraIntegration.Values
         public override string Type => "float";
         public override string TypeDisplay => "Float";
 
-        public override Color DisplayColor => Color.Green;
+        public override Color TypeColor => Color.Green;
 
         public float Value { get; set; }
 
@@ -58,6 +58,18 @@ namespace TerraIntegration.Values
         public override string ToString()
         {
             return Value.ToString();
+        }
+
+        public override bool Equals(object obj)
+        {
+            return obj is Float @float &&
+                   Type == @float.Type &&
+                   Value == @float.Value;
+        }
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(Type, Value);
         }
     }
 }

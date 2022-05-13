@@ -15,7 +15,7 @@ namespace TerraIntegration.Values
         public override string Type => "char";
         public override string TypeDisplay => "Char";
 
-        public override Color DisplayColor => Color.LightPink;
+        public override Color TypeColor => Color.LightPink;
 
         public char Value { get; set; }
 
@@ -58,6 +58,18 @@ namespace TerraIntegration.Values
         public override string ToString()
         {
             return Value.ToString();
+        }
+
+        public override bool Equals(object obj)
+        {
+            return obj is Char @char &&
+                   Type == @char.Type &&
+                   Value == @char.Value;
+        }
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(Type, Value);
         }
     }
 }

@@ -19,7 +19,7 @@ namespace TerraIntegration.Values
         public virtual string Type => "any";
         public virtual string TypeDisplay => "Any";
 
-        public virtual Color DisplayColor => Color.White;
+        public virtual Color TypeColor => Color.White;
 
         public virtual string Display() { return "null"; }
 
@@ -86,7 +86,7 @@ namespace TerraIntegration.Values
             }
             if (ByType.TryGetValue(type, out Values.VariableValue val))
             {
-                color = val.DisplayColor;
+                color = val.TypeColor;
                 return val.TypeDisplay;
             }
             if (type.IsInterface)
@@ -107,7 +107,7 @@ namespace TerraIntegration.Values
         public override string Type => "unloaded";
         public override string TypeDisplay => "Unloaded value";
 
-        public override Color DisplayColor => Color.Red;
+        public override Color TypeColor => Color.Red;
         public override string Display()
         {
             return "Unloaded";

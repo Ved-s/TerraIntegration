@@ -1,11 +1,8 @@
 ﻿using Microsoft.Xna.Framework;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using TerraIntegration.UI;
 using TerraIntegration.Variables;
 using Terraria;
 using Terraria.DataStructures;
@@ -13,15 +10,14 @@ using Terraria.GameContent.UI.Elements;
 using Terraria.ModLoader;
 using Terraria.ModLoader.IO;
 using Terraria.ObjectData;
-using Terraria.UI;
 
 namespace TerraIntegration.Components
 {
     public abstract class Component : ModTile
     {
-        public override string Texture 
+        public override string Texture
         {
-            get 
+            get
             {
                 if (Mod.Name == nameof(TerraIntegration)) return $"{nameof(TerraIntegration)}/Assets/Tiles/{Name}";
                 return base.Texture;
@@ -53,7 +49,7 @@ namespace TerraIntegration.Components
         public virtual Vector2 InterfaceOffset { get; protected set; }
 
         public virtual ushort DefaultUpdateFrequency => 0;
-        
+
         public virtual int VariableSlots => 0;
 
         internal virtual bool HasData => false;
@@ -64,7 +60,7 @@ namespace TerraIntegration.Components
             {
                 Point16 pos = new(i, j);
                 pos = GetInterfaceTarget(pos);
-                World.SetInterfaceComponent(pos, this);
+                ModContent.GetInstance<ComponentInterface>().SetInterfaceComponent(pos, this);
                 return true;
             }
             return false;
@@ -89,17 +85,20 @@ namespace TerraIntegration.Components
                 @interface = SetupInterface();
         }
 
+        [CallSide(CallSide.Both)]
         public virtual void OnPlaced(Point16 pos)
         {
             ComponentSystem.UpdateSystem(pos);
             if (DefaultUpdateFrequency > 0)
                 World.ComponentUpdates[pos] = this;
         }
+        [CallSide(CallSide.Both)]
         public virtual void OnKilled(Point16 pos)
         {
             ComponentSystem.UpdateSystem(pos);
             World.RemoveAll(pos);
         }
+        [CallSide(CallSide.Both)]
         public virtual void OnLoaded(Point16 pos)
         {
             if (DefaultUpdateFrequency > 0)
@@ -110,26 +109,35 @@ namespace TerraIntegration.Components
                 if (var is not null)
                     World.Guids.AddToDictionary(var.Var.Id);
         }
+        [CallSide(CallSide.Both)]
         public virtual void OnUpdate(Point16 pos) { }
+        [CallSide(CallSide.Server)]
         public virtual void OnEvent(Point16 pos, int variableIndex) { }
+        [CallSide(CallSide.Server)]
         public virtual void OnSystemUpdate(Point16 pos) { }
-        public virtual void OnVariableChanged(Point16 pos, int varIndex) 
+        [CallSide(CallSide.Both)]
+        public virtual void OnVariableChanged(Point16 pos, int varIndex)
         {
             ComponentData data = GetData(pos);
+            Networking.SendComponentVariable(pos, varIndex);
             if (data.Variables[varIndex] is null) return;
             World.Guids.AddToDictionary(data.Variables[varIndex].Var.Id);
         }
+        [CallSide(CallSide.Both)]
+        public virtual void OnPlayerJoined(int player) { }
 
         public virtual string GetHoverText(Point16 pos) => null;
         public virtual UIPanel SetupInterface() { return new(); }
         public virtual void UpdateInterface(Point16 pos) { }
         public virtual Point16 GetInterfaceTarget(Point16 pos) => pos;
         public virtual bool CheckShowInterface(Point16 pos) => true;
-        public virtual bool ShouldSaveData(ComponentData data) => true;
-        public virtual Vector2 GetInterfaceReachCheckPos(Point16 pos) 
+        public virtual Vector2 GetInterfaceReachCheckPos(Point16 pos)
         {
             return pos.ToVector2() * 16 + new Vector2(8);
         }
+
+        public virtual bool ShouldSaveData(ComponentData data) => true;
+        public virtual bool ShouldSyncData(ComponentData data) => VariableSlots > 0 || DefaultUpdateFrequency > 0;
 
         public virtual IEnumerable<PropertyVariable> GetProperties()
         {
@@ -139,7 +147,7 @@ namespace TerraIntegration.Components
             return props.Values;
         }
 
-        public void ReloadInterface() 
+        public void ReloadInterface()
         {
             if (!HasRightClickInterface) return;
             @interface = SetupInterface();
@@ -155,78 +163,78 @@ namespace TerraIntegration.Components
             ComponentData data = GetData(pos);
             data.UpdateFrequency = rate;
 
+            Networking.SendComponentFrequency(pos);
+
             SetUpdates(pos, rate > 0);
         }
 
+        public virtual bool HandlePacket(Point16 pos, ushort messageType, BinaryReader reader, int whoAmI, ref bool broadcast) { return false; }
+        public ModPacket CreatePacket(Point16 pos, ushort messageType) => Networking.CreateComponentPacket(ComponentType, pos, messageType);
+
         public ComponentData GetData(Point16 pos) => ModContent.GetInstance<ComponentWorld>().GetData(pos, this);
+        public ComponentData GetDataOrNull(Point16 pos) => ModContent.GetInstance<ComponentWorld>().GetDataOrNull(pos);
 
-        //internal virtual void SaveData(BinaryWriter writer, ComponentData data)
-        //{
-        //    writer.Write(data is UnloadedComponentData u ? u.ComponentType : ComponentType);
-        //    writer.Write((ushort)data.Variables.Length);
+        internal virtual void NetSendData(BinaryWriter writer, ComponentData data)
+        {
+            if (data is UnloadedComponentData)
+                throw new InvalidDataException("Unloaded data should not be synced");
 
-        //    foreach (Items.Variable var in data.Variables)
-        //    {
-        //        if (var is null)
-        //        {
-        //            writer.Write("");
-        //            continue;
-        //        }
+            writer.Write(ComponentType);
+            writer.Write((ushort)data.Variables.Length);
 
-        //        var.Var.SaveData(writer);
-        //    }
-        //    if (data is UnloadedComponentData unloaded)
-        //    {
-        //        if (unloaded.TagData)
-        //        {
-        //            writer.Write((ushort)0);
+            foreach (Items.Variable var in data.Variables)
+            {
+                if (var is null)
+                {
+                    writer.Write("");
+                    continue;
+                }
 
-        //        }
-        //        else
-        //        {
-        //            byte[] bytes = 
-        //            writer.Write((ushort)unloaded.Data.Length);
-        //            writer.Write(unloaded.Data);
-        //        }
-        //    }
-        //    else SaveDataInternal(writer, data);
-        //}
-        //internal static ComponentData LoadData(BinaryReader reader)
-        //{
-        //    string component = reader.ReadString();
-        //    Items.Variable[] vars = new Items.Variable[reader.ReadUInt16()];
+                var.Var.SaveData(writer);
+            }
+            writer.Write(data.UpdateFrequency);
+            SendDataInternal(writer, data);
+        }
+        internal static ComponentData NetReceiveData(BinaryReader reader)
+        {
+            string component = reader.ReadString();
+            Items.Variable[] vars = new Items.Variable[reader.ReadUInt16()];
 
-        //    for (int i = 0; i < vars.Length; i++)
-        //    {
-        //        Variables.Variable var = Variables.Variable.LoadData(reader);
+            for (int i = 0; i < vars.Length; i++)
+            {
+                Variables.Variable var = Variables.Variable.LoadData(reader);
 
-        //        if (var is null) continue;
+                if (var is null) continue;
 
-        //        Item item = new();
-        //        item.SetDefaults(ModContent.ItemType<Items.Variable>());
-        //        Items.Variable itemvar = item.ModItem as Items.Variable;
-        //        itemvar.Var = var;
-        //        vars[i] = itemvar;
-        //    }
+                Item item = new();
+                item.SetDefaults(ModContent.ItemType<Items.Variable>());
+                Items.Variable itemvar = item.ModItem as Items.Variable;
+                itemvar.Var = var;
+                vars[i] = itemvar;
+            }
+            ushort freq = reader.ReadUInt16();
+            ushort dataLength = reader.ReadUInt16();
 
-        //    ushort dataLength = reader.ReadUInt16();
+            ComponentData data;
+            if (!ByTypeName.TryGetValue(component, out Component c))
+            {
+                if (dataLength > 0)
+                    reader.ReadBytes(dataLength);
+                return null;
+            }
 
-        //    ComponentData data;
-        //    if (!ByTypeName.TryGetValue(component, out Component c))
-        //        data = new UnloadedComponentData(component, reader.ReadBytes(dataLength));
-        //    else
-        //    {
-        //        data = c.LoadDataInternal(reader, dataLength, component);
-        //        data.Init(c);
-        //    }
-        //    for (int i = 0; i < vars.Count; i++)
-        //    {
-        //        if (i >= data.Variables.Length) break;
-        //        data.Variables[i] = vars[i];
-        //    }
-        //
-        //    return data;
-        //}
+            data = c.ReceiveDataInternal(reader, dataLength, component);
+            data.Init(c);
+
+            for (int i = 0; i < vars.Length; i++)
+            {
+                if (i >= data.Variables.Length) break;
+                data.Variables[i] = vars[i];
+            }
+            data.UpdateFrequency = freq;
+
+            return data;
+        }
 
         internal virtual TagCompound SaveTag(ComponentData data)
         {
@@ -314,11 +322,11 @@ namespace TerraIntegration.Components
             return data;
         }
 
-        //internal virtual ComponentData LoadDataInternal(BinaryReader reader, ushort dataLength, string type) { return new(); }
-        //internal virtual void SaveDataInternal(BinaryWriter writer, ComponentData data)
-        //{
-        //    writer.Write((ushort)0);
-        //}
+        internal virtual ComponentData ReceiveDataInternal(BinaryReader reader, ushort dataLength, string type) { return new(); }
+        internal virtual void SendDataInternal(BinaryWriter writer, ComponentData data)
+        {
+            writer.Write((ushort)0);
+        }
 
         internal virtual object SaveTagInternal(ComponentData data) => null;
         internal virtual ComponentData LoadTagInternal(object tag) => new();
@@ -366,12 +374,13 @@ namespace TerraIntegration.Components
         internal override bool HasData => true;
 
         public new TDataType GetData(Point16 pos) => ModContent.GetInstance<ComponentWorld>().GetData<TDataType>(pos, this);
+        public new TDataType GetDataOrNull(Point16 pos) => ModContent.GetInstance<ComponentWorld>().GetDataOrNull<TDataType>(pos);
 
         public virtual object SaveCustomDataTag(TDataType data) => null;
         public virtual TDataType LoadCustomDataTag(object data) => new();
 
-        //public virtual void SaveCustomData(TDataType data, BinaryWriter writer) {  }
-        //public virtual TDataType LoadCustomData(BinaryReader reader) => new();
+        public virtual void SendCustomData(TDataType data, BinaryWriter writer) { }
+        public virtual TDataType ReceiveCustomData(BinaryReader reader) => new();
 
         internal override object SaveTagInternal(ComponentData data)
         {
@@ -386,40 +395,40 @@ namespace TerraIntegration.Components
             return LoadCustomDataTag(tag);
         }
 
-        //internal override void SaveDataInternal(BinaryWriter writer, ComponentData data)
-        //{
-        //    if (data is not TDataType tdata)
-        //    {
-        //        writer.Write((ushort)0);
-        //        return;
-        //    }
+        internal override void SendDataInternal(BinaryWriter writer, ComponentData data)
+        {
+            if (data is not TDataType tdata)
+            {
+                writer.Write((ushort)0);
+                return;
+            }
 
-        //    long lenPos = writer.BaseStream.Position;
-        //    writer.Write((ushort)0);
-        //    long startPos = writer.BaseStream.Position;
-        //    SaveCustomData(tdata, writer);
-        //    long endPos = writer.BaseStream.Position;
-        //    long length = endPos - startPos;
+            long lenPos = writer.BaseStream.Position;
+            writer.Write((ushort)0);
+            long startPos = writer.BaseStream.Position;
+            SendCustomData(tdata, writer);
+            long endPos = writer.BaseStream.Position;
+            long length = endPos - startPos;
 
-        //    if (length == 0) return;
-        //    writer.BaseStream.Seek(lenPos, SeekOrigin.Begin);
-        //    writer.Write((ushort)length);
-        //    writer.BaseStream.Seek(endPos, SeekOrigin.Begin);
-        //}
-        //internal override ComponentData LoadDataInternal(BinaryReader reader, ushort length, string type)
-        //{
-        //    long pos = reader.BaseStream.Position;
-        //    ComponentData data = LoadCustomData(reader);
-        //    long diff = (reader.BaseStream.Position - pos) - length;
-        //    if (diff != 0)
-        //    {
-        //        if (diff > 0) Mod.Logger.WarnFormat("Component {0} data overread: {1} bytes", type, diff);
-        //        else Mod.Logger.WarnFormat("Component {0} data underread: {1} bytes", type, -diff);
+            if (length == 0) return;
+            writer.BaseStream.Seek(lenPos, SeekOrigin.Begin);
+            writer.Write((ushort)length);
+            writer.BaseStream.Seek(endPos, SeekOrigin.Begin);
+        }
+        internal override ComponentData ReceiveDataInternal(BinaryReader reader, ushort length, string type)
+        {
+            long pos = reader.BaseStream.Position;
+            ComponentData data = ReceiveCustomData(reader);
+            long diff = (reader.BaseStream.Position - pos) - length;
+            if (diff != 0)
+            {
+                if (diff > 0) Mod.Logger.WarnFormat("Component {0} data overread: {1} bytes", type, diff);
+                else Mod.Logger.WarnFormat("Component {0} data underread: {1} bytes", type, -diff);
 
-        //        reader.BaseStream.Seek(pos + length, SeekOrigin.Begin);
-        //    }
-        //    return data;
-        //}
+                reader.BaseStream.Seek(pos + length, SeekOrigin.Begin);
+            }
+            return data;
+        }
 
         public override bool ShouldSaveData(ComponentData data)
         {

@@ -1,6 +1,7 @@
 using Microsoft.Xna.Framework;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using TerraIntegration.Components;
@@ -97,7 +98,12 @@ namespace TerraIntegration
 			}
         }
 
-		public void RegisterComponent(Component c)
+        public override void HandlePacket(BinaryReader reader, int whoAmI)
+        {
+            Networking.HandlePacket(reader, whoAmI);
+        }
+
+        public void RegisterComponent(Component c)
 		{
 			if (c?.ComponentType is null) return;
 
@@ -131,5 +137,12 @@ namespace TerraIntegration
 	public record struct PositionedComponent(Point16 Pos, Component Component) 
 	{
 		public ComponentData GetData() => Component.GetData(Pos);
+	}
+
+	public enum CallSide { Both, Client, Server }
+	public class CallSideAttribute : Attribute 
+	{
+		public CallSide Side { get; set; }
+		public CallSideAttribute(CallSide side) { Side = side; }
 	}
 }

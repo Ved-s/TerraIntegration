@@ -15,7 +15,7 @@ namespace TerraIntegration.Values
         public override string Type => "double";
         public override string TypeDisplay => "Double";
 
-        public override Color DisplayColor => Color.Lime;
+        public override Color TypeColor => Color.Lime;
 
         public double Value { get; set; }
 
@@ -58,6 +58,18 @@ namespace TerraIntegration.Values
         public override string ToString()
         {
             return Value.ToString();
+        }
+
+        public override bool Equals(object obj)
+        {
+            return obj is Double @double &&
+                   Type == @double.Type &&
+                   Value == @double.Value;
+        }
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(Type, Value);
         }
     }
 }

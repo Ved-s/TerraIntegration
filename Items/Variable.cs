@@ -32,18 +32,21 @@ namespace TerraIntegration.Items
 
         public override void Load()
         {
-            VariableValueOverlays.Clear();
-            VariableTypeOverlays.Clear();
-            foreach (string asset in Mod.RootContentSource.EnumerateAssets()) 
+            if (!Main.dedServ)
             {
-                if (asset.StartsWith(TypeOverlayPath) || asset.StartsWith(ValueOverlayPath))
+                VariableValueOverlays.Clear();
+                VariableTypeOverlays.Clear();
+                foreach (string asset in Mod.RootContentSource.EnumerateAssets())
                 {
-                    string type = Path.GetFileNameWithoutExtension(asset);
-                    string path = $"{Mod.Name}/{Path.ChangeExtension(asset, null)}";
-                    Asset<Texture2D> tex = ModContent.Request<Texture2D>(path);
+                    if (asset.StartsWith(TypeOverlayPath) || asset.StartsWith(ValueOverlayPath))
+                    {
+                        string type = Path.GetFileNameWithoutExtension(asset);
+                        string path = $"{Mod.Name}/{Path.ChangeExtension(asset, null)}";
+                        Asset<Texture2D> tex = ModContent.Request<Texture2D>(path);
 
-                    if (asset.StartsWith(ValueOverlayPath)) VariableValueOverlays[type] = tex;
-                    else VariableTypeOverlays[type] = tex;
+                        if (asset.StartsWith(ValueOverlayPath)) VariableValueOverlays[type] = tex;
+                        else VariableTypeOverlays[type] = tex;
+                    }
                 }
             }
         }
@@ -144,6 +147,8 @@ namespace TerraIntegration.Items
 
         public static void DrawVariableOverlay(SpriteBatch spriteBatch, bool drawVariable, Type returnType, string type, Vector2 pos, Vector2 size, Color color, float rotation, Vector2 origin)
         {
+            if (Main.dedServ) return;
+
             if (drawVariable)
             {
                 Asset<Texture2D> variable = TextureAssets.Item[ModContent.ItemType<Variable>()];

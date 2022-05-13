@@ -98,5 +98,13 @@ namespace TerraIntegration
 			return $"[c/{v:x6}:{text.Replace("\n", $"]\n[c/{v:x6}:")}]";
 
 		}
+
+
+		public static bool ObjectsNullEqual(object a, object b)
+		{
+			if (a is not null && b is not null) 
+				return a.Equals(b);
+			return a is null && b is null;
+		}
 	}
 }

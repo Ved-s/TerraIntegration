@@ -3,13 +3,19 @@
     "Terraria": {
       "commandName": "Executable",
       "executablePath": "dotnet",
-      "commandLineArgs": "$(tMLPath) -skipselect \"Tester:Testing world\"",
+      "commandLineArgs": "$(tMLPath)",
       "workingDirectory": "$(tMLSteamPath)"
     },
     "TerrariaServer": {
       "commandName": "Executable",
       "executablePath": "dotnet",
-      "commandLineArgs": "$(tMLServerPath)",
+      "commandLineArgs": "$(tMLServerPath) -world \"C:\\Users\\vedom\\Documents\\My Games\\Terraria\\tModLoader\\Worlds\\Testing_world.wld\"",
+      "workingDirectory": "$(tMLSteamPath)"
+    },
+    "Terraria (Testing)": {
+      "commandName": "Executable",
+      "executablePath": "dotnet",
+      "commandLineArgs": "$(tMLPath) -skipselect \"Tester:Testing world\"",
       "workingDirectory": "$(tMLSteamPath)"
     }
   }

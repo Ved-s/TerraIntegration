@@ -14,7 +14,7 @@ namespace TerraIntegration.Variables
         public override string Type => "const";
         public override string TypeDisplay => "Constant";
 
-        public override string TypeDescription => $"[c/aaaa00:Value:] {Util.ColorTag(Value.DisplayColor, Value.Display())}";
+        public override string TypeDescription => $"[c/aaaa00:Value:] {Util.ColorTag(Value.TypeColor, Value.Display())}";
 
         public VariableValue Value { get; set; } = new();
 

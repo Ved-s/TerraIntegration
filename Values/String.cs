@@ -15,7 +15,7 @@ namespace TerraIntegration.Values
         public override string Type => "str";
         public override string TypeDisplay => "String";
 
-        public override Color DisplayColor => Color.OrangeRed;
+        public override Color TypeColor => Color.OrangeRed;
 
         public string Value { get; set; }
         public Type[] ValidAddTypes => new[] { typeof(IToString) };
@@ -64,6 +64,18 @@ namespace TerraIntegration.Values
             
             errors.Add(new(ErrorType.ExpectedValue, TypeToName(typeof(IToString), out _)));
             return null;
+        }
+
+        public override bool Equals(object obj)
+        {
+            return obj is String @string &&
+                   Type == @string.Type &&
+                   Value == @string.Value;
+        }
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(Type, Value);
         }
     }
 }

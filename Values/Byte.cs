@@ -15,7 +15,7 @@ namespace TerraIntegration.Values
         public override string Type => "byte";
         public override string TypeDisplay => "Byte";
 
-        public override Color DisplayColor => Color.Blue;
+        public override Color TypeColor => Color.Blue;
 
         public byte Value { get; set; }
         public long NumericValue => Value;
@@ -59,6 +59,18 @@ namespace TerraIntegration.Values
         public override string ToString()
         {
             return Value.ToString();
+        }
+
+        public override bool Equals(object obj)
+        {
+            return obj is Byte @byte &&
+                   Type == @byte.Type &&
+                   Value == @byte.Value;
+        }
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(Type, Value);
         }
     }
 }

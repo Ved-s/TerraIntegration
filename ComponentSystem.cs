@@ -4,6 +4,7 @@ using TerraIntegration.Components;
 using TerraIntegration.Values;
 using TerraIntegration.Variables;
 using Terraria;
+using Terraria.ID;
 using Terraria.ModLoader;
 
 namespace TerraIntegration
@@ -26,6 +27,8 @@ namespace TerraIntegration
 
         public static ComponentSystem UpdateSystem(Point16 pos)
         {
+            if (Main.netMode == NetmodeID.MultiplayerClient) return null;
+
             Tile t = Main.tile[pos.X, pos.Y];
             if (!t.HasTile || !Component.TileTypes.Contains(t.TileType))
             {
@@ -34,7 +37,7 @@ namespace TerraIntegration
                 foreach (Point16 component in GetComponentsAround(pos))
                 {
                     ComponentData data = World.GetDataOrNull(component);
-                    if (data is not null && ids.Contains(data.System.TempId)) continue;
+                    if (data is not null && data.System is not null && ids.Contains(data.System.TempId)) continue;
                     ComponentSystem sys = UpdateSystem(component);
                     if (sys is not null) ids.Add(sys.TempId);
                 }

@@ -15,7 +15,7 @@ namespace TerraIntegration.Values
         public override string Type => "bool";
         public override string TypeDisplay => "Boolean";
 
-        public override Color DisplayColor => Color.CadetBlue;
+        public override Color TypeColor => Color.CadetBlue;
 
         public bool Value { get; set; }
 
@@ -66,6 +66,18 @@ namespace TerraIntegration.Values
         public override string ToString()
         {
             return Value.ToString();
+        }
+
+        public override bool Equals(object obj)
+        {
+            return obj is Boolean boolean &&
+                   Type == boolean.Type &&
+                   Value == boolean.Value;
+        }
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(Type, Value);
         }
     }
 }

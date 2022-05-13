@@ -129,7 +129,7 @@ namespace TerraIntegration.UI
                 if (VariableReturnType is null) returns = null;
                 else if (Values.VariableValue.ByType.TryGetValue(VariableReturnType, out Values.VariableValue val))
                 {
-                    returns = Util.ColorTag(val.DisplayColor, val.TypeDisplay);
+                    returns = Util.ColorTag(val.TypeColor, val.TypeDisplay);
                 }
                 else if (VariableReturnType.IsInterface)
                 {

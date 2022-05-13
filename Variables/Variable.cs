@@ -119,7 +119,7 @@ namespace TerraIntegration.Variables
             long pos = reader.BaseStream.Position;
             var = var.LoadCustomData(reader);
             var.Id = id;
-            World.Guids.AddToDictionary(var.Id);
+            World.Guids.AddToDictionary(id);
 
             long diff = (reader.BaseStream.Position - pos) - length;
             pos = reader.BaseStream.Position;
@@ -215,7 +215,7 @@ namespace TerraIntegration.Variables
             } 
             else newVar = (Variable)Activator.CreateInstance(var.GetType());
 
-            World.Guids.AddToDictionary(newVar.Id);
+            World.Guids.AddToDictionary(id);
 
             newVar.Id = id;
             return newVar;
@@ -226,6 +226,9 @@ namespace TerraIntegration.Variables
 
         protected virtual object SaveCustomTag() => null;
         protected virtual Variable LoadCustomTag(object data) => (Variable)Activator.CreateInstance(GetType());
+
+        public virtual void HandlePacket(Point16 pos, ushort messageType, BinaryReader reader, int whoAmI, ref bool broadcast) { }
+        public ModPacket CreatePacket(Point16 pos, ushort messageType) => Networking.CreateVariablePacket(Type, pos, messageType);
     }
 
     public class UnloadedVariable : Variable

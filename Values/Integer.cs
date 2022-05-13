@@ -15,7 +15,7 @@ namespace TerraIntegration.Values
         public override string Type => "int";
         public override string TypeDisplay => "Integer";
 
-        public override Color DisplayColor => Color.Orange;
+        public override Color TypeColor => Color.Orange;
 
         public int Value { get; set; }
         public long NumericValue => Value;
@@ -83,6 +83,18 @@ namespace TerraIntegration.Values
         public override string ToString()
         {
             return Value.ToString();
+        }
+
+        public override bool Equals(object obj)
+        {
+            return obj is Integer integer &&
+                   Type == integer.Type &&
+                   Value == integer.Value;
+        }
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(Type, Value);
         }
     }
 }
