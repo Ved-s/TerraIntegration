@@ -54,9 +54,12 @@ namespace TerraIntegration
 			}
 
             On.Terraria.WorldGen.KillTile += WorldGen_KillTile;
+            On.Terraria.TileObject.Place += TileObject_Place;
 
             WorldFile.OnWorldLoad += WorldFile_OnWorldLoad;
         }
+
+        
 
         public override void Unload()
         {
@@ -68,6 +71,11 @@ namespace TerraIntegration
 			VariableValue.ByTypeName.Clear();
 			VariableValue.ByType.Clear();
 			PropertyVariable.Unregister();
+
+			On.Terraria.WorldGen.KillTile -= WorldGen_KillTile;
+			On.Terraria.TileObject.Place -= TileObject_Place;
+
+			WorldFile.OnWorldLoad -= WorldFile_OnWorldLoad;
 		}
 
         private void WorldFile_OnWorldLoad()
@@ -87,7 +95,6 @@ namespace TerraIntegration
 					updated.UnionWith(system.ComponentsByPos.Keys);
 				}
 		}
-
         private void WorldGen_KillTile(On.Terraria.WorldGen.orig_KillTile orig, int i, int j, bool fail, bool effectOnly, bool noItem)
         {
 			int type = Main.tile[i, j].TileType;
@@ -97,8 +104,16 @@ namespace TerraIntegration
 				Component.ByTileType[type].OnKilled(new(i, j));
 			}
         }
+		private bool TileObject_Place(On.Terraria.TileObject.orig_Place orig, TileObject toBePlaced)
+		{
+			bool result = orig(toBePlaced);
+			if (Component.ByTileType.TryGetValue(toBePlaced.type, out Component c))
+				c.OnPlaced(new(toBePlaced.xCoord, toBePlaced.yCoord));
 
-        public override void HandlePacket(BinaryReader reader, int whoAmI)
+			return result;
+		}
+
+		public override void HandlePacket(BinaryReader reader, int whoAmI)
         {
             Networking.HandlePacket(reader, whoAmI);
         }
@@ -145,4 +160,6 @@ namespace TerraIntegration
 		public CallSide Side { get; set; }
 		public CallSideAttribute(CallSide side) { Side = side; }
 	}
+
+	public delegate bool VariableMatchDelegate(Variable var);
 }

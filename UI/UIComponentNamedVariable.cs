@@ -16,29 +16,8 @@ namespace TerraIntegration.UI
 {
     public class UIComponentNamedVariable : UIPanel
     {
-        public string VariableType
-        {
-            get => variableType;
-            set
-            {
-                variableType = value;
-
-                if (value is null)
-                    Slot.HighlightTypes = null;
-                else Slot.HighlightTypes = new[] { value };
-            }
-        }
-        public Type VariableReturnType
-        {
-            get => variableReturnType;
-            set
-            {
-                variableReturnType = value;
-                if (value is null)
-                    Slot.HighlightReturnTypes = null;
-                else Slot.HighlightReturnTypes = new[] { value };
-            }
-        }
+        public string VariableType { get; set; } = null;
+        public Type VariableReturnType { get; set; } = typeof(VariableValue);
         public string VariableDescription { get; set; }
 
         public Action<Items.Variable> DefineVariable;
@@ -66,8 +45,6 @@ namespace TerraIntegration.UI
         private UIText TextName;
         private UIComponentVariable Slot;
         private string variableName;
-        private string variableType = null;
-        private Type variableReturnType = typeof(VariableValue);
 
         public UIComponentNamedVariable()
         {

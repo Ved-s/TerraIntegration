@@ -28,11 +28,11 @@ namespace TerraIntegration
             item.velocity.X = Main.rand.Next(-30, 31) * 0.1f;
             item.velocity.Y = Main.rand.Next(-40, -15) * 0.1f;
 
-			if (Main.netMode == NetmodeID.Server)
+			if (Main.netMode != NetmodeID.SinglePlayer)
 			{
 				NetMessage.SendData(MessageID.SyncItem, -1, -1, null, num, 1);
 			}
-			else if (Main.netMode == NetmodeID.SinglePlayer)
+			else
 			{
 				item.playerIndexTheItemIsReservedFor = Main.myPlayer;
 			}
@@ -98,7 +98,6 @@ namespace TerraIntegration
 			return $"[c/{v:x6}:{text.Replace("\n", $"]\n[c/{v:x6}:")}]";
 
 		}
-
 
 		public static bool ObjectsNullEqual(object a, object b)
 		{

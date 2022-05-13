@@ -36,7 +36,7 @@ namespace TerraIntegration
 
                 foreach (Point16 component in GetComponentsAround(pos))
                 {
-                    ComponentData data = World.GetDataOrNull(component);
+                    ComponentData data = World.GetData(component);
                     if (data is not null && data.System is not null && ids.Contains(data.System.TempId)) continue;
                     ComponentSystem sys = UpdateSystem(component);
                     if (sys is not null) ids.Add(sys.TempId);

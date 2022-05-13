@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using TerraIntegration.Components;
 using TerraIntegration.UI;
 using TerraIntegration.Variables;
@@ -35,17 +36,23 @@ namespace TerraIntegration
 
         private Texture2D HighlightTexture;
 
-        public readonly HashSet<string> TypeHighlights = new();
-        public readonly HashSet<Type> ReturnTypeHighlights = new();
+        public readonly List<VariableMatchDelegate> VariableHighlights = new();
 
         private UnloadedComponent UnloadedComponent = new();
 
-        public T GetData<T>(Point16 pos, Component c) where T : ComponentData, new()
+        public T GetData<T>(Point16 pos, Component c = null) where T : ComponentData, new()
         {
             if (ComponentData.TryGetValue(pos, out ComponentData data))
             {
                 if (data is T tdata)
                     return tdata;
+            }
+
+            if (c is null)
+            {
+                Tile t = Main.tile[pos.X, pos.Y];
+                if (!Component.ByTileType.TryGetValue(t.TileType, out c))
+                    return null;
             }
 
             T newData = new();
@@ -56,11 +63,18 @@ namespace TerraIntegration
             ComponentData[pos] = newData;
             return newData;
         }
-        public ComponentData GetData(Point16 pos, Component c)
+        public ComponentData GetData(Point16 pos, Component c = null)
         {
             if (ComponentData.TryGetValue(pos, out ComponentData data))
             {
                 return data;
+            }
+
+            if (c is null)
+            {
+                Tile t = Main.tile[pos.X, pos.Y];
+                if (!Component.ByTileType.TryGetValue(t.TileType, out c))
+                    return null;
             }
 
             ComponentData newData = new();
@@ -178,8 +192,7 @@ namespace TerraIntegration
 
         public override void UpdateUI(GameTime gameTime)
         {
-            TypeHighlights.Clear();
-            ReturnTypeHighlights.Clear();
+            VariableHighlights.Clear();
 
             ProgrammerInterface.Update();
             ModContent.GetInstance<ComponentInterface>().Update();
@@ -236,14 +249,12 @@ namespace TerraIntegration
             }
         }
 
-        
-
         public void HighlightItem(SpriteBatch spriteBatch, Item item, Texture2D back, Vector2 position, float scale)
         {
             if (item.type != ModContent.ItemType<Items.Variable>()) return;
             Items.Variable var = item.ModItem as Items.Variable;
 
-            bool needsHighlight = TypeHighlights.Contains(var.Var.Type) || ReturnTypeHighlights.Contains(var.Var.VariableReturnType);
+            bool needsHighlight = VariableHighlights.Any(h => h(var.Var));
             if (!needsHighlight && var.Highlight == 0) return;
 
             if (needsHighlight && var.Highlight < 255)

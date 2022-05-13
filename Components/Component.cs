@@ -7,6 +7,7 @@ using TerraIntegration.Variables;
 using Terraria;
 using Terraria.DataStructures;
 using Terraria.GameContent.UI.Elements;
+using Terraria.ID;
 using Terraria.ModLoader;
 using Terraria.ModLoader.IO;
 using Terraria.ObjectData;
@@ -76,7 +77,7 @@ namespace TerraIntegration.Components
             TileObjectData.newTile.CoordinatePadding = 2;
             TileObjectData.newTile.HookCheckIfCanPlace = new PlacementHook((_, _, _, _, _, _) => 0, -1, 0, true);
             TileObjectData.newTile.UsesCustomCanPlace = true;
-            TileObjectData.newTile.HookPostPlaceMyPlayer = new PlacementHook((x, y, _, _, _, _) => { OnPlaced(new(x, y)); return 0; }, -1, 0, true);
+            //TileObjectData.newTile.HookPostPlaceEveryone = new PlacementHook((x, y, _, _, _, _) => { OnPlaced(new(x, y)); return 0; }, -1, 0, true);
         }
 
         public void SetupInterfaceIfNeeded()
@@ -88,6 +89,7 @@ namespace TerraIntegration.Components
         [CallSide(CallSide.Both)]
         public virtual void OnPlaced(Point16 pos)
         {
+            GetData(pos);
             ComponentSystem.UpdateSystem(pos);
             if (DefaultUpdateFrequency > 0)
                 World.ComponentUpdates[pos] = this;

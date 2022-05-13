@@ -21,12 +21,10 @@ namespace TerraIntegration.UI
         private static Item Air = new();
 
         public bool DisplayOnly { get; set; } = false;
-        public IEnumerable<string> HighlightTypes { get; set; }
-        public IEnumerable<Type> HighlightReturnTypes { get; set; }
 
         public abstract Items.Variable Var { get; set; }
 
-        public Func<Variable, bool> VariableValidator { get; set; }
+        public VariableMatchDelegate VariableValidator { get; set; }
 
         static Item PlayerHeldItem
         {
@@ -67,11 +65,8 @@ namespace TerraIntegration.UI
                 }
                 else 
                 {
-                    if (HighlightTypes is not null)
-                        ModContent.GetInstance<ComponentWorld>().TypeHighlights.UnionWith(HighlightTypes);
-
-                    if (HighlightReturnTypes is not null)
-                        ModContent.GetInstance<ComponentWorld>().ReturnTypeHighlights.UnionWith(HighlightReturnTypes);
+                    if (VariableValidator is not null)
+                        ModContent.GetInstance<ComponentWorld>().VariableHighlights.Add(VariableValidator);
                 }
 
                 if (PlayerInput.MouseInfo.LeftButton == ButtonState.Pressed && PlayerInput.MouseInfoOld.LeftButton == ButtonState.Released)

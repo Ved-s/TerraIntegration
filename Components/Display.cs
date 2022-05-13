@@ -202,8 +202,6 @@ namespace TerraIntegration.Components
         {
             DisplayData data = GetData(pos);
 
-            Mod.Logger.Info(((MessageType)messageType).ToString());
-
             switch ((MessageType)messageType)
             {
                 case MessageType.DisplayBoundaries:
@@ -277,7 +275,11 @@ namespace TerraIntegration.Components
                     return;
 
             ModPacket p = CreatePacket(pos, (ushort)MessageType.DisplayValue);
-            data.DisplayValue.SaveData(p);
+
+            if (data.DisplayValue is null)
+                p.Write("");
+            else
+                data.DisplayValue.SaveData(p);
             p.Send();
             data.SentDisplayValue = data.DisplayValue;
         }
