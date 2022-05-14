@@ -11,19 +11,19 @@ namespace TerraIntegration
     public class Error
     {
         public ErrorType Type { get; set; }
-        public object[] Args { get; set; }
+        public string[] Args { get; set; }
 
         public Error(ErrorType type, params object[] args)
         {
             Type = type;
-            Args = args;
+            Args = args.Select(o => o.ToString()).ToArray();
         }
 
         public override bool Equals(object obj)
         {
             return obj is Error error &&
                    Type == error.Type &&
-                   EqualityComparer<object[]>.Default.Equals(Args, error.Args);
+                   EqualityComparer<string[]>.Default.Equals(Args, error.Args);
         }
 
         public override int GetHashCode()

@@ -14,8 +14,6 @@ namespace TerraIntegration.Variables
         public override string Type => "const";
         public override string TypeDisplay => "Constant";
 
-        public override string TypeDescription => $"[c/aaaa00:Value:] {Util.ColorTag(Value.TypeColor, Value.Display())}";
-
         public VariableValue Value { get; set; } = new();
 
         public override Type VariableReturnType => Value.GetType();
@@ -64,6 +62,12 @@ namespace TerraIntegration.Variables
             }
 
             return new Constant(res);
+        }
+
+        public override void ModifyTooltips(List<TooltipLine> tooltips)
+        {
+            if (Value is not null)
+                tooltips.Add(new(Mod, "TIConstantValue", $"[c/aaaa00:Value:] {Util.ColorTag(Value.TypeColor, Value.Display())}"));
         }
     }
 }

@@ -229,6 +229,8 @@ namespace TerraIntegration.Variables
 
         public virtual void HandlePacket(Point16 pos, ushort messageType, BinaryReader reader, int whoAmI, ref bool broadcast) { }
         public ModPacket CreatePacket(Point16 pos, ushort messageType) => Networking.CreateVariablePacket(Type, pos, messageType);
+
+        public virtual void ModifyTooltips(List<TooltipLine> tooltips) { }
     }
 
     public class UnloadedVariable : Variable

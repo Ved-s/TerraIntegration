@@ -6,11 +6,15 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using TerraIntegration.Interfaces;
+using TerraIntegration.Items;
+using TerraIntegration.UI;
+using TerraIntegration.Variables;
+using Terraria.GameContent.UI.Elements;
 using Terraria.ModLoader;
 
 namespace TerraIntegration.Values
 {
-    public class String : VariableValue, IToString, IAddable
+    public class String : VariableValue, IToString, IAddable, IOwnProgrammerInterface
     {
         public override string Type => "str";
         public override string TypeDisplay => "String";
@@ -19,6 +23,9 @@ namespace TerraIntegration.Values
 
         public string Value { get; set; }
         public Type[] ValidAddTypes => new[] { typeof(IToString) };
+
+        public UIPanel Interface { get; set; }
+        UIFocusInputTextField InterfaceValue;
 
         public String() { }
         public String(string value) { Value = value; }
@@ -76,6 +83,26 @@ namespace TerraIntegration.Values
         public override int GetHashCode()
         {
             return HashCode.Combine(Type, Value);
+        }
+
+        public void SetupInterface()
+        {
+            UIPanel p = new();
+
+            InterfaceValue = new("")
+            {
+                Top = new(-12, .5f),
+                Left = new(20, 0),
+                Width = new(-40, 1),
+                Height = new(25, 0),
+            };
+            p.Append(InterfaceValue);
+            Interface = p;
+        }
+
+        public void WriteVariable(Items.Variable var)
+        {
+            var.Var = new Constant(new String(InterfaceValue.CurrentString));
         }
     }
 }

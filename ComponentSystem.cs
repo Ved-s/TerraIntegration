@@ -209,7 +209,7 @@ namespace TerraIntegration
                 {
                     if (type is not null && c.ComponentType != type)
                     {
-                        errors.Add(new(ErrorType.WrongComponentAtPos, pos.X, pos.Y, c.Type, type));
+                        errors.Add(new(ErrorType.WrongComponentAtPos, pos.X, pos.Y, c.ComponentType, type));
                         return null;
                     }
                     return c;

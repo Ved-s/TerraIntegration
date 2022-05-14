@@ -18,10 +18,6 @@ namespace TerraIntegration.Variables
         public Guid First { get; set; }
         public Guid Second { get; set; }
 
-        public override string TypeDescription => 
-            (First == default || Second == default) ? null :
-            $"[c/aaaa00:Referenced IDs:] {World.Guids.GetShortGuid(First)}, {World.Guids.GetShortGuid(Second)}";
-
         private Type ReturnTypeCache;
         public override Type VariableReturnType => ReturnTypeCache;
 
@@ -105,6 +101,12 @@ namespace TerraIntegration.Variables
             args.RemoveAt(0);
 
             return new Add(first.Value, second.Value);
+        }
+
+        public override void ModifyTooltips(List<TooltipLine> tooltips)
+        {
+            if (First != default && Second != default)
+                tooltips.Add(new(Mod, "TIAddIds", $"[c/aaaa00:Referenced IDs:] {World.Guids.GetShortGuid(First)}, {World.Guids.GetShortGuid(Second)}"));
         }
     }
 }

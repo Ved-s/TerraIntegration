@@ -14,8 +14,6 @@ namespace TerraIntegration.Variables
         public override string Type => "ref";
         public override string TypeDisplay => "Reference";
 
-        public override string TypeDescription => RefId == default ? null : $"[c/aaaa00:Referenced ID:] {World.Guids.GetShortGuid(RefId)}";
-
         public override Type VariableReturnType => returnType;
 
         public Guid RefId { get; set; }
@@ -64,6 +62,12 @@ namespace TerraIntegration.Variables
             args.RemoveAt(0);
 
             return new Reference(id.Value);
+        }
+
+        public override void ModifyTooltips(List<TooltipLine> tooltips)
+        {
+            if (RefId != default)
+                tooltips.Add(new(Mod, "TIReferencedId", $"[c/aaaa00:Referenced ID:] {World.Guids.GetShortGuid(RefId)}"));
         }
     }
 }

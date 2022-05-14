@@ -80,6 +80,8 @@ namespace TerraIntegration.Items
                 tooltips.Add(new(Mod, "TIVarReturn", $"[c/aaaa00:Returns:] {returns}"));
             tooltips.Add(new(Mod, "TIVarID", $"[c/aaaa00:ID:] {Var.ShortId}"));
 
+            Var.ModifyTooltips(tooltips);
+
             if (Var.TypeDescription is not null)
             {
                 tooltips.Add(new(Mod, "TIVarDescription", Var.TypeDescription));

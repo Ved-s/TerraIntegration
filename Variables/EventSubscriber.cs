@@ -13,7 +13,6 @@ namespace TerraIntegration.Variables
     {
         public override string Type => "eventsub";
         public override string TypeDisplay => "Event Subscriber";
-        public override string TypeDescription => EventId == default ? null : $"[c/aaaa00:Event ID:] {World.Guids.GetShortGuid(EventId)}";
 
         public override Type VariableReturnType => typeof(Values.Boolean);
 
@@ -61,6 +60,12 @@ namespace TerraIntegration.Variables
             args.RemoveAt(0);
 
             return new EventSubscriber(id.Value);
+        }
+
+        public override void ModifyTooltips(List<TooltipLine> tooltips)
+        {
+            if (EventId != default)
+                tooltips.Add(new(Mod, "TIEventId", $"[c/aaaa00:Event ID:] {World.Guids.GetShortGuid(EventId)}"));
         }
     }
 }
