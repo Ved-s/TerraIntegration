@@ -59,9 +59,9 @@ namespace TerraIntegration
             else ts = MaxUpdates[timei];
             
 
-            double nano = ts.TotalMilliseconds * 1000;
+            double micro = ts.TotalMilliseconds * 1000;
 
-            if (nano < 1000) return $"{nano:0.0}ns max";
+            if (micro < 1000) return $"{micro:0.0}us max";
 
             if (ts.TotalMilliseconds < 10) return $"{ts.TotalMilliseconds:0.000}ms max";
             if (ts.TotalMilliseconds < 100) return $"{ts.TotalMilliseconds:0.00}ms max";

@@ -135,8 +135,11 @@ namespace TerraIntegration
                 ComponentData data = GetData(kvp.Key, kvp.Value);
                 if (data.UpdateFrequency == 0) continue;
                 if (UpdateCounter % data.UpdateFrequency == 0)
+                {
                     kvp.Value.OnUpdate(kvp.Key);
-                Statistics.UpdatedComponents++;
+                    Statistics.UpdatedComponents++;
+                }
+                
             }
             Statistics.Stop(Statistics.UpdateTime.Components);
 

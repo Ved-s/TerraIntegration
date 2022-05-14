@@ -148,9 +148,11 @@ namespace TerraIntegration.Components
                 if (value is null)
                 {
                     data.Master.DisplayValue = null;
+                    data.Master.Errors = null;
                     SyncNull(pos, data.Master);
                     return;
                 }
+                data.Master.Errors = null;
                 data.Master.DisplayValue = value;
                 SyncValue(pos, data.Master);
             }
