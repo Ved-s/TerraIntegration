@@ -17,6 +17,9 @@ namespace TerraIntegration.Values
 
         public override Color TypeColor => Color.CadetBlue;
 
+        public override SpriteSheet SpriteSheet => BasicSheet;
+        public override Point SpritesheetPos => new(1, 0);
+
         public bool Value { get; set; }
 
         public Boolean() { }

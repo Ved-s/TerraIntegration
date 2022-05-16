@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Xna.Framework;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -15,6 +16,9 @@ namespace TerraIntegration.Variables
         public override string TypeDisplay => "Reference";
 
         public override Type VariableReturnType => returnType;
+
+        public override SpriteSheet SpriteSheet => BasicSheet;
+        public override Point SpritesheetPos => new(1, 0);
 
         public Guid RefId { get; set; }
 

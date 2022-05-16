@@ -15,11 +15,6 @@ namespace TerraIntegration.UI
         public static UIState State = new();
 
         public static bool Active = false;
-#if DEBUG
-        static bool ShowUIReload = true;
-#else
-        static bool ShowUIReload = false;
-#endif
 
         static bool BackGrab = false;
         static bool BackResizeW = false;
@@ -232,7 +227,7 @@ namespace TerraIntegration.UI
                 Left = new(-120, 1),
             });
 
-            if (ShowUIReload)
+            if (TerraIntegration.DebugMode)
             {
                 State.Append(Reload = new UITextPanel<string>("Reload", 0.8f, false)
                 {
@@ -284,12 +279,7 @@ namespace TerraIntegration.UI
                 BackResizeW = false;
                 BackResizeH = false;
             };
-            WriteButton.OnClick += (ev, el) =>
-            {
-                if (ResultSlot?.Var is null || CurrentOwner is null) return;
-                CurrentOwner.WriteVariable(ResultSlot.Var);
-                SoundEngine.PlaySound(SoundID.MenuTick);
-            };
+            WriteButton.OnClick += WriteButton_OnClick;
 
             VariablesSearch.OnTextChange += PopulateVariables;
             VariablesList.SetScrollbar(VariablesScroll);
@@ -297,8 +287,36 @@ namespace TerraIntegration.UI
             PropertiesSearch.OnTextChange += PopulateProperties;
             PropertiesList.SetScrollbar(PropertiesScroll);
 
+            ResultSlot.VariableChanged += ResultSlot_VariableChanged;
+
             PopulateVariables();
         }
+
+        private static void ResultSlot_VariableChanged()
+        {
+            if (ResultSlot.Var?.Var is null)
+            {
+                VariableName.SetText("");
+            }
+            else if (ResultSlot.Var.Var.Name is not null)
+            {
+                VariableName.SetText(ResultSlot.Var.Var.Name);
+            }
+        }
+
+        private static void WriteButton_OnClick(UIMouseEvent evt, UIElement listeningElement)
+        {
+            if (ResultSlot?.Var is null) return;
+            if (CurrentOwner is not null) CurrentOwner.WriteVariable(ResultSlot.Var);
+
+            if (ResultSlot.Var?.Var is not null && !VariableName.CurrentString.IsNullEmptyOrWhitespace())
+            {
+                ResultSlot.Var.Var.Name = VariableName.CurrentString;
+            }
+
+            SoundEngine.PlaySound(SoundID.MenuTick);
+        }
+
         public static void Draw()
         {
             if (!Main.playerInventory || !Active) return;
@@ -348,7 +366,7 @@ namespace TerraIntegration.UI
                 Back.Recalculate();
             }
 
-            if (ShowUIReload)
+            if (TerraIntegration.DebugMode)
             {
                 Reload.Top = new(back.Y - Reload.Height.Pixels - 5, 0);
                 Reload.Left = new(back.X + back.Width - Reload.Width.Pixels, 0);

@@ -21,6 +21,17 @@ namespace TerraIntegration.Variables
         public abstract string ComponentType { get; }
         public abstract string ComponentProperty { get; }
 
+        public override SpriteSheet SpriteSheet
+        {
+            get
+            {
+                if (Component.ByTypeName.TryGetValue(ComponentType, out Component com))
+                    return com.DefaultPropertySpriteSheet;
+
+                return null;
+            }
+        }
+
         public Point16 ComponentPos { get; set; }
 
         protected Component BoundComponentCache;
@@ -173,6 +184,17 @@ namespace TerraIntegration.Variables
                     BoundComponentCache = instance;
 
                 return BoundComponentCache?.ComponentType;
+            }
+        }
+
+        public override SpriteSheet SpriteSheet
+        {
+            get
+            {
+                if (Component.ByType.TryGetValue(typeof(TComponent), out Component com))
+                    return com.DefaultPropertySpriteSheet;
+
+                return null;
             }
         }
 

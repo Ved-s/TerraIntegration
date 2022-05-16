@@ -14,14 +14,20 @@ namespace TerraIntegration.Variables
 {
     public class Variable
     {
+        public readonly static SpriteSheet BasicSheet = new("TerraIntegration/Assets/Types/basic", new(32, 32));
+
         public virtual Mod Mod => ModContent.GetInstance<TerraIntegration>();
         public static ComponentWorld World => ModContent.GetInstance<ComponentWorld>();
 
         public static readonly Dictionary<string, Variable> ByTypeName = new();
 
-        private Item item;
+        public virtual string Texture => null;
+        public virtual SpriteSheet SpriteSheet => null;
+        public virtual Point SpritesheetPos => default;
 
+        public string Name { get; set; }
         public Guid Id { get; set; }
+
         public string ShortId => ModContent.GetInstance<ComponentWorld>().Guids.GetShortGuid(Id);
 
         public bool IsEmpty => GetType() == typeof(Variable);
@@ -32,23 +38,6 @@ namespace TerraIntegration.Variables
         public virtual string TypeDescription => null;
 
         public virtual Type VariableReturnType => typeof(VariableValue);
-
-        public Item Item
-        {
-            get
-            {
-                if (item is null || item.IsAir)
-                {
-                    item = new();
-                    item.SetDefaults(ModContent.ItemType<Items.Variable>());
-
-                    Items.Variable var = item.ModItem as Items.Variable;
-                    var.Var = this;
-                }
-                return item;
-            }
-            internal set { item = value; }
-        }
 
         public Variable()
         {
@@ -67,6 +56,7 @@ namespace TerraIntegration.Variables
             if (this is UnloadedVariable unloaded)
             {
                 writer.Write(unloaded.UnloadedTypeName);
+                writer.Write(Name ?? "");
                 writer.Write((ushort)unloaded.UnloadedData.Length);
                 writer.Write(Id.ToByteArray());
                 writer.Write(unloaded.UnloadedData);
@@ -74,7 +64,7 @@ namespace TerraIntegration.Variables
             }
 
             writer.Write(Type);
-
+            writer.Write(Name ?? "");
             if (IsEmpty)
             {
                 writer.Write((ushort)0);
@@ -100,6 +90,9 @@ namespace TerraIntegration.Variables
         {
             string type = reader.ReadString();
             if (type == "") return null;
+            string name = reader.ReadString();
+            if (name.IsNullEmptyOrWhitespace())
+                name = null;
 
             ushort length = reader.ReadUInt16();
 
@@ -109,7 +102,7 @@ namespace TerraIntegration.Variables
             {
                 id = new Guid(reader.ReadBytes(16));
                 byte[] data = reader.ReadBytes(length);
-                return new UnloadedVariable(type, data, null) { Id = id };
+                return new UnloadedVariable(type, data, null) { Id = id, Name = name };
             }
 
             if (var.IsEmpty) return var;
@@ -119,6 +112,7 @@ namespace TerraIntegration.Variables
             long pos = reader.BaseStream.Position;
             var = var.LoadCustomData(reader);
             var.Id = id;
+            var.Name = name;
             World.Guids.AddToDictionary(id);
 
             long diff = (reader.BaseStream.Position - pos) - length;
@@ -156,10 +150,17 @@ namespace TerraIntegration.Variables
                 if (unloaded.UnloadedData is not null)
                     tag["bytes"] = unloaded.UnloadedData;
 
+                if (unloaded.Name is not null)
+                    tag["name"] = unloaded.Name;
+
                 return tag;
             }
 
             tag["type"] = Type;
+
+            if (Name is not null)
+                tag["name"] = Name;
+
             if (IsEmpty) return tag;
 
             tag["id"] = Id.ToByteArray();
@@ -185,6 +186,10 @@ namespace TerraIntegration.Variables
             string type = tag.GetString("type");
             Guid id;
 
+            string name = null;
+            if (tag.ContainsKey("name"))
+                name = tag.GetString("name");
+
             if (!ByTypeName.TryGetValue(type, out Variable var))
             {
                 object tagData = null;
@@ -196,7 +201,7 @@ namespace TerraIntegration.Variables
                 if (tag.ContainsKey("bytes")) byteData = tag.GetByteArray("bytes");
 
 
-                return new UnloadedVariable(type, byteData, tagData) { Id = id };
+                return new UnloadedVariable(type, byteData, tagData) { Id = id, Name = name };
             }
 
             Variable newVar = null;
@@ -218,6 +223,8 @@ namespace TerraIntegration.Variables
             World.Guids.AddToDictionary(id);
 
             newVar.Id = id;
+            newVar.Name = name;
+
             return newVar;
         }
 
@@ -231,12 +238,24 @@ namespace TerraIntegration.Variables
         public ModPacket CreatePacket(Point16 pos, ushort messageType) => Networking.CreateVariablePacket(Type, pos, messageType);
 
         public virtual void ModifyTooltips(List<TooltipLine> tooltips) { }
+
+        public Variable Clone()
+        {
+            Variable var = IsEmpty? new() : CloneCustom();
+            var.Name = Name;
+            var.Id = Id;
+            return var;
+        }
+        public virtual Variable CloneCustom() => (Variable)MemberwiseClone();
     }
 
     public class UnloadedVariable : Variable
     {
         public override string Type => "unloaded";
         public override string TypeDisplay => $"Unloaded variable ({UnloadedTypeName})";
+
+        public override SpriteSheet SpriteSheet => BasicSheet;
+        public override Point SpritesheetPos => new(0, 0);
 
         public override Type VariableReturnType => typeof(UnloadedVariableValue);
 

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Xna.Framework;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -12,6 +13,8 @@ namespace TerraIntegration.Variables.Display
     {
         public override string TypeDisplay => "Display area";
         public override string ComponentProperty => "area";
+
+        public override Point SpritesheetPos => new(1, 0);
 
         public override Type VariableReturnType => typeof(Integer);
 

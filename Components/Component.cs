@@ -16,14 +16,7 @@ namespace TerraIntegration.Components
 {
     public abstract class Component : ModTile
     {
-        public override string Texture
-        {
-            get
-            {
-                if (Mod.Name == nameof(TerraIntegration)) return $"{nameof(TerraIntegration)}/Assets/Tiles/{Name}";
-                return base.Texture;
-            }
-        }
+        
 
         public static HashSet<int> TileTypes = new();
         public static Dictionary<string, Component> ByTypeName = new();
@@ -36,8 +29,23 @@ namespace TerraIntegration.Components
         public static ComponentWorld World => ModContent.GetInstance<ComponentWorld>();
 
         public abstract string ComponentType { get; }
+        public override string Texture
+        {
+            get
+            {
+                if (Mod.Name == nameof(TerraIntegration)) return $"{nameof(TerraIntegration)}/Assets/Tiles/{Name}";
+                return base.Texture;
+            }
+        }
+        public virtual ushort DefaultUpdateFrequency => 0;
+        public virtual int VariableSlots => 0;
+
+        public virtual string DefaultPropertyTexture => null;
+        public virtual SpriteSheet DefaultPropertySpriteSheet => null;
+        public virtual Point DefaultPropertySpriteSheetPos => default;
 
         public virtual bool HasRightClickInterface => false;
+        public virtual Vector2 InterfaceOffset { get; protected set; }
         public UIPanel Interface
         {
             get
@@ -46,12 +54,6 @@ namespace TerraIntegration.Components
                 return @interface;
             }
         }
-
-        public virtual Vector2 InterfaceOffset { get; protected set; }
-
-        public virtual ushort DefaultUpdateFrequency => 0;
-
-        public virtual int VariableSlots => 0;
 
         internal virtual bool HasData => false;
 

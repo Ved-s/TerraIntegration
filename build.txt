@@ -2,3 +2,4 @@ displayName = Terra Integration
 author = Ved_s
 version = 0.1
 buildIgnore = *.xcf
+modReferences = CustomTreeLib

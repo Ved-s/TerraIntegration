@@ -11,10 +11,16 @@ namespace TerraIntegration.Values
 {
     public class VariableValue
     {
+        public readonly static SpriteSheet BasicSheet = new("TerraIntegration/Assets/Values/basic", new(32, 32));
+
         public static readonly Dictionary<string, VariableValue> ByTypeName = new();
         public static readonly Dictionary<Type, VariableValue> ByType = new();
 
         public virtual Mod Mod => ModContent.GetInstance<TerraIntegration>();
+
+        public virtual string Texture => null;
+        public virtual SpriteSheet SpriteSheet => null;
+        public virtual Point SpritesheetPos => default;
 
         public virtual string Type => "any";
         public virtual string TypeDisplay => "Any";

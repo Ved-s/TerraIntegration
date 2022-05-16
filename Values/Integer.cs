@@ -17,6 +17,9 @@ namespace TerraIntegration.Values
 
         public override Color TypeColor => Color.Orange;
 
+        public override SpriteSheet SpriteSheet => BasicSheet;
+        public override Point SpritesheetPos => new(0, 0);
+
         public int Value { get; set; }
         public long NumericValue => Value;
 

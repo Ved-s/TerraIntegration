@@ -5,6 +5,8 @@ VisualStudioVersion = 17.0.32014.148
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TerraIntegration", "TerraIntegration.csproj", "{29C0548B-2A65-425D-B50B-72209B48C0ED}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CustomTreeLib", "..\CustomTreeLib\CustomTreeLib.csproj", "{5F15077B-4FD8-432F-B011-D7A7117D550F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{29C0548B-2A65-425D-B50B-72209B48C0ED}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{29C0548B-2A65-425D-B50B-72209B48C0ED}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{29C0548B-2A65-425D-B50B-72209B48C0ED}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5F15077B-4FD8-432F-B011-D7A7117D550F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5F15077B-4FD8-432F-B011-D7A7117D550F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5F15077B-4FD8-432F-B011-D7A7117D550F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5F15077B-4FD8-432F-B011-D7A7117D550F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

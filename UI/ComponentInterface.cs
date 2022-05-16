@@ -24,13 +24,7 @@ namespace TerraIntegration.UI
         public int CurrentTab;
         public List<ComponentUITab> Tabs = new();
 
-
         private int ReloadButtonHeight = 30;
-#if DEBUG
-        private bool ShowUIReload = true;
-#else
-        private bool ShowUIReload = false;
-#endif
 
         public void Load(Mod mod)
         {
@@ -81,7 +75,7 @@ namespace TerraIntegration.UI
 
         private void SetupReloadButton()
         {
-            if (!ShowUIReload) return;
+            if (!TerraIntegration.DebugMode) return;
 
             UIState s = Interface.CurrentState;
 

@@ -1,6 +1,7 @@
 using Microsoft.Xna.Framework;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -17,6 +18,8 @@ namespace TerraIntegration
 {
 	public class TerraIntegration : Mod
 	{
+		public static bool DebugMode => Debugger.IsAttached;
+
 		public override void Load()
         {
             Component.TileTypes.Clear();
@@ -71,6 +74,8 @@ namespace TerraIntegration
 			VariableValue.ByTypeName.Clear();
 			VariableValue.ByType.Clear();
 			PropertyVariable.Unregister();
+
+			VariableRenderer.Unload();
 
 			On.Terraria.WorldGen.KillTile -= WorldGen_KillTile;
 			On.Terraria.TileObject.Place -= TileObject_Place;

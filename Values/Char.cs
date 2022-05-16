@@ -17,6 +17,9 @@ namespace TerraIntegration.Values
 
         public override Color TypeColor => Color.LightPink;
 
+        public override SpriteSheet SpriteSheet => BasicSheet;
+        public override Point SpritesheetPos => new(3, 0);
+
         public char Value { get; set; }
 
         public Char() { }
