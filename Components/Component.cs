@@ -91,7 +91,7 @@ namespace TerraIntegration.Components
         [CallSide(CallSide.Both)]
         public virtual void OnPlaced(Point16 pos)
         {
-            GetData(pos);
+            InitData(pos);
             ComponentSystem.UpdateSystem(pos);
             if (DefaultUpdateFrequency > 0)
                 World.ComponentUpdates[pos] = this;
@@ -335,6 +335,11 @@ namespace TerraIntegration.Components
         internal virtual object SaveTagInternal(ComponentData data) => null;
         internal virtual ComponentData LoadTagInternal(object tag) => new();
 
+        internal virtual void InitData(Point16 pos) 
+        {
+            World.InitData(pos, this);
+        }
+
     }
 
     public class ComponentData
@@ -440,6 +445,11 @@ namespace TerraIntegration.Components
             return true;
         }
         public virtual bool ShouldSaveData(TDataType data) => true;
+
+        internal override void InitData(Point16 pos)
+        {
+            World.InitData(pos, this);
+        }
     }
 
     public class UnloadedComponentData : ComponentData

@@ -99,9 +99,22 @@ namespace TerraIntegration
 
             return null;
         }
-        
+        public void InitData(Point16 pos, Component c) 
+        {
+            ComponentData newData = new();
+            newData.Init(c);
+            ComponentData[pos] = newData;
+        }
+        public void InitData<T>(Point16 pos, Component<T> c) where T : ComponentData, new()
+        {
+            T newData = new();
+            newData.Init(c);
+            ComponentData[pos] = newData;
+        }
+
         public void RemoveAll(Point16 pos)
         {
+            TileMimicking.MimicType.Remove(pos);
             if (ComponentData.TryGetValue(pos, out ComponentData data))
             {
                 data.Destroy(pos);
@@ -117,6 +130,7 @@ namespace TerraIntegration
         }
         public override void OnWorldUnload()
         {
+            TileMimicking.Clear();
             ComponentData.Clear();
             Guids.Clear();
         }

@@ -154,9 +154,15 @@ namespace TerraIntegration
 		}
 	}
 
-	public record struct PositionedComponent(Point16 Pos, Component Component) 
+	public record struct PositionedComponent(Point16 Pos, Component Component)
 	{
-		public ComponentData GetData() => Component.GetData(Pos);
+		public ComponentData GetData() => ModContent.GetInstance<ComponentWorld>().GetData(Pos, Component);
+		public ComponentData GetDataOrNull() => ModContent.GetInstance<ComponentWorld>().GetDataOrNull(Pos);
+
+		public T GetData<T>() where T : ComponentData, new()
+			=> ModContent.GetInstance<ComponentWorld>().GetData<T>(Pos, Component);
+		public T GetDataOrNull<T>() where T : ComponentData, new()
+			=> ModContent.GetInstance<ComponentWorld>().GetDataOrNull<T>(Pos);
 	}
 
 	public enum CallSide { Both, Client, Server }
@@ -166,5 +172,5 @@ namespace TerraIntegration
 		public CallSideAttribute(CallSide side) { Side = side; }
 	}
 
-	public delegate bool VariableMatchDelegate(Variable var);
+	
 }

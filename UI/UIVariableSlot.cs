@@ -5,7 +5,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using TerraIntegration.Items;
-using Terraria;
 
 namespace TerraIntegration.UI
 {

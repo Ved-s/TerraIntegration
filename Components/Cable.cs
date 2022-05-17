@@ -26,19 +26,14 @@ namespace TerraIntegration.Components
 			ItemDrop = ModContent.ItemType<Items.Cable>();
 		}
 
-		public static int CanPlace(int i, int j, int type, int style, int direction, int alternative)
-		{
-			return 0;
-		}
-
 		public override bool TileFrame(int i, int j, ref bool resetFrame, ref bool noBreak)
         {
 			short x = 0, y = 0;
 
-			if (CanConnectTo(Main.tile[i, j - 1].TileType)) y += 18;
-			if (CanConnectTo(Main.tile[i - 1, j].TileType)) x += 18;
-			if (CanConnectTo(Main.tile[i, j + 1].TileType)) y += 36;
-			if (CanConnectTo(Main.tile[i + 1, j].TileType)) x += 36;
+			if (CanConnectTo(TileMimicking.GetRealTileType(i, j - 1))) y += 18;
+			if (CanConnectTo(TileMimicking.GetRealTileType(i - 1, j))) x += 18;
+			if (CanConnectTo(TileMimicking.GetRealTileType(i, j + 1))) y += 36;
+			if (CanConnectTo(TileMimicking.GetRealTileType(i + 1, j))) x += 36;
 
 			Tile tile = Main.tile[i, j];
 			tile.TileFrameX = x;

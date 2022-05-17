@@ -256,7 +256,6 @@ namespace TerraIntegration.Components
             data.SentErrors = null;
             data.SentDisplayValue = null;
         }
-
         public void SyncError(Point16 pos, MasterDisplayData data, bool changedOnly = true)
         {
             if (Main.netMode == NetmodeID.SinglePlayer) return;
@@ -271,7 +270,6 @@ namespace TerraIntegration.Components
 
             data.SentErrors = data.Errors;
         }
-
         public void SyncValue(Point16 pos, MasterDisplayData data, bool changedOnly = true)
         {
             if (Main.netMode == NetmodeID.SinglePlayer) return;

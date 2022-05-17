@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Mono.Cecil.Cil;
 using MonoMod.Cil;
 using Terraria;
+using Terraria.ID;
 using Terraria.ModLoader;
 
 namespace TerraIntegration
@@ -15,12 +16,24 @@ namespace TerraIntegration
         {
             IL.Terraria.Main.DrawItem += DrawItemTexturePatch;
             IL.Terraria.UI.ItemSlot.Draw_SpriteBatch_ItemArray_int_int_Vector2_Color += PostItemSlotBackgroundDrawPatch;
+
+            On.Terraria.WorldGen.TileFrame += WorldGen_TileFrame;
         }
+
 
         public void Unload()
         {
             IL.Terraria.Main.DrawItem -= DrawItemTexturePatch;
             IL.Terraria.UI.ItemSlot.Draw_SpriteBatch_ItemArray_int_int_Vector2_Color -= PostItemSlotBackgroundDrawPatch;
+
+            On.Terraria.WorldGen.TileFrame -= WorldGen_TileFrame;
+        }
+
+        private void WorldGen_TileFrame(On.Terraria.WorldGen.orig_TileFrame orig, int i, int j, bool resetFrame, bool noBreak)
+        {
+            TileMimicking.BeforeTileFrame(i, j);
+            orig(i, j, resetFrame, noBreak);
+            TileMimicking.AfterTileFrame(i, j);
         }
 
         private void DrawItemTexturePatch(ILContext il)
@@ -159,7 +172,6 @@ namespace TerraIntegration
             if (item.ModItem is Items.Variable var)
                 var.PostDrawAll(Main.spriteBatch, position, sourceRectangle, color, rotation, origin, scale);
         }
-
         public static void PostItemSlotPackgoundDrawHook(SpriteBatch spriteBatch, Item[] inv, int slot, Vector2 position, Texture2D texture, float scale) 
         {
             if (slot >= inv.Length) return;
