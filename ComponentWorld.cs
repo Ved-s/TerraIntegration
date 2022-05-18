@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿using CustomTreeLib;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
 using System;
@@ -193,6 +194,19 @@ namespace TerraIntegration
         public bool DrawUI() 
         {
             ProgrammerInterface.Draw();
+
+            //if (HoverText is null) 
+            //{
+            //    Point mouse = (Main.MouseWorld / 16).ToPoint();
+            //
+            //    Tile t = Main.tile[mouse.X, mouse.Y];
+            //
+            //    if (t.HasTile && TileID.Sets.IsATreeTrunk[t.TileType]) 
+            //    {
+            //        TreeTileInfo info = TreeTileInfo.GetInfo(mouse.X, mouse.Y);
+            //        HoverText = info.ToString();
+            //    }
+            //}
 
             if (HoverItem is not null)
             {

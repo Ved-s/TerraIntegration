@@ -20,7 +20,7 @@ namespace TerraIntegration
             public Rectangle FrameRect() => new(FrameX, FrameY, 16, 16);
         }
 
-        public static void Clear() 
+        public static void Clear()
         {
             MimicType.Clear();
             MimicResult.Clear();

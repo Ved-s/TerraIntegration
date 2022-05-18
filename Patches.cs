@@ -2,8 +2,8 @@
 using Microsoft.Xna.Framework.Graphics;
 using Mono.Cecil.Cil;
 using MonoMod.Cil;
+using System.Collections.Generic;
 using Terraria;
-using Terraria.ID;
 using Terraria.ModLoader;
 
 namespace TerraIntegration
@@ -18,15 +18,21 @@ namespace TerraIntegration
             IL.Terraria.UI.ItemSlot.Draw_SpriteBatch_ItemArray_int_int_Vector2_Color += PostItemSlotBackgroundDrawPatch;
 
             On.Terraria.WorldGen.TileFrame += WorldGen_TileFrame;
+            On.Terraria.WorldGen.KillTile += WorldGen_KillTile;
+            On.Terraria.TileObject.Place += TileObject_Place;
+
+            Terraria.IO.WorldFile.OnWorldLoad += WorldFile_OnWorldLoad;
         }
-
-
         public void Unload()
         {
             IL.Terraria.Main.DrawItem -= DrawItemTexturePatch;
             IL.Terraria.UI.ItemSlot.Draw_SpriteBatch_ItemArray_int_int_Vector2_Color -= PostItemSlotBackgroundDrawPatch;
 
             On.Terraria.WorldGen.TileFrame -= WorldGen_TileFrame;
+            On.Terraria.WorldGen.KillTile -= WorldGen_KillTile;
+            On.Terraria.TileObject.Place -= TileObject_Place;
+
+            Terraria.IO.WorldFile.OnWorldLoad -= WorldFile_OnWorldLoad;
         }
 
         private void WorldGen_TileFrame(On.Terraria.WorldGen.orig_TileFrame orig, int i, int j, bool resetFrame, bool noBreak)
@@ -34,6 +40,40 @@ namespace TerraIntegration
             TileMimicking.BeforeTileFrame(i, j);
             orig(i, j, resetFrame, noBreak);
             TileMimicking.AfterTileFrame(i, j);
+        }
+        private void WorldGen_KillTile(On.Terraria.WorldGen.orig_KillTile orig, int i, int j, bool fail, bool effectOnly, bool noItem)
+        {
+            int type = Main.tile[i, j].TileType;
+            orig(i, j, fail, effectOnly, noItem);
+            if (!Main.tile[i, j].HasTile && Components.Component.TileTypes.Contains(type))
+            {
+                Components.Component.ByTileType[type].OnKilled(new(i, j));
+            }
+        }
+        private bool TileObject_Place(On.Terraria.TileObject.orig_Place orig, TileObject toBePlaced)
+        {
+            bool result = orig(toBePlaced);
+            if (Components.Component.ByTileType.TryGetValue(toBePlaced.type, out Components.Component c))
+                c.OnPlaced(new(toBePlaced.xCoord, toBePlaced.yCoord));
+
+            return result;
+        }
+        private void WorldFile_OnWorldLoad()
+        {
+            HashSet<Point16> updated = new();
+
+            for (int y = 0; y < Main.maxTilesY; y++)
+                for (int x = 0; x < Main.maxTilesX; x++)
+                {
+                    Tile t = Main.tile[x, y];
+                    if (!t.HasTile) continue;
+                    if (!Components.Component.TileTypes.Contains(t.TileType)) continue;
+                    Components.Component.ByTileType[t.TileType].OnLoaded(new(x, y));
+                    if (updated.Contains(new(x, y))) continue;
+
+                    ComponentSystem system = ComponentSystem.UpdateSystem(new(x, y));
+                    updated.UnionWith(system.ComponentsByPos.Keys);
+                }
         }
 
         private void DrawItemTexturePatch(ILContext il)

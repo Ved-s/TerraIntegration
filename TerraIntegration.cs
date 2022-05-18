@@ -55,14 +55,7 @@ namespace TerraIntegration
 					RegisterVariableValue(Activator.CreateInstance(t) as VariableValue);
 				}
 			}
-
-            On.Terraria.WorldGen.KillTile += WorldGen_KillTile;
-            On.Terraria.TileObject.Place += TileObject_Place;
-
-            WorldFile.OnWorldLoad += WorldFile_OnWorldLoad;
         }
-
-        
 
         public override void Unload()
         {
@@ -76,46 +69,6 @@ namespace TerraIntegration
 			PropertyVariable.Unregister();
 
 			VariableRenderer.Unload();
-
-			On.Terraria.WorldGen.KillTile -= WorldGen_KillTile;
-			On.Terraria.TileObject.Place -= TileObject_Place;
-
-			WorldFile.OnWorldLoad -= WorldFile_OnWorldLoad;
-		}
-
-        private void WorldFile_OnWorldLoad()
-        {
-			HashSet<Point16> updated = new();
-
-			for (int y = 0; y < Main.maxTilesY; y++)
-				for (int x = 0; x < Main.maxTilesX; x++)
-				{
-					Tile t = Main.tile[x, y];
-					if (!t.HasTile) continue;
-					if (!Component.TileTypes.Contains(t.TileType)) continue;
-					Component.ByTileType[t.TileType].OnLoaded(new(x, y));
-					if (updated.Contains(new(x, y))) continue;
-
-					ComponentSystem system = ComponentSystem.UpdateSystem(new(x, y));
-					updated.UnionWith(system.ComponentsByPos.Keys);
-				}
-		}
-        private void WorldGen_KillTile(On.Terraria.WorldGen.orig_KillTile orig, int i, int j, bool fail, bool effectOnly, bool noItem)
-        {
-			int type = Main.tile[i, j].TileType;
-			orig(i, j, fail, effectOnly, noItem);
-			if (!Main.tile[i, j].HasTile && Component.TileTypes.Contains(type))
-			{
-				Component.ByTileType[type].OnKilled(new(i, j));
-			}
-        }
-		private bool TileObject_Place(On.Terraria.TileObject.orig_Place orig, TileObject toBePlaced)
-		{
-			bool result = orig(toBePlaced);
-			if (Component.ByTileType.TryGetValue(toBePlaced.type, out Component c))
-				c.OnPlaced(new(toBePlaced.xCoord, toBePlaced.yCoord));
-
-			return result;
 		}
 
 		public override void HandlePacket(BinaryReader reader, int whoAmI)
