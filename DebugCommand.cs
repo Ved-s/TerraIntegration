@@ -12,12 +12,37 @@ namespace TerraIntegration
 {
     public class DebugCommand : ModCommand
     {
-        public override string Command => "tivar";
+        public override string Command => "ti";
         public override CommandType Type => CommandType.Chat;
 
         public override void Action(CommandCaller caller, string input, string[] args)
         {
             List<string> arg = new(args);
+
+            if (arg.Count == 0)
+            {
+                caller.Reply("Expected subcommand: var, gen");
+                return;
+            }
+            string sub = arg[0];
+            arg.RemoveAt(0);
+            if (sub == "var")
+            {
+                VarCommand(caller, arg);
+                return;
+            }
+            if (sub == "gen")
+            {
+                ModContent.GetInstance<ComponentWorld>().PostWorldGen();
+                return;
+            }
+
+            caller.Reply("Unknown subcommand");
+            return;
+        }
+
+        private void VarCommand(CommandCaller caller, List<string> arg) 
+        {
             Guid? id = null;
 
             if (arg.Count < 1)

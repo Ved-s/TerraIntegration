@@ -16,6 +16,7 @@ using Terraria.ID;
 using Terraria.ModLoader;
 using Terraria.ModLoader.IO;
 using Terraria.UI;
+using Terraria.WorldBuilding;
 
 namespace TerraIntegration
 {
@@ -191,22 +192,29 @@ namespace TerraIntegration
             ModContent.GetInstance<ComponentInterface>().Draw();
         }
 
-        public bool DrawUI() 
+        public bool DrawUI()
         {
             ProgrammerInterface.Draw();
 
-            //if (HoverText is null) 
-            //{
-            //    Point mouse = (Main.MouseWorld / 16).ToPoint();
-            //
-            //    Tile t = Main.tile[mouse.X, mouse.Y];
-            //
-            //    if (t.HasTile && TileID.Sets.IsATreeTrunk[t.TileType]) 
-            //    {
-            //        TreeTileInfo info = TreeTileInfo.GetInfo(mouse.X, mouse.Y);
-            //        HoverText = info.ToString();
-            //    }
-            //}
+            if (HoverText is null && TerraIntegration.DebugMode) 
+            {
+                Point mouse = (Main.MouseWorld / 16).ToPoint();
+            
+                Tile t = Main.tile[mouse.X, mouse.Y];
+            
+                if (t.HasTile && TileID.Sets.IsATreeTrunk[t.TileType])
+                {
+                    TreeStats stats = TreeGrowing.GetTreeStats(mouse.X, mouse.Y);
+                    bool haveSettings = CustomTree.TryGetTreeSettingsByType(t.TileType, out TreeSettings settings);
+
+                    HoverText = $"- TerraIntegration tree info -\ntX: {t.TileFrameX} tY: {t.TileFrameY}\n"
+                        + TreeTileInfo.GetInfo(mouse.X, mouse.Y) + "\n"
+                        + stats.ToString()
+                        + (haveSettings? 
+                            $"\nGV:{(settings.GroundTypeCheck(stats.GroundType)? "T" : "F")} " +
+                            $"GM:{(settings.CanGrowMoreCheck(stats.Top, settings, stats) ? "T" : "F")}" : "");
+                }
+            }
 
             if (HoverItem is not null)
             {
@@ -297,6 +305,49 @@ namespace TerraIntegration
             Vector2 hlScale = backSize / HighlightTexture.Size();
 
             spriteBatch.Draw(HighlightTexture, position, null, Color.White * (var.Highlight / 255f), 0f, Vector2.Zero, hlScale, SpriteEffects.None, 0);
+        }
+
+        public override void PostWorldGen()
+        {
+            Bluewood tree = ModContent.GetInstance<Bluewood>();
+            HashSet<Point> foundValidTrees = new();
+
+
+            for (int i = 1; i < Main.maxTilesX - 1; i++)
+                for (int j = 1; j < Main.worldSurface; j++)
+                    if (TileID.Sets.IsATreeTrunk[Main.tile[i,j].TileType])
+                    {
+                        TreeTileInfo info = TreeTileInfo.GetInfo(i, j);
+                        if (!info.IsCenter) continue;
+
+                        TreeStats stats = TreeGrowing.GetTreeStats(i, j);
+
+                        if (stats.Bottom.Y > 0)
+                            j = stats.Bottom.Y;
+
+                        if (!tree.ValidGroundType(stats.GroundType)) continue;
+
+                        foundValidTrees.Add(stats.Bottom);
+                    }
+            int treesToSpawn = Main.maxTilesX / 200;
+
+            treesToSpawn = Math.Max(5, Math.Min(treesToSpawn, foundValidTrees.Count / 5));
+
+            List<Point> validTrees = new(foundValidTrees);
+
+            while (treesToSpawn > 0 && validTrees.Count > 0)
+            {
+                int index = WorldGen.genRand.Next(validTrees.Count);
+                Point pos = validTrees[index];
+
+                foreach (PositionedTreeTile tile in TreeGrowing.EnumerateTreeTiles(pos.X, pos.Y))
+                    Main.tile[tile.Pos.X, tile.Pos.Y].ClearTile();
+
+                if (TreeGrowing.GrowTree(pos.X, pos.Y+1, tree.GetTreeSettings()))
+                    treesToSpawn--;
+
+                validTrees.RemoveAt(index);
+            }
         }
     }
 

@@ -49,7 +49,7 @@ namespace TerraIntegration
         {
             TreeTileInfo info = TreeTileInfo.GetInfo(x, y);
 
-            if (info.IsLeafy)
+            if (info.IsLeafy && Main.rand.NextBool(2))
                 Item.NewItem(WorldGen.GetItemSource_FromTileBreak(x, y), new Vector2(x, y) * 16, Acorn.Type);
 
             if (Main.rand.NextBool(2))
@@ -68,13 +68,60 @@ namespace TerraIntegration
 
         public override void RandomUpdate(int x, int y)
         {
+            base.RandomUpdate(x, y);
             CheckCutSides(x, y, out bool top, out bool left, out bool right);
 
             Tile t = Main.tile[x, y];
 
-            if (top) PlaceSap(x, y - 1, 0, t.TileColor);
-            if (left) PlaceSap(x - 1, y, 1, t.TileColor);
-            if (right) PlaceSap(x + 1, y, 2, t.TileColor);
+            TreeTileInfo info = TreeTileInfo.GetInfo(x, y);
+            bool tileChanged = false;
+
+            if (top && !Main.tile[x, y-1].HasTile && Main.rand.NextBool(15)) 
+            {
+                top = false;
+                tileChanged = true;
+            }
+            if (left && !Main.tile[x-1, y].HasTile && Main.rand.NextBool(10))
+            {
+                left = false;
+                tileChanged = true;
+            }
+            if (right && !Main.tile[x+1, y].HasTile && Main.rand.NextBool(10))
+            {
+                right = false;
+                tileChanged = true;
+            }
+
+            if (tileChanged)
+            {
+                bool noSides = !left && !right;
+
+                TreeTileSide side = TreeGrowing.GetSide(left, right);
+                TreeTileType type;
+                if (top)
+                {
+                    if (noSides) type = TreeTileType.Top;
+                    else if (info.WithRoots) type = TreeTileType.TopWithRoots;
+                    else type = TreeTileType.TopWithBranches;
+                }
+                else
+                {
+                    if (noSides) type = TreeTileType.Normal;
+                    else if (info.WithRoots) type = TreeTileType.WithRoots;
+                    else type = TreeTileType.WithBranches;
+                }
+
+                TreeGrowing.Place(x, y, new(info.Style, side, type), t.TileColor, GetTreeSettings());
+            }
+
+            if (top && Main.rand.NextBool(10)) PlaceSap(x, y - 1, 0, t.TileColor);
+            if (left && Main.rand.NextBool(15)) PlaceSap(x - 1, y, 1, t.TileColor);
+            if (right && Main.rand.NextBool(15)) PlaceSap(x + 1, y, 2, t.TileColor);
+        }
+
+        public override bool Shake(int x, int y, ref bool createLeaves)
+        {
+            return base.Shake(x, y, ref createLeaves);
         }
 
         public void PlaceSap(int x, int y, int side, byte color) 

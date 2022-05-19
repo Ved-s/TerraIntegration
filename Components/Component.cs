@@ -16,8 +16,6 @@ namespace TerraIntegration.Components
 {
     public abstract class Component : ModTile
     {
-        
-
         public static HashSet<int> TileTypes = new();
         public static Dictionary<string, Component> ByTypeName = new();
         public static Dictionary<int, Component> ByTileType = new();
