@@ -27,6 +27,8 @@ namespace TerraIntegration.Components
         public static ComponentWorld World => ModContent.GetInstance<ComponentWorld>();
 
         public abstract string ComponentType { get; }
+        public virtual string ComponentDisplayName { get; }
+
         public override string Texture
         {
             get
@@ -36,6 +38,7 @@ namespace TerraIntegration.Components
             }
         }
         public virtual ushort DefaultUpdateFrequency => 0;
+        public virtual bool ConfigurableFrequency => true;
         public virtual int VariableSlots => 0;
 
         public virtual string DefaultPropertyTexture => null;
@@ -52,6 +55,9 @@ namespace TerraIntegration.Components
                 return @interface;
             }
         }
+
+        public bool InterfaceVisible => ModContent.GetInstance<ComponentInterface>().InterfaceComponent.Component?.ComponentType == ComponentType;
+        public Point16 InterfacePos => ModContent.GetInstance<ComponentInterface>().InterfaceComponent.Pos;
 
         internal virtual bool HasData => false;
 

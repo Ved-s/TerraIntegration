@@ -19,7 +19,7 @@ using Terraria.UI;
 
 namespace TerraIntegration.Components
 {
-    public class CamoData : ComponentData 
+    public class CamoData : ComponentData
     {
         public Item CamoTileItem { get; set; }
     }
@@ -27,11 +27,11 @@ namespace TerraIntegration.Components
     public class Camo : Component<CamoData>
     {
         public override string ComponentType => "camo";
+        public override string ComponentDisplayName => "Camouflage block";
 
         public override bool HasRightClickInterface => true;
 
         public override Vector2 InterfaceOffset => new(24, 0);
-
 
         public override void SetStaticDefaults()
         {
@@ -59,6 +59,8 @@ namespace TerraIntegration.Components
                 Top = new(8, 0),
                 Left = new(-21, 0.5f),
 
+                MaxSlotCapacity = 1,
+
                 GetItem = () =>
                 ModContent.GetInstance<ComponentInterface>()
                 .InterfaceComponent.GetDataOrNull<CamoData>()?
@@ -71,7 +73,7 @@ namespace TerraIntegration.Components
                     if (data is not null)
                     {
                         data.CamoTileItem = item;
-                        CamoChanged(item, component.Pos);
+                        CamoChanged(item, component.Pos, false);
                     }
                 }
                 
@@ -140,7 +142,7 @@ namespace TerraIntegration.Components
             return cd;
         }
 
-        public static void CamoChanged(Item camo, Point16 pos)
+        public void CamoChanged(Item camo, Point16 pos, bool noSync)
         {
             if (camo is not null && camo.createTile > -1)
             {
@@ -149,6 +151,40 @@ namespace TerraIntegration.Components
             else TileMimicking.MimicType.Remove(pos);
 
             WorldGen.SquareTileFrame(pos.X, pos.Y, false);
+
+            if (!noSync && Main.netMode != NetmodeID.SinglePlayer)
+            {
+                CamoData data = GetData(pos);
+
+                if (data.CamoTileItem is null) CreatePacket(pos, 0).Send();
+                else
+                {
+                    ModPacket p = CreatePacket(pos, 1);
+                    ItemIO.Send(data.CamoTileItem, p, true);
+                    p.Send();
+                }
+            }
+        }
+
+        public override bool HandlePacket(Point16 pos, ushort messageType, BinaryReader reader, int whoAmI, ref bool broadcast)
+        {
+            if (messageType == 0) 
+            {
+                GetData(pos).CamoTileItem = null;
+                CamoChanged(null, pos, true);
+                broadcast = true;
+                return true;
+            }
+            if (messageType == 1)
+            {
+                Item item = ItemIO.Receive(reader);
+
+                GetData(pos).CamoTileItem = item;
+                CamoChanged(item, pos, true);
+                broadcast = true;
+                return true;
+            }
+            return false;
         }
 
         public override bool PreDraw(int i, int j, SpriteBatch spriteBatch)

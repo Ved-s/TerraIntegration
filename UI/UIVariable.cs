@@ -12,6 +12,8 @@ namespace TerraIntegration.UI
 
         public virtual VariableMatchDelegate VariableValidator { get; set; }
 
+        public override int MaxSlotCapacity => 1;
+
         public override ItemMatchDelegate ItemValidator => (item) =>
             item.type == ModContent.ItemType<Items.Variable>() && (VariableValidator?.Invoke((item.ModItem as Items.Variable)?.Var) ?? true);
 

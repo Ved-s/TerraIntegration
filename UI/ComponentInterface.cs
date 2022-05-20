@@ -37,7 +37,8 @@ namespace TerraIntegration.UI
                 SetupProperties));
 
             Tabs.Add(new ComponentUITab("Config",
-                () => InterfaceComponent.Component.DefaultUpdateFrequency > 0,
+                () => InterfaceComponent.Component.DefaultUpdateFrequency > 0 
+                && InterfaceComponent.Component.ConfigurableFrequency,
                 SetupComponentConfig));
         }
         public void Unload()
@@ -73,13 +74,26 @@ namespace TerraIntegration.UI
             return diff.X <= Main.LocalPlayer.lastTileRangeX && diff.Y <= Main.LocalPlayer.lastTileRangeY;
         }
 
+        private void SetupComponentName()
+        {
+            if (InterfaceComponent.Component.ComponentDisplayName is null) return;
+
+            UIState s = Interface.CurrentState;
+
+            UIText text = new UIText(InterfaceComponent.Component.ComponentDisplayName)
+            {
+                Left = new(6, 0)
+            };
+
+            MoveUI(0, text.MinHeight.Pixels);
+
+            s.Append(text);
+        }
         private void SetupReloadButton()
         {
             if (!TerraIntegration.DebugMode) return;
 
             UIState s = Interface.CurrentState;
-
-            InterfaceOffset.Y -= ReloadButtonHeight;
 
             MoveUI(0, ReloadButtonHeight);
 
@@ -196,6 +210,7 @@ namespace TerraIntegration.UI
 
                 UITextPanel<string> tabpanel = new(tab.Name)
                 {
+                    Top = new(4, 0),
                     Left = new(x, 0),
                     Height = new(24, 0),
 
@@ -248,6 +263,7 @@ namespace TerraIntegration.UI
                 }
 
             SetupTabSwitch();
+            SetupComponentName();
             SetupReloadButton();
 
             GetMinUISize(out _, out float height);

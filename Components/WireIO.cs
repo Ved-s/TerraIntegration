@@ -17,6 +17,8 @@ namespace TerraIntegration.Components
     public class WireIO : Component
     {
         public override string ComponentType => "wire";
+        public override string ComponentDisplayName => "Wire IO";
+
         public override int VariableSlots => 2;
 
         public override bool HasRightClickInterface => true;

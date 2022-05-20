@@ -56,6 +56,8 @@ namespace TerraIntegration.Components
         public readonly static SpriteSheet TypeSheet = new("TerraIntegration/Assets/Types/display", new(32, 32));
 
         public override string ComponentType => "display";
+        public override string ComponentDisplayName => "Variable display";
+
         public override bool HasRightClickInterface => true;
 
         public override ushort DefaultUpdateFrequency => 15;

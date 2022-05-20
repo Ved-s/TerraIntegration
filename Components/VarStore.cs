@@ -16,6 +16,8 @@ namespace TerraIntegration.Components
     public class VarStore : Component
     {
         public override string ComponentType => "store";
+        public override string ComponentDisplayName => "Variable store";
+
         public override int VariableSlots => 16;
 
         public override bool HasRightClickInterface => true;

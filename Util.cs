@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Terraria;
 using Terraria.ID;
+using Terraria.ModLoader;
 
 namespace TerraIntegration
 {
@@ -104,6 +105,15 @@ namespace TerraIntegration
 			if (a is not null && b is not null) 
 				return a.Equals(b);
 			return a is null && b is null;
+		}
+
+		public static T CreateModItem<T>(int stack = 1) where T : ModItem 
+		{
+			Item item = new();
+			item.SetDefaults(ModContent.ItemType<T>());
+			item.stack = stack;
+
+			return item.ModItem as T;
 		}
 	}
 }

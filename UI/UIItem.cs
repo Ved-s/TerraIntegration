@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using System;
 using Terraria;
 using Terraria.Audio;
 using Terraria.GameInput;
@@ -15,6 +16,8 @@ namespace TerraIntegration.UI
         const int Context = ItemSlot.Context.InventoryCoin;
         private readonly static Item Air = new();
 
+        public virtual int MaxSlotCapacity { get; set; } = int.MaxValue;
+
         public virtual bool DisplayOnly { get; set; } = false;
         public virtual float Scale { get; set; } = 0.8f;
 
@@ -23,12 +26,12 @@ namespace TerraIntegration.UI
 
         static Item PlayerHeldItem
         {
-            get 
+            get
             {
                 if (Main.playerInventory) return Main.mouseItem;
                 return Main.LocalPlayer.inventory[Main.LocalPlayer.selectedItem];
             }
-            set 
+            set
             {
                 if (Main.playerInventory) Main.mouseItem = value;
                 else Main.LocalPlayer.inventory[Main.LocalPlayer.selectedItem] = value;
@@ -58,11 +61,11 @@ namespace TerraIntegration.UI
                 }
 
                 OnHover();
+                Item playerHeld = PlayerHeldItem;
+                Item item = Item;
 
                 if (PlayerInput.MouseInfo.LeftButton == ButtonState.Pressed && PlayerInput.MouseInfoOld.LeftButton == ButtonState.Released)
                 {
-                    Item playerHeld = PlayerHeldItem;
-
                     if (PlayerHeldItem.IsAir)
                     {
                         if (Item is not null)
@@ -79,35 +82,111 @@ namespace TerraIntegration.UI
                             SoundEngine.PlaySound(SoundID.Grab);
                         }
                     }
-
-                    else if (ItemValidator is not null && !ItemValidator(playerHeld)) return;
-
-                    if (playerHeld.stack == 1)
+                    else
                     {
-                        if (DisplayOnly)
+                        if (ItemValidator is not null && !ItemValidator(playerHeld)) return;
+
+                        if (!DisplayOnly && item is not null && CheckItemStack(item, playerHeld) &&
+                            (item.stack < MaxSlotCapacity || playerHeld.stack < playerHeld.maxStack))
                         {
-                            Item = playerHeld.Clone();
+                            int itemMaxStack = Math.Min(item.maxStack, MaxSlotCapacity);
+
+                            if (item.stack < itemMaxStack)
+                            {
+                                int take = Math.Min(playerHeld.stack, itemMaxStack - item.stack);
+
+                                Item.stack += take;
+                                playerHeld.stack -= take;
+                                if (playerHeld.stack <= 0)
+                                    playerHeld.TurnToAir();
+                                PlayerHeldItem = playerHeld;
+                            }
+                            else
+                            {
+                                int give = Math.Min(item.stack, playerHeld.maxStack - item.stack);
+
+                                item.stack -= give;
+                                playerHeld.stack += give;
+                                if (item.stack <= 0)
+                                    item = null;
+                                Item = item;
+                            }
+                            SoundEngine.PlaySound(SoundID.Grab);
                         }
-                        else
+
+                        else if (playerHeld.stack <= MaxSlotCapacity)
                         {
-                            PlayerHeldItem = Item ?? new();
-                            Item = playerHeld;
+                            if (DisplayOnly)
+                            {
+                                Item = playerHeld.Clone();
+                            }
+                            else
+                            {
+                                PlayerHeldItem = Item ?? new();
+                                Item = playerHeld;
+                            }
+                            SoundEngine.PlaySound(SoundID.Grab);
                         }
+                        else if (Item is null && playerHeld.stack > 1)
+                        {
+                            int take = Math.Min(playerHeld.stack, MaxSlotCapacity);
+                            bool takeAll = take == playerHeld.stack;
 
-                        SoundEngine.PlaySound(SoundID.Grab);
-                    }
-                    else if (Item is null && playerHeld.stack > 1) 
-                    {
-                        Item i = playerHeld.Clone();
-                        i.stack = 1;
-                        Item = i;
+                            if (takeAll)
+                            {
+                                Item = playerHeld;
+                                playerHeld = new();
+                            }
+                            else
+                            {
+                                Item i = playerHeld.Clone();
+                                i.stack = take;
+                                Item = i;
+                            }
 
-                        if (!DisplayOnly) PlayerHeldItem.stack--;
+                            if (!DisplayOnly)
+                            {
+                                if (!takeAll)
+                                {
+                                    playerHeld.stack -= take;
+                                    if (playerHeld.stack <= 0)
+                                        playerHeld.TurnToAir();
+                                }
 
-                        SoundEngine.PlaySound(SoundID.Grab);
+                                PlayerHeldItem = playerHeld;
+                            }
+
+                            SoundEngine.PlaySound(SoundID.Grab);
+                        }
                     }
                 }
+                else if (Main.stackSplit <= 1 && Main.mouseRight && item is not null &&
+                    (playerHeld.IsAir || CheckItemStack(playerHeld, item) && playerHeld.stack < playerHeld.maxStack))
+                {
+                    if (playerHeld.IsAir)
+                    {
+                        playerHeld = item.Clone();
+                        playerHeld.stack = 0;
+                    }
+
+                    playerHeld.stack++;
+                    item.stack--;
+
+                    if (item.stack <= 0) item = null;
+
+                    PlayerHeldItem = playerHeld;
+                    Item = item;
+
+                    SoundEngine.PlaySound(SoundID.MenuTick);
+                    ItemSlot.RefreshStackSplitCooldown();
+
+                }
             }
+        }
+
+        internal bool CheckItemStack(Item a, Item b)
+        {
+            return a.netID == b.netID && a.type == b.type && ItemLoader.CanStack(a, b);
         }
 
         protected override void DrawSelf(SpriteBatch spriteBatch)
