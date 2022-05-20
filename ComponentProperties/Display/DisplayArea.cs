@@ -10,7 +10,7 @@ using TerraIntegration.Variables;
 
 namespace TerraIntegration.ComponentProperties.Display
 {
-    public class DisplayArea : PropertyVariable<Components.Display>
+    public class DisplayArea : ComponentProperty<Components.Display>
     {
         public override string TypeDisplay => "Display area";
         public override string PropertyName => "area";

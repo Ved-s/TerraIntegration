@@ -378,7 +378,7 @@ namespace TerraIntegration.Components
         public Variable GetVariable(int index) 
         {
             if (Variables.TryGetValue(index, out Items.Variable var))
-                return var.Var;
+                return var?.Var;
             return null;
         }
         public Items.Variable GetVariableItem(int index)

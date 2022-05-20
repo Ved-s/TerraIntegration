@@ -31,6 +31,7 @@ namespace TerraIntegration
 			VariableValue.ByTypeName.Clear();
 			VariableValue.ByType.Clear();
 			ComponentProperty.Unregister();
+			ValueProperty.Unregister();
 
 			RegisterVariable(new Variable());
 			RegisterVariableValue(new VariableValue());
@@ -68,6 +69,7 @@ namespace TerraIntegration
 			VariableValue.ByTypeName.Clear();
 			VariableValue.ByType.Clear();
 			ComponentProperty.Unregister();
+			ValueProperty.Unregister();
 
 			VariableRenderer.Unload();
 		}
@@ -95,6 +97,11 @@ namespace TerraIntegration
 				ComponentProperty.Register(pv);
 				return;
 			}
+			if (v is ValueProperty valpr)
+			{
+				ValueProperty.Register(valpr);
+				return;
+			}
 
 			if (v?.Type is null) return;
 			Variable.ByTypeName[v.Type] = v;
@@ -105,6 +112,8 @@ namespace TerraIntegration
 
 			VariableValue.ByTypeName[v.Type] = v;
 			VariableValue.ByType[v.GetType()] = v;
+
+			ValueProperty.ValueRegistered();
 		}
 	}
 

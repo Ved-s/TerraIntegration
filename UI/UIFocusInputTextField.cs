@@ -11,7 +11,7 @@ using Terraria.GameContent.UI.Elements;
 using Terraria.GameInput;
 using Terraria.UI;
 
-namespace TerraIntegration
+namespace TerraIntegration.UI
 {
 	internal class UIFocusInputTextField : UIPanel
 	{

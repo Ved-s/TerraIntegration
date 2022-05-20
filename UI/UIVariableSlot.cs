@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using TerraIntegration.Items;
+using Terraria;
 
 namespace TerraIntegration.UI
 {
@@ -21,7 +22,7 @@ namespace TerraIntegration.UI
                 VariableChanged?.Invoke();
             }
         }
-        public Point WorldPos { get; set; }
+        public virtual Point WorldPos { get; set; }
 
         public event Action VariableChanged;
 
@@ -32,5 +33,10 @@ namespace TerraIntegration.UI
             Util.DropItemInWorld(Var.Item, WorldPos.X, WorldPos.Y);
             Var = null;
         }
+    }
+
+    public class UIPlayerVariableSlot : UIVariableSlot
+    {
+        public override Point WorldPos => (Main.LocalPlayer.Center / 16).ToPoint();
     }
 }

@@ -175,7 +175,7 @@ namespace TerraIntegration.Variables
         }
     }
 
-    public abstract class PropertyVariable<TComponent> : ComponentProperty where TComponent : Component
+    public abstract class ComponentProperty<TComponent> : ComponentProperty where TComponent : Component
     {
         public sealed override string ComponentType
         {

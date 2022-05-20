@@ -25,7 +25,7 @@ namespace TerraIntegration.UI
 
         public override void OnHover()
         {
-            if (Var is not null && VariableValidator is not null)
+            if (Var is null && VariableValidator is not null)
                 ModContent.GetInstance<ComponentWorld>().VariableHighlights.Add(VariableValidator);
         }
     }

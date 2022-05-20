@@ -47,6 +47,8 @@ namespace TerraIntegration.UI
 
         static IOwnProgrammerInterface CurrentOwner;
         static UIFocusInputTextField VariableName;
+        static UIPanel SelectedPanel;
+        static Color PreviousSelectedColor;
 
         static ProgrammerInterface()
         {
@@ -141,6 +143,11 @@ namespace TerraIntegration.UI
                 MarginLeft = 5,
                 MarginRight = 0,
                 MarginBottom = 0,
+
+                PaddingTop = 5,
+                PaddingLeft = 5,
+                PaddingRight = 5,
+                PaddingBottom = 5,
 
                 BackgroundColor = new Color(0x48, 0x51, 0x64, 200),
             });
@@ -398,6 +405,10 @@ namespace TerraIntegration.UI
         static void PopulateVariables()
         {
             VariablesList.Clear();
+            PropertiesList.Clear();
+
+            Select(null);
+
             foreach (VariableValue v in VariableValue.ByTypeName.Values)
             {
                 if (v is not IOwnProgrammerInterface interfaceOwner || !v.TypeDisplay.ToLower().Contains(VariablesSearch.CurrentString.ToLower())) continue;
@@ -416,6 +427,7 @@ namespace TerraIntegration.UI
                 };
                 panel.OnClick += (ev, el) =>
                 {
+                    Select(panel);
                     SoundEngine.PlaySound(SoundID.MenuTick);
                     VariableClicked(interfaceOwner);
                 };
@@ -424,7 +436,9 @@ namespace TerraIntegration.UI
 
             foreach (Variable v in Variable.ByTypeName.Values)
             {
-                if (v is not IOwnProgrammerInterface interfaceOwner || !v.TypeDisplay.ToLower().Contains(VariablesSearch.CurrentString.ToLower())) continue;
+                if (v is not IOwnProgrammerInterface interfaceOwner 
+                    || !v.TypeDisplay.ToLower().Contains(VariablesSearch.CurrentString.ToLower())
+                    || v is ValueProperty) continue;
 
                 UITextPanel<string> panel = new UITextPanel<string>(v.TypeDisplay)
                 {
@@ -438,22 +452,54 @@ namespace TerraIntegration.UI
                 };
                 panel.OnClick += (ev, el) =>
                 {
+                    Select(panel);
                     SoundEngine.PlaySound(SoundID.MenuTick);
                     VariableClicked(interfaceOwner);
                 };
                 VariablesList.Add(panel);
             }
         }
-        static void PopulateProperties() { }
+        static void PopulateProperties()
+        {
+            PropertiesList.Clear();
+
+            if (CurrentOwner is VariableValue value)
+            {
+                foreach (var (type, prop) in value.GetProperties())
+                {
+                    if (!prop.TypeDisplay.ToLower().Contains(VariablesSearch.CurrentString.ToLower())) continue;
+
+                    string typeName = VariableValue.TypeToName(type, out Color typeColor);
+
+                    UITextPanel<string> panel = new UITextPanel<string>($"{Util.ColorTag(typeColor, typeName)}.{prop.TypeDisplay}")
+                    {
+                        Width = new(0, 1),
+                        Height = new(30, 0),
+
+                        MarginTop = 0,
+                        MarginLeft = 0,
+                        MarginRight = 0,
+                        MarginBottom = 0,
+                    };
+                    panel.OnClick += (ev, el) =>
+                    {
+                        Select(panel);
+                        SoundEngine.PlaySound(SoundID.MenuTick);
+                        PropertyClicked(prop);
+                    };
+                    PropertiesList.Add(panel);
+                }
+            }
+        }
 
         static void VariableClicked(IOwnProgrammerInterface var)
         {
             SetInterface(var);
+            PopulateProperties();
         }
-
         static void PropertyClicked(IOwnProgrammerInterface prop)
         {
-
+            SetInterface(prop);
         }
 
         static void SetInterface(IOwnProgrammerInterface owner)
@@ -479,6 +525,20 @@ namespace TerraIntegration.UI
             VariableInterface.BackgroundColor = new Color(0x33, 0x61, 0x6e, 200);
 
             Back.Append(VariableInterface);
+        }
+
+        static void Select(UIPanel panel) 
+        {
+            if (SelectedPanel is not null)
+                SelectedPanel.BackgroundColor = PreviousSelectedColor;
+
+            if (panel is null) 
+                return;
+
+            SelectedPanel = panel;
+            PreviousSelectedColor = panel.BackgroundColor;
+
+            panel.BackgroundColor = new Color(100, 160, 180);
         }
     }
 }

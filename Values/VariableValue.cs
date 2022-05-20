@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TerraIntegration.Variables;
 using Terraria.ModLoader;
 
 namespace TerraIntegration.Values
@@ -105,6 +106,19 @@ namespace TerraIntegration.Values
             }
             color = new(0xff, 0xaa, 0xaa);
             return $"unregistered type {type.Name}";
+        }
+
+        public IEnumerable<(Type, ValueProperty)> GetProperties() 
+        {
+            Type type = GetType();
+            if (ValueProperty.ByValueType.TryGetValue(type, out var props))
+                foreach (ValueProperty prop in props.Values)
+                    yield return (type, prop);
+
+            foreach (Type interf in type.GetInterfaces())
+                if (ValueProperty.ByValueType.TryGetValue(interf, out var intprops))
+                    foreach (ValueProperty prop in intprops.Values)
+                        yield return (interf, prop);
         }
     }
 
