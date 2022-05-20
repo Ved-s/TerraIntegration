@@ -251,14 +251,13 @@ namespace TerraIntegration
 
                 if (!shouldSave) continue;
 
-                components.Add(new()
-                {
-                    ["x"] = kvp.Key.X,
-                    ["y"] = kvp.Key.Y,
-                    ["data"] = kvp.Value is UnloadedComponentData ?
+                TagCompound t = kvp.Value is UnloadedComponentData ?
                     UnloadedComponent.SaveTag(kvp.Value) :
-                    kvp.Value.Component.SaveTag(kvp.Value)
-                });
+                    kvp.Value.Component.SaveTag(kvp.Value);
+                if (t is null) continue;
+                t["x"] = kvp.Key.X;
+                t["y"] = kvp.Key.Y;
+                components.Add(t);
             }
 
             tag["components"] = components;
@@ -278,9 +277,7 @@ namespace TerraIntegration
                     if (component.ContainsKey("y"))
                         pos.Y = component.GetShort("y");
 
-                    if (!component.ContainsKey("data")) continue;
-                    ComponentData data = Component.LoadTag(component.GetCompound("data"));
-
+                    ComponentData data = Component.LoadTag(component);
                     if (data is null) continue;
 
                     ComponentData[pos] = data;

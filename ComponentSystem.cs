@@ -51,7 +51,7 @@ namespace TerraIntegration
             {
                 system.AllComponents.Add(component);
 
-                if (component.Component.VariableSlots > 0)
+                if (component.Component.CanHaveVariables)
                     system.ComponentsWithVariables.Add(component);
 
                 string type = component.Component.ComponentType;
@@ -169,7 +169,7 @@ namespace TerraIntegration
                 foreach (PositionedComponent c in ComponentsWithVariables)
                 {
                     ComponentData d = c.GetData();
-                    foreach (Items.Variable var in d.Variables)
+                    foreach (Items.Variable var in d.Variables.Values)
                         if (var is not null)
                             if (var.Var.Id == varId)
                             {

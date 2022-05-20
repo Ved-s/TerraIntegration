@@ -23,7 +23,7 @@ namespace TerraIntegration.Components
 
     public class SapCollector : Component<SapCollectorData>
     {
-        public override string Texture => "TerraIntegration/Assets/Tiles/Camo";
+        public override string Texture => "TerraIntegration/Assets/Tiles/SapCollector";
 
         public override string ComponentType => "sap";
         public override string ComponentDisplayName => "Sap collector";

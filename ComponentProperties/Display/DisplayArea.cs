@@ -6,13 +6,14 @@ using System.Text;
 using System.Threading.Tasks;
 using TerraIntegration.Components;
 using TerraIntegration.Values;
+using TerraIntegration.Variables;
 
-namespace TerraIntegration.Variables.Display
+namespace TerraIntegration.ComponentProperties.Display
 {
     public class DisplayArea : PropertyVariable<Components.Display>
     {
         public override string TypeDisplay => "Display area";
-        public override string ComponentProperty => "area";
+        public override string PropertyName => "area";
 
         public override Point SpritesheetPos => new(1, 0);
 

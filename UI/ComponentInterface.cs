@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TerraIntegration.ComponentProperties;
 using TerraIntegration.Components;
 using TerraIntegration.Variables;
 using Terraria;
@@ -33,7 +34,7 @@ namespace TerraIntegration.UI
                     SetupInterface));
 
             Tabs.Add(new ComponentUITab("Properties",
-                () => PropertyVariable.ByComponentType.ContainsKey(InterfaceComponent.Component.ComponentType),
+                () => ComponentProperty.ByComponentType.ContainsKey(InterfaceComponent.Component.ComponentType),
                 SetupProperties));
 
             Tabs.Add(new ComponentUITab("Config",
@@ -165,12 +166,12 @@ namespace TerraIntegration.UI
         }
         private void SetupProperties(Vector2 pos)
         {
-            IEnumerable<PropertyVariable> props = InterfaceComponent.Component.GetProperties();
+            IEnumerable<ComponentProperty> props = InterfaceComponent.Component.GetProperties();
             if (props is not null)
             {
                 int y = (int)pos.Y;
 
-                foreach (PropertyVariable v in props)
+                foreach (ComponentProperty v in props)
                 {
                     var def = new UIComponentVariableDefinition()
                     {

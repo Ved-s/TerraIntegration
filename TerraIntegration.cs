@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using TerraIntegration.ComponentProperties;
 using TerraIntegration.Components;
 using TerraIntegration.Values;
 using TerraIntegration.Variables;
@@ -29,7 +30,7 @@ namespace TerraIntegration
 			Variable.ByTypeName.Clear();
 			VariableValue.ByTypeName.Clear();
 			VariableValue.ByType.Clear();
-			PropertyVariable.Unregister();
+			ComponentProperty.Unregister();
 
 			RegisterVariable(new Variable());
 			RegisterVariableValue(new VariableValue());
@@ -66,7 +67,7 @@ namespace TerraIntegration
 			Variable.ByTypeName.Clear();
 			VariableValue.ByTypeName.Clear();
 			VariableValue.ByType.Clear();
-			PropertyVariable.Unregister();
+			ComponentProperty.Unregister();
 
 			VariableRenderer.Unload();
 		}
@@ -85,13 +86,13 @@ namespace TerraIntegration
 			Component.ByTileType[c.Type] = c;
 			Component.ByTypeName[c.ComponentType] = c;
 
-			PropertyVariable.ComponentRegistered();
+			ComponentProperty.ComponentRegistered();
 		}
 		public void RegisterVariable(Variable v)
 		{
-			if (v is PropertyVariable pv)
+			if (v is ComponentProperty pv)
 			{
-				PropertyVariable.Register(pv);
+				ComponentProperty.Register(pv);
 				return;
 			}
 

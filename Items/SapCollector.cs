@@ -11,7 +11,7 @@ namespace TerraIntegration.Items
 {
     public class SapCollector : ModItem
     {
-        public override string Texture => "TerraIntegration/Assets/Tiles/Camo";
+        public override string Texture => "TerraIntegration/Assets/Tiles/SapCollector";
 
         public override void SetDefaults()
         {

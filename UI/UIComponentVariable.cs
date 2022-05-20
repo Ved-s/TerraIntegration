@@ -1,4 +1,5 @@
 ﻿using TerraIntegration.Components;
+using TerraIntegration.Variables;
 
 namespace TerraIntegration.UI
 {
@@ -11,12 +12,9 @@ namespace TerraIntegration.UI
                 if (Component.Component is null)
                     return null;
 
-                ComponentData data = Component.Component.GetData(Component.Pos);
+                ComponentData data = Component.Component.GetDataOrNull(Component.Pos);
 
-                if (data.Variables.Length <= VariableSlot)
-                    return null;
-
-                return data.Variables[VariableSlot];
+                return data?.GetVariableItem(VariableSlot);
             }
             set
             {
@@ -25,10 +23,7 @@ namespace TerraIntegration.UI
 
                 ComponentData data = Component.Component.GetData(Component.Pos);
 
-                if (data.Variables.Length <= VariableSlot)
-                    return;
-
-                data.Variables[VariableSlot] = value;
+                data.SetVariable(VariableSlot, value);
                 Component.Component.OnVariableChanged(Component.Pos, VariableSlot);
             }
         }

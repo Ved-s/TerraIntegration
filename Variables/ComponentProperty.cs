@@ -6,20 +6,21 @@ using System.Text;
 using System.Threading.Tasks;
 using TerraIntegration.Components;
 using TerraIntegration.Values;
+using TerraIntegration.Variables;
 using Terraria.ModLoader.IO;
 
 namespace TerraIntegration.Variables
 {
-    public abstract class PropertyVariable : Variable
+    public abstract class ComponentProperty : Variable
     {
-        public static readonly Dictionary<string, Dictionary<string, PropertyVariable>> ByComponentType = new();
-        public static readonly List<PropertyVariable> AllProperties = new();
-        public static readonly List<PropertyVariable> WaitingComponent = new();
+        public static readonly Dictionary<string, Dictionary<string, ComponentProperty>> ByComponentType = new();
+        public static readonly List<ComponentProperty> AllProperties = new();
+        public static readonly List<ComponentProperty> WaitingComponent = new();
 
-        public override string Type => $"{ComponentType}.{ComponentProperty}";
+        public override string Type => $"{ComponentType}.{PropertyName}";
 
         public abstract string ComponentType { get; }
-        public abstract string ComponentProperty { get; }
+        public abstract string PropertyName { get; }
 
         public override SpriteSheet SpriteSheet
         {
@@ -73,9 +74,9 @@ namespace TerraIntegration.Variables
 
         public abstract VariableValue GetProperty(PositionedComponent c, List<Error> errors);
 
-        public virtual PropertyVariable CreateVariable(PositionedComponent c)
+        public virtual ComponentProperty CreateVariable(PositionedComponent c)
         {
-            PropertyVariable pv = (PropertyVariable)Activator.CreateInstance(GetType());
+            ComponentProperty pv = (ComponentProperty)Activator.CreateInstance(GetType());
             pv.ComponentPos = c.Pos;
             pv.BoundComponent = c.Component;
 
@@ -92,9 +93,9 @@ namespace TerraIntegration.Variables
 
         public static void ComponentRegistered()
         {
-            List<PropertyVariable> success = new();
+            List<ComponentProperty> success = new();
 
-            foreach (PropertyVariable pv in WaitingComponent) 
+            foreach (ComponentProperty pv in WaitingComponent) 
             {
                 if (pv.ComponentType is null) 
                     continue;
@@ -103,11 +104,11 @@ namespace TerraIntegration.Variables
                 success.Add(pv);
             }
 
-            foreach (PropertyVariable pv in success)
+            foreach (ComponentProperty pv in success)
                 WaitingComponent.Remove(pv);
         }
 
-        public static void Register(PropertyVariable property)
+        public static void Register(ComponentProperty property)
         {
             if (property.ComponentType is null)
             {
@@ -120,7 +121,7 @@ namespace TerraIntegration.Variables
                 prop = new();
                 ByComponentType[property.ComponentType] = prop;
             }
-            prop[property.ComponentProperty] = property;
+            prop[property.PropertyName] = property;
             Variable.ByTypeName[property.Type] = property;
         }
 
@@ -137,7 +138,7 @@ namespace TerraIntegration.Variables
         }
         protected override Variable LoadCustomData(BinaryReader reader)
         {
-            PropertyVariable pv = (PropertyVariable)Activator.CreateInstance(GetType());
+            ComponentProperty pv = (ComponentProperty)Activator.CreateInstance(GetType());
 
             pv.ComponentPos = new(reader.ReadInt16(), reader.ReadInt16());
             return pv;
@@ -154,7 +155,7 @@ namespace TerraIntegration.Variables
 
         protected override Variable LoadCustomTag(object data)
         {
-            PropertyVariable pv = (PropertyVariable)Activator.CreateInstance(GetType());
+            ComponentProperty pv = (ComponentProperty)Activator.CreateInstance(GetType());
 
 
             if (data is TagCompound tag)
@@ -174,7 +175,7 @@ namespace TerraIntegration.Variables
         }
     }
 
-    public abstract class PropertyVariable<TComponent> : PropertyVariable where TComponent : Component
+    public abstract class PropertyVariable<TComponent> : ComponentProperty where TComponent : Component
     {
         public sealed override string ComponentType
         {
@@ -199,7 +200,7 @@ namespace TerraIntegration.Variables
         }
 
         public abstract VariableValue GetProperty(TComponent component, Point16 pos, List<Error> errors);
-        public virtual PropertyVariable CreateVariable(TComponent component, Point16 pos) => (PropertyVariable)Activator.CreateInstance(GetType());
+        public virtual ComponentProperty CreateVariable(TComponent component, Point16 pos) => (ComponentProperty)Activator.CreateInstance(GetType());
 
         public sealed override VariableValue GetProperty(PositionedComponent c, List<Error> errors)
         {

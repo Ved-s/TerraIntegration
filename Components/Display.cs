@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.IO;
 using TerraIntegration.UI;
 using TerraIntegration.Values;
+using TerraIntegration.Variables;
 using Terraria;
 using Terraria.GameContent;
 using Terraria.GameContent.UI.Elements;
@@ -25,19 +26,21 @@ namespace TerraIntegration.Components
 
         public void NoMoreMaster(Point16 pos)
         {
-            if (Variables[0] is not null)
+            Variable v = GetVariable(0);
+            if (v is not null)
             {
                 DisplayData master = (Component as Display).GetData(MasterPos);
-                if (master.Variables[0] is null)
+                Variable masterVar = master.GetVariable(0);
+                if (masterVar is null)
                 {
-                    master.Variables[0] = Variables[0];
-                    Variables[0] = null;
+                    masterVar = v;
+                    ClearVariable(0);
                     master.Component.OnVariableChanged(MasterPos, 0);
                     return;
                 }
 
-                Util.DropItemInWorld(Variables[0].Item, pos.X * 16, pos.Y * 16);
-                Variables[0] = null;
+                Util.DropItemInWorld(GetVariableItem(0).Item, pos.X * 16, pos.Y * 16);
+                ClearVariable(0);
             }
         }
     }
@@ -64,7 +67,7 @@ namespace TerraIntegration.Components
 
         public override SpriteSheet DefaultPropertySpriteSheet => TypeSheet;
 
-        public override int VariableSlots => 1;
+        public override bool CanHaveVariables => true;
 
         private UIComponentVariable Slot = new();
         private List<Error> Errors = new();
@@ -133,7 +136,7 @@ namespace TerraIntegration.Components
             DisplayData data = GetData(pos);
 
             if (data.Master is null) return;
-            if (data.Variables[0] is null)
+            if (!data.HasVariable(0))
             {
                 data.Master.DisplayValue = null;
                 return;
@@ -142,7 +145,7 @@ namespace TerraIntegration.Components
 
             if (Main.netMode != NetmodeID.MultiplayerClient)
             {
-                Values.VariableValue value = data.Variables[0].Var.GetValue(data.System, Errors);
+                Values.VariableValue value = data.GetVariable(0).GetValue(data.System, Errors);
 
                 if (Errors.Count > 0)
                 {

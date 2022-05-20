@@ -19,7 +19,7 @@ namespace TerraIntegration.Components
         public override string ComponentType => "wire";
         public override string ComponentDisplayName => "Wire IO";
 
-        public override int VariableSlots => 2;
+        public override bool CanHaveVariables => true;
 
         public override bool HasRightClickInterface => true;
 
@@ -109,7 +109,7 @@ namespace TerraIntegration.Components
             Point16 pos = new(i, j);
 
             ComponentData data = GetData(pos);
-            if (data.Variables[0] is not null && data.Variables[0].Var is Event ev)
+            if (data.GetVariable(0) is Event ev)
                 ev.Trigger(pos, data.System);
         }
     }

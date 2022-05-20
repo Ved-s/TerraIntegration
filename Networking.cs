@@ -246,10 +246,10 @@ namespace TerraIntegration
 
             ComponentWorld world = ModContent.GetInstance<ComponentWorld>();
             ComponentData data = world.GetDataOrNull(pos);
-            if (data is null || slot < 0 || slot >= data.Variables.Length)
+            if (!data.Variables.TryGetValue(slot, out Items.Variable var))
                 return;
 
-            Variable v = data.Variables[slot]?.Var;
+            Variable v = var.Var;
 
             ModPacket pack = CreatePacket(NetMessageType.ComponentVariable);
             pack.Write(pos.X);
@@ -271,10 +271,7 @@ namespace TerraIntegration
             Variable v = Variable.LoadData(reader);
 
             ComponentData data = world.GetDataOrNull(pos);
-            if (data is null || slot < 0 || slot >= data.Variables.Length)
-                return;
-
-            data.Variables[slot] = v is null? null : new() { Var = v };
+            data?.SetVariable(slot, v);
         }
 
         public static void SendComponentFrequency(Point16 pos)

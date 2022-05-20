@@ -2,6 +2,8 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using TerraIntegration.ComponentProperties;
 using TerraIntegration.UI;
 using TerraIntegration.Variables;
 using Terraria;
@@ -39,7 +41,8 @@ namespace TerraIntegration.Components
         }
         public virtual ushort DefaultUpdateFrequency => 0;
         public virtual bool ConfigurableFrequency => true;
-        public virtual int VariableSlots => 0;
+
+        public virtual bool CanHaveVariables => false;
 
         public virtual string DefaultPropertyTexture => null;
         public virtual SpriteSheet DefaultPropertySpriteSheet => null;
@@ -113,9 +116,8 @@ namespace TerraIntegration.Components
                 World.ComponentUpdates[pos] = this;
 
             ComponentData data = GetData(pos);
-            foreach (var var in data.Variables)
-                if (var is not null)
-                    World.Guids.AddToDictionary(var.Var.Id);
+            foreach (var var in data.Variables.Values)
+                World.Guids.AddToDictionary(var.Var.Id);
         }
         [CallSide(CallSide.Both)]
         public virtual void OnUpdate(Point16 pos) { }
@@ -128,8 +130,9 @@ namespace TerraIntegration.Components
         {
             ComponentData data = GetData(pos);
             Networking.SendComponentVariable(pos, varIndex);
-            if (data.Variables[varIndex] is null) return;
-            World.Guids.AddToDictionary(data.Variables[varIndex].Var.Id);
+            Variable v = data.GetVariable(varIndex);
+            if (v is null) return;
+            World.Guids.AddToDictionary(v.Id);
         }
         [CallSide(CallSide.Both)]
         public virtual void OnPlayerJoined(int player) { }
@@ -145,11 +148,11 @@ namespace TerraIntegration.Components
         }
 
         public virtual bool ShouldSaveData(ComponentData data) => true;
-        public virtual bool ShouldSyncData(ComponentData data) => VariableSlots > 0 || DefaultUpdateFrequency > 0;
+        public virtual bool ShouldSyncData(ComponentData data) => CanHaveVariables || DefaultUpdateFrequency > 0;
 
-        public virtual IEnumerable<PropertyVariable> GetProperties()
+        public virtual IEnumerable<ComponentProperty> GetProperties()
         {
-            if (!PropertyVariable.ByComponentType.TryGetValue(ComponentType, out var props))
+            if (!ComponentProperty.ByComponentType.TryGetValue(ComponentType, out var props))
                 return null;
 
             return props.Values;
@@ -188,17 +191,13 @@ namespace TerraIntegration.Components
                 throw new InvalidDataException("Unloaded data should not be synced");
 
             writer.Write(ComponentType);
-            writer.Write((ushort)data.Variables.Length);
+            writer.Write((ushort)data.Variables.Values.Count(v => v is not null));
 
-            foreach (Items.Variable var in data.Variables)
+            foreach (var kvp in data.Variables)
             {
-                if (var is null)
-                {
-                    writer.Write("");
-                    continue;
-                }
-
-                var.Var.SaveData(writer);
+                if (kvp.Value is null) continue;
+                writer.Write(kvp.Key);
+                kvp.Value.Var.SaveData(writer);
             }
             writer.Write(data.UpdateFrequency);
             SendDataInternal(writer, data);
@@ -206,19 +205,17 @@ namespace TerraIntegration.Components
         internal static ComponentData NetReceiveData(BinaryReader reader)
         {
             string component = reader.ReadString();
-            Items.Variable[] vars = new Items.Variable[reader.ReadUInt16()];
+            Dictionary<int, Variable> vars = new();
 
-            for (int i = 0; i < vars.Length; i++)
+            ushort count = reader.ReadUInt16();
+            for (int i = 0; i < count; i++)
             {
+                int index = reader.ReadInt16();
                 Variables.Variable var = Variables.Variable.LoadData(reader);
 
                 if (var is null) continue;
 
-                Item item = new();
-                item.SetDefaults(ModContent.ItemType<Items.Variable>());
-                Items.Variable itemvar = item.ModItem as Items.Variable;
-                itemvar.Var = var;
-                vars[i] = itemvar;
+                vars[index] = var;
             }
             ushort freq = reader.ReadUInt16();
             ushort dataLength = reader.ReadUInt16();
@@ -234,11 +231,9 @@ namespace TerraIntegration.Components
             data = c.ReceiveDataInternal(reader, dataLength, component);
             data.Init(c);
 
-            for (int i = 0; i < vars.Length; i++)
-            {
-                if (i >= data.Variables.Length) break;
-                data.Variables[i] = vars[i];
-            }
+            foreach (var kvp in vars)
+                data.SetVariable(kvp.Key, kvp.Value);
+
             data.UpdateFrequency = freq;
 
             return data;
@@ -252,14 +247,12 @@ namespace TerraIntegration.Components
 
             List<TagCompound> variables = new List<TagCompound>();
 
-            foreach (Items.Variable var in data.Variables)
+            foreach (var kvp in data.Variables)
             {
-                if (var is null)
-                {
-                    variables.Add(new());
-                    continue;
-                }
-                TagCompound vartag = var.Var.SaveTag();
+                if (kvp.Value is null) continue;
+                
+                TagCompound vartag = kvp.Value.Var.SaveTag();
+                vartag["index"] = kvp.Key;
                 variables.Add(vartag);
             }
             tag["var"] = variables;
@@ -277,27 +270,31 @@ namespace TerraIntegration.Components
             if (!tag.ContainsKey("type")) return null;
             string component = tag.GetString("type");
 
-            List<Items.Variable> vars = null;
+            Dictionary<int, Variable> vars = null;
             if (tag.ContainsKey("var"))
             {
                 IList<TagCompound> variables = tag.GetList<TagCompound>("var");
                 vars = new();
 
+                int oldIndex = 0;
+
                 foreach (TagCompound vartag in variables)
                 {
-                    Variables.Variable var = Variables.Variable.LoadTag(vartag);
+                    int index;
 
-                    if (var is null)
-                    {
-                        vars.Add(null);
-                        continue;
-                    }
+                    if (!vartag.ContainsKey("index")) 
+                        index = oldIndex;
+                    else 
+                        index = vartag.GetInt("index");
 
-                    Item item = new();
-                    item.SetDefaults(ModContent.ItemType<Items.Variable>());
-                    Items.Variable itemvar = item.ModItem as Items.Variable;
-                    itemvar.Var = var;
-                    vars.Add(itemvar);
+                    Variable var = Variable.LoadTag(vartag);
+
+                    if (var is null) continue;
+
+                    vars[index] = var;
+
+                    do oldIndex++;
+                    while (vars.ContainsKey(oldIndex));
                 }
             }
 
@@ -321,11 +318,9 @@ namespace TerraIntegration.Components
                 data.UpdateFrequency = (ushort)tag.GetShort("freq");
             }
 
-            for (int i = 0; i < vars.Count; i++)
-            {
-                if (i >= data.Variables.Length) break;
-                data.Variables[i] = vars[i];
-            }
+            if (vars is not null)
+                foreach (var kvp in vars)
+                    data.SetVariable(kvp.Key, kvp.Value);
 
             return data;
         }
@@ -343,7 +338,6 @@ namespace TerraIntegration.Components
         {
             World.InitData(pos, this);
         }
-
     }
 
     public class ComponentData
@@ -352,7 +346,7 @@ namespace TerraIntegration.Components
         public ComponentSystem System { get; internal set; }
 
         public ushort UpdateFrequency { get; set; } = 1;
-        public Items.Variable[] Variables { get; internal set; }
+        public Dictionary<int, Items.Variable> Variables { get; internal set; }
 
         public void CopyTo(ComponentData data)
         {
@@ -364,7 +358,7 @@ namespace TerraIntegration.Components
         internal void Init(Component c)
         {
             Component = c;
-            Variables = new Items.Variable[c.VariableSlots];
+            Variables = new();
             UpdateFrequency = c.DefaultUpdateFrequency;
             CustomInit(c);
         }
@@ -373,12 +367,43 @@ namespace TerraIntegration.Components
 
         internal void Destroy(Point16 pos)
         {
-            for (int i = 0; i < Variables.Length; i++)
-                if (Variables[i] is not null)
+            foreach (Items.Variable v in Variables.Values)
+                if (v is not null)
                 {
-                    Util.DropItemInWorld(Variables[i].Item, pos.X * 16, pos.Y * 16);
-                    Variables[i] = null;
+                    Util.DropItemInWorld(v.Item, pos.X * 16, pos.Y * 16);
                 }
+            Variables.Clear();
+        }
+
+        public Variable GetVariable(int index) 
+        {
+            if (Variables.TryGetValue(index, out Items.Variable var))
+                return var.Var;
+            return null;
+        }
+        public Items.Variable GetVariableItem(int index)
+        {
+            if (Variables.TryGetValue(index, out Items.Variable var))
+                return var;
+            return null;
+        }
+        public void SetVariable(int index, Variable var)
+        {
+            Items.Variable v = Util.CreateModItem<Items.Variable>();
+            v.Var = var;
+            Variables[index] = v;
+        }
+        public void SetVariable(int index, Items.Variable var)
+        {
+            Variables[index] = var;
+        }
+        public void ClearVariable(int index)
+        {
+            Variables.Remove(index);
+        }
+        public bool HasVariable(int index)
+        {
+            return Variables.ContainsKey(index) && Variables[index] is not null;
         }
     }
 

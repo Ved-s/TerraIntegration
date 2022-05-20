@@ -32,12 +32,11 @@ namespace TerraIntegration.Variables
                 if (c.Pos == pos) continue;
 
                 ComponentData data = c.GetData();
-                for (int i = 0; i < data.Variables.Length; i++)
+                foreach (var kvp in data.Variables)
                 {
-                    Items.Variable v = data.Variables[i];
-                    if (v?.Var is EventSubscriber sub && sub.EventId == Id)
+                    if (kvp.Value?.Var is EventSubscriber sub && sub.EventId == Id)
                     {
-                        c.Component.OnEvent(c.Pos, i);
+                        c.Component.OnEvent(c.Pos, kvp.Key);
                         sub.Triggered = true;
                     }
                 }
