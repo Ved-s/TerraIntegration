@@ -25,6 +25,22 @@ namespace TerraIntegration
 
         internal ComponentSystem() { }
 
+        public static void UpdateSystem(IEnumerable<Point16> positions) 
+        {
+            HashSet<Guid> ids = new();
+
+            foreach (Point16 pos in positions)
+            {
+                Tile t = Framing.GetTileSafely(pos);
+                if (!t.HasTile || !Component.TileTypes.Contains(t.TileType)) continue;
+
+                ComponentData data = World.GetData(pos);
+                if (data is not null && data.System is not null && ids.Contains(data.System.TempId)) continue;
+                ComponentSystem sys = UpdateSystem(pos);
+                if (sys is not null) ids.Add(sys.TempId);
+            }
+        }
+
         public static ComponentSystem UpdateSystem(Point16 pos)
         {
             if (Main.netMode == NetmodeID.MultiplayerClient) return null;
@@ -72,11 +88,16 @@ namespace TerraIntegration
             return system;
         }
 
+        public static void UpdateSystemWalls(Point16 pos) => UpdateSystem(CableWallRunner(pos));
+
         public static IEnumerable<PositionedComponent> ComponentRunner(Point16 pos)
         {
             HashSet<Point16> found = new();
+            HashSet<Point16> foundWalls = new();
             Queue<Point16> queue = new();
             queue.Enqueue(pos);
+
+            int cableWallType = ModContent.WallType<Walls.CableWall>();
 
             while (queue.Count > 0)
             {
@@ -86,27 +107,86 @@ namespace TerraIntegration
 
                 found.Add(p);
                 Tile t = Main.tile[p.X, p.Y];
+
+                if (t.WallType == cableWallType && !foundWalls.Contains(p))
+                {
+                    foreach (Point16 wallpos in CableWallRunner(p))
+                        if (!foundWalls.Contains(wallpos))
+                        {
+                            foundWalls.Add(wallpos);
+                            if (!found.Contains(wallpos))
+                                queue.Enqueue(wallpos);
+                        }
+                }
                 if (Component.TileTypes.Contains(t.TileType))
                     yield return new(p, Component.ByTileType[t.TileType]);
+                else continue;
 
                 Point16 check = new(p.X, p.Y - 1);
                 t = Main.tile[check.X, check.Y];
-                if (t.HasTile && Component.TileTypes.Contains(t.TileType) && !found.Contains(check))
+                if (t.HasTile && !found.Contains(check))
                     queue.Enqueue(check);
 
                 check = new(p.X - 1, p.Y);
                 t = Main.tile[check.X, check.Y];
-                if (t.HasTile && Component.TileTypes.Contains(t.TileType) && !found.Contains(check))
+                if (t.HasTile && !found.Contains(check))
                     queue.Enqueue(check);
 
                 check = new(p.X, p.Y + 1);
                 t = Main.tile[check.X, check.Y];
-                if (t.HasTile && Component.TileTypes.Contains(t.TileType) && !found.Contains(check))
+                if (t.HasTile && !found.Contains(check))
                     queue.Enqueue(check);
 
                 check = new(p.X + 1, p.Y);
                 t = Main.tile[check.X, check.Y];
-                if (t.HasTile && Component.TileTypes.Contains(t.TileType) && !found.Contains(check))
+                if (t.HasTile && !found.Contains(check))
+                    queue.Enqueue(check);
+            }
+        }
+
+        public static IEnumerable<Point16> CableWallRunner(Point16 pos)
+        {
+            HashSet<Point16> found = new();
+            Queue<Point16> queue = new();
+            queue.Enqueue(new(pos.X, pos.Y - 1));
+            queue.Enqueue(new(pos.X, pos.Y + 1));
+            queue.Enqueue(new(pos.X - 1, pos.Y));
+            queue.Enqueue(new(pos.X + 1, pos.Y));
+            queue.Enqueue(pos);
+
+            int cableWallType = ModContent.WallType<Walls.CableWall>();
+
+            while (queue.Count > 0)
+            {
+                Point16 p = queue.Dequeue();
+                if (found.Contains(p))
+                    continue;
+
+                found.Add(p);
+                Tile t = Main.tile[p.X, p.Y];
+
+                if (t.WallType != cableWallType) continue;
+
+                yield return p;
+
+                Point16 check = new(p.X, p.Y - 1);
+                t = Main.tile[check.X, check.Y];
+                if (!found.Contains(check))
+                    queue.Enqueue(check);
+
+                check = new(p.X - 1, p.Y);
+                t = Main.tile[check.X, check.Y];
+                if (!found.Contains(check))
+                    queue.Enqueue(check);
+
+                check = new(p.X, p.Y + 1);
+                t = Main.tile[check.X, check.Y];
+                if (!found.Contains(check))
+                    queue.Enqueue(check);
+
+                check = new(p.X + 1, p.Y);
+                t = Main.tile[check.X, check.Y];
+                if (!found.Contains(check))
                     queue.Enqueue(check);
             }
         }
@@ -136,33 +216,42 @@ namespace TerraIntegration
 
         public VariableValue GetVariableValue(Guid varId, List<Error> errors)
         {
-            Variable var = GetVariable(varId, errors);
-            if (var is null) return null;
-
-            VariableValue val = var.GetValue(this, errors);
-            if (val is null) return null;
-
-            if (val is UnloadedVariableValue)
+            if (GetVariableSet.Contains(varId))
             {
-                errors.Add(new(ErrorType.ValueUnloaded, World.Guids.GetShortGuid(varId)));
+                errors.Add(new(ErrorType.RecursiveReference, World.Guids.GetShortGuid(varId)));
                 return null;
             }
+            GetVariableSet.Add(varId);
+            try
+            {
+                Variable var = GetVariable(varId, errors);
+                if (var is null) return null;
 
-            return val;
+                VariableValue val = var.GetValue(this, errors);
+                if (val is null) return null;
+
+                if (val is UnloadedVariableValue)
+                {
+                    errors.Add(new(ErrorType.ValueUnloaded, World.Guids.GetShortGuid(varId)));
+                    return null;
+                }
+
+                return val;
+
+            }
+            finally
+            {
+                GetVariableSet.Remove(varId);
+            }
         }
 
         public Variable GetVariable(Guid varId, List<Error> errors)
         {
             Statistics.VariableRequests++;
             Statistics.Start(Statistics.UpdateTime.VariableRequests);
+
             try
             {
-                if (GetVariableSet.Contains(varId))
-                {
-                    errors.Add(new(ErrorType.RecursiveReference, World.Guids.GetShortGuid(varId)));
-                    return null;
-                }
-
                 bool found = false;
                 Variable result = null;
 

@@ -115,5 +115,15 @@ namespace TerraIntegration
 
 			return item.ModItem as T;
 		}
+
+		public static Vector2 WorldPixelsToScreen(Vector2 worldPos)
+		{
+			return worldPos + new Vector2(Main.offScreenRange) - Main.screenPosition;
+		}
+
+		public static Vector2 WorldToScreen(Point worldPos)
+		{
+			return WorldPixelsToScreen(worldPos.ToVector2() * 16);
+		}
 	}
 }

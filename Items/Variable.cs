@@ -24,6 +24,8 @@ namespace TerraIntegration.Items
         public Variables.Variable Var = new();
         public byte Highlight;
 
+        public override bool IsCloneable => true;
+
         public override void SetDefaults()
         {
             Item.width = 24;
@@ -76,7 +78,7 @@ namespace TerraIntegration.Items
             if (!Var.IsEmpty || Var.Name is not null) return false;
 
             Variable var = item2.ModItem as Variable;
-            if (var is null || var.Var?.Name != var.Name) return false;
+            if (var is null || var.Var?.Name != var.Var.Name) return false;
 
             return var.Var.IsEmpty;
         }
@@ -93,9 +95,9 @@ namespace TerraIntegration.Items
 
         public override void LoadData(TagCompound tag)
         {
+            tag = GetUnloadedItemData(tag);
             if (tag.ContainsKey(VarTagKey))
                 Var = Variables.Variable.LoadTag(tag.GetCompound(VarTagKey)) ?? new();
-            
         }
 
         public override void NetSend(BinaryWriter writer)
@@ -128,6 +130,15 @@ namespace TerraIntegration.Items
         {
             Vector2 overlaySize = sourceRectangle.Size() * scale;
             VariableRenderer.DrawVariableOverlay(spriteBatch, false, Var.VariableReturnType, Var.Type, position, overlaySize, color, rotation, origin);
+        }
+
+        TagCompound GetUnloadedItemData(TagCompound tag)
+        {
+            if (tag.ContainsKey("mod") && tag.ContainsKey("name") && tag.ContainsKey("data")) 
+            {
+                return GetUnloadedItemData(tag.GetCompound("data"));
+            }
+            return tag;
         }
     }
 }

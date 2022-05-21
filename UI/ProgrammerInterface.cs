@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using System;
 using TerraIntegration.Values;
 using TerraIntegration.Variables;
 using Terraria;
@@ -46,6 +47,7 @@ namespace TerraIntegration.UI
         static UIVariableSlot ResultSlot;
 
         static IOwnProgrammerInterface CurrentOwner;
+        static VariableValue CurrentValue;
         static UIFocusInputTextField VariableName;
         static UIPanel SelectedPanel;
         static Color PreviousSelectedColor;
@@ -314,7 +316,13 @@ namespace TerraIntegration.UI
         private static void WriteButton_OnClick(UIMouseEvent evt, UIElement listeningElement)
         {
             if (ResultSlot?.Var is null) return;
-            if (CurrentOwner is not null) CurrentOwner.WriteVariable(ResultSlot.Var);
+            if (CurrentOwner is not null)
+            {
+                Guid id = ResultSlot.Var.Var.Id;
+                CurrentOwner.WriteVariable(ResultSlot.Var);
+                if (id != default)
+                    ResultSlot.Var.Var.Id = id;
+            }
 
             if (ResultSlot.Var?.Var is not null && !VariableName.CurrentString.IsNullEmptyOrWhitespace())
             {
@@ -411,7 +419,8 @@ namespace TerraIntegration.UI
 
             foreach (VariableValue v in VariableValue.ByTypeName.Values)
             {
-                if (v is not IOwnProgrammerInterface interfaceOwner || !v.TypeDisplay.ToLower().Contains(VariablesSearch.CurrentString.ToLower())) continue;
+                if (!v.TypeDisplay.ToLower().Contains(VariablesSearch.CurrentString.ToLower())
+                    || (!v.HasProperties() && v is not IOwnProgrammerInterface)) continue;
 
                 UITextPanel<string> panel = new UITextPanel<string>(v.TypeDisplay)
                 {
@@ -429,7 +438,7 @@ namespace TerraIntegration.UI
                 {
                     Select(panel);
                     SoundEngine.PlaySound(SoundID.MenuTick);
-                    VariableClicked(interfaceOwner);
+                    ValueClicked(v);
                 };
                 VariablesList.Add(panel);
             }
@@ -463,15 +472,16 @@ namespace TerraIntegration.UI
         {
             PropertiesList.Clear();
 
-            if (CurrentOwner is VariableValue value)
+            if (CurrentValue is not null)
             {
-                foreach (var (type, prop) in value.GetProperties())
+                Type valueType = CurrentValue.GetType();
+
+                foreach (var (type, prop) in CurrentValue.GetProperties())
                 {
-                    if (!prop.TypeDisplay.ToLower().Contains(VariablesSearch.CurrentString.ToLower())) continue;
+                    if (!prop.TypeDisplay.ToLower().Contains(VariablesSearch.CurrentString.ToLower())
+                        || !prop.AppliesTo(CurrentValue)) continue;
 
-                    string typeName = VariableValue.TypeToName(type, out Color typeColor);
-
-                    UITextPanel<string> panel = new UITextPanel<string>($"{Util.ColorTag(typeColor, typeName)}.{prop.TypeDisplay}")
+                    UITextPanel<string> panel = new UITextPanel<string>(prop.TypeDisplay)
                     {
                         Width = new(0, 1),
                         Height = new(30, 0),
@@ -487,13 +497,34 @@ namespace TerraIntegration.UI
                         SoundEngine.PlaySound(SoundID.MenuTick);
                         PropertyClicked(prop);
                     };
+
+                    if (type != valueType)
+                    {
+                        string typeName = VariableValue.TypeToName(type, out Color typeColor);
+
+                        panel.Height = new(45, 0);
+                        panel.PaddingTop = 18;
+
+                        panel.Append(new UIText($"from {Util.ColorTag(typeColor, typeName)}", .7f) 
+                        {
+                            Top = new(-13, 0)
+                        });
+                    }
+
                     PropertiesList.Add(panel);
                 }
             }
         }
 
+        static void ValueClicked(VariableValue value)
+        {
+            CurrentValue = value;
+            SetInterface(value as IOwnProgrammerInterface);
+            PopulateProperties();
+        }
         static void VariableClicked(IOwnProgrammerInterface var)
         {
+            CurrentValue = null;
             SetInterface(var);
             PopulateProperties();
         }

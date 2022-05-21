@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Xna.Framework;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -15,6 +16,9 @@ namespace TerraIntegration.Variables
         public override string TypeDisplay => "Event Subscriber";
 
         public override Type VariableReturnType => typeof(Values.Boolean);
+
+        public override SpriteSheet SpriteSheet => BasicSheet;
+        public override Point SpritesheetPos => new(0, 1);
 
         public Guid EventId { get; set; }
         public bool Triggered { get; set; }

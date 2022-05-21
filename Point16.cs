@@ -30,6 +30,7 @@ namespace TerraIntegration
         public static bool operator !=(Point16 a, Point16 b) => a.X != b.X || a.Y != b.Y;
 
         public static explicit operator Point16(Vector2 v) => new((int)v.X, (int)v.Y);
+        public static implicit operator Point(Point16 p) => new(p.X, p.Y);
 
         public Vector2 ToVector2() => new Vector2(X, Y);
     }

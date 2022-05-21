@@ -4,33 +4,46 @@ using Mono.Cecil.Cil;
 using MonoMod.Cil;
 using System.Collections.Generic;
 using Terraria;
+using Terraria.GameContent.Drawing;
+using Terraria.ID;
 using Terraria.ModLoader;
 
 namespace TerraIntegration
 {
     public class Patches : ILoadable
     {
-        public TerraIntegration Mod => ModContent.GetInstance<TerraIntegration>();
+        public static TerraIntegration Mod => ModContent.GetInstance<TerraIntegration>();
 
         public void Load(Mod mod)
         {
             IL.Terraria.Main.DrawItem += DrawItemTexturePatch;
             IL.Terraria.UI.ItemSlot.Draw_SpriteBatch_ItemArray_int_int_Vector2_Color += PostItemSlotBackgroundDrawPatch;
+            IL.Terraria.Framing.WallFrame += Framing_WallFrame;
+            IL.Terraria.GameContent.Drawing.WallDrawing.DrawWalls += WallDrawing_DrawWalls;
 
             On.Terraria.WorldGen.TileFrame += WorldGen_TileFrame;
             On.Terraria.WorldGen.KillTile += WorldGen_KillTile;
             On.Terraria.TileObject.Place += TileObject_Place;
+            On.Terraria.WorldGen.PlaceWall += WorldGen_PlaceWall;
+            On.Terraria.WorldGen.KillWall += WorldGen_KillWall;
 
             Terraria.IO.WorldFile.OnWorldLoad += WorldFile_OnWorldLoad;
         }
+
+        
+
         public void Unload()
         {
             IL.Terraria.Main.DrawItem -= DrawItemTexturePatch;
             IL.Terraria.UI.ItemSlot.Draw_SpriteBatch_ItemArray_int_int_Vector2_Color -= PostItemSlotBackgroundDrawPatch;
+            IL.Terraria.Framing.WallFrame -= Framing_WallFrame;
+            IL.Terraria.GameContent.Drawing.WallDrawing.DrawWalls -= WallDrawing_DrawWalls;
 
             On.Terraria.WorldGen.TileFrame -= WorldGen_TileFrame;
             On.Terraria.WorldGen.KillTile -= WorldGen_KillTile;
             On.Terraria.TileObject.Place -= TileObject_Place;
+            On.Terraria.WorldGen.PlaceWall -= WorldGen_PlaceWall;
+            On.Terraria.WorldGen.KillWall -= WorldGen_KillWall;
 
             Terraria.IO.WorldFile.OnWorldLoad -= WorldFile_OnWorldLoad;
         }
@@ -71,11 +84,145 @@ namespace TerraIntegration
                     Components.Component.ByTileType[t.TileType].OnLoaded(new(x, y));
                     if (updated.Contains(new(x, y))) continue;
 
-                    ComponentSystem system = ComponentSystem.UpdateSystem(new(x, y));
+                    ComponentSystem system = ComponentSystem.UpdateSystem(new Point16(x, y));
                     updated.UnionWith(system.ComponentsByPos.Keys);
                 }
         }
+        private void Framing_WallFrame(ILContext il)
+        {
+            ILCursor c = new(il);
+            /*
+              IL_0249: ldloc.1
+	          IL_024A: ldc.i4.s  15
+	          IL_024C: bne.un.s  IL_025E
+             */
 
+            int frame = -1;
+
+            if (!c.TryGotoNext(
+                x=>x.MatchLdloc(out frame),
+                x=>x.MatchLdcI4(15),
+                x=>x.MatchBneUn(out _))) 
+            {
+                Mod.Logger.WarnFormat("Patch error: WallFrame:EditFraming");
+                return;
+            }
+
+            c.Index++;
+            ILLabel noReturn = c.DefineLabel();
+
+            c.Emit(OpCodes.Pop);
+            c.Emit(OpCodes.Ldarg_0);
+            c.Emit(OpCodes.Ldarg_1);
+            c.Emit(OpCodes.Ldloca, frame);
+            c.Emit<Patches>(OpCodes.Call, nameof(WallFramingHook));
+            c.Emit(OpCodes.Brfalse, noReturn);
+            c.Emit(OpCodes.Ret);
+            c.MarkLabel(noReturn);
+            c.Emit(OpCodes.Ldloc, frame);
+        }
+        private void WallDrawing_DrawWalls(ILContext il)
+        {
+            WallOutlinePatch(il);
+            PostWallDrawPatch(il);
+        }
+        private void WorldGen_PlaceWall(On.Terraria.WorldGen.orig_PlaceWall orig, int i, int j, int type, bool mute)
+        {
+            orig(i, j, type, mute);
+            if (Main.netMode == NetmodeID.MultiplayerClient) return;
+            if (Framing.GetTileSafely(i, j).WallType == ModContent.WallType<Walls.CableWall>())
+                ComponentSystem.UpdateSystemWalls(new(i, j));
+        }
+        private void WorldGen_KillWall(On.Terraria.WorldGen.orig_KillWall orig, int i, int j, bool fail)
+        {
+            bool cable = Framing.GetTileSafely(i, j).WallType == ModContent.WallType<Walls.CableWall>();
+            orig(i, j, fail);
+            if (cable && Main.netMode != NetmodeID.MultiplayerClient &&
+                Framing.GetTileSafely(i, j).WallType != ModContent.WallType<Walls.CableWall>())
+            {
+                ComponentSystem.UpdateSystemWalls(new(i, j));
+            }
+        }
+
+        private void WallOutlinePatch(ILContext il)
+        {
+            ILCursor c = new(il);
+
+            /*
+              IL_01FF: ldloc.s   j
+			  IL_0201: ldloc.s   i
+			  IL_0203: call      instance bool Terraria.GameContent.Drawing.WallDrawing::FullTile(int32, int32)
+             */
+
+            int coordX = -1, coordY = -1;
+            if (!c.TryGotoNext(
+                x => x.MatchLdloc(out coordX),
+                x => x.MatchLdloc(out coordY),
+                x => x.MatchCall<WallDrawing>("FullTile")
+                ))
+            {
+                Mod.Logger.Warn("Parch error: DrawWalls:GetCoords");
+                return;
+            }
+
+            /*
+              IL_05E6: brfalse.s IL_0647
+
+			  IL_05E8: ldloc.s   spriteBatch
+			  IL_05EA: ldsfld    class [ReLogic]ReLogic.Content.Asset`1<class [FNA]Microsoft.Xna.Framework.Graphics.Texture2D> Terraria.GameContent.TextureAssets::WallOutline             
+             */
+
+            int side = 0;
+            int patches = 0;
+
+            ILLabel endIf = null;
+
+            while (c.TryGotoNext(
+                x => x.MatchBrfalse(out endIf),
+                x => x.MatchLdloc(out _),
+                x => x.MatchLdsfld("Terraria.GameContent.TextureAssets", "WallOutline")
+                ))
+            {
+                c.Index++;
+
+                c.Emit(OpCodes.Ldloc, coordX);
+                c.Emit(OpCodes.Ldloc, coordY);
+                c.Emit(OpCodes.Ldc_I4, side);
+                c.Emit<Patches>(OpCodes.Call, nameof(WallOutlineHook));
+                c.Emit(OpCodes.Brfalse, endIf);
+
+                side++;
+                patches++;
+            }
+
+            if (patches == 0) Mod.Logger.Warn("Patch error: DrawWalls:PatchOutline");
+            else if (patches != 4) Mod.Logger.WarnFormat("Patch warning: expected 4 patches, got {0} (DrawWalls:PatchOutline)", patches);
+        }
+        private void PostWallDrawPatch(ILContext il) 
+        {
+            ILCursor c = new(il);
+
+            /*
+              IL_07B9: ldsfld    class Terraria.Main Terraria.Main::'instance'
+	          IL_07BE: ldc.i4.2
+	          IL_07BF: call      class Terraria.Player Terraria.Main::get_LocalPlayer()
+	          IL_07C4: ldfld     class Terraria.HitTile Terraria.Player::hitReplace
+	          IL_07C9: callvirt  instance void Terraria.Main::DrawTileCracks(int32, class Terraria.HitTile)
+             */
+
+            if (!c.TryGotoNext(
+                x=>x.MatchLdsfld<Main>("instance"),
+                x=>true,
+                x=>true,
+                x=>true,
+                x=>x.MatchCallvirt<Main>("DrawTileCracks")
+                ))
+            {
+                Mod.Logger.Warn("Patch error: DrawWalls:PostDrawHook");
+                return;
+            }
+            c.Emit<Patches>(OpCodes.Call, nameof(PostWallDrawHook));
+        }
         private void DrawItemTexturePatch(ILContext il)
         {
             ILCursor c = new(il);
@@ -207,6 +354,47 @@ namespace TerraIntegration
             c.Emit<Patches>(OpCodes.Call, nameof(PostItemSlotPackgoundDrawHook));
         }
 
+        public static void PostWallDrawHook()
+        {
+            Walls.CableWall.DelayedDraw();
+        }
+        // false to skip outline render
+        public static bool WallOutlineHook(int x, int y, int side) 
+        {
+            switch (side)
+            {
+                case 0: x--; break;
+                case 1: x++; break;
+                case 2: y--; break;
+                case 3: y++; break;
+            }
+
+            return Framing.GetTileSafely(x, y).WallType != ModContent.WallType<Walls.CableWall>();
+        }
+        public static bool WallFramingHook(int x, int y, ref int framing)
+        {
+            int cable = ModContent.WallType<Walls.CableWall>();
+
+            //if (Framing.GetTileSafely(x, y).WallType == cable)
+            //{
+            //    //Walls.CableWall.WallFrame(x, y);
+            //    return true;
+            //}
+
+            if ((framing & 1) > 0 && Framing.GetTileSafely(x, y - 1).WallType == cable)
+                framing &= ~1;
+
+            if ((framing & 2) > 0 && Framing.GetTileSafely(x - 1, y).WallType == cable)
+                framing &= ~2;
+
+            if ((framing & 4) > 0 && Framing.GetTileSafely(x + 1, y).WallType == cable)
+                framing &= ~4;
+
+            if ((framing & 8) > 0 && Framing.GetTileSafely(x, y + 1).WallType == cable)
+                framing &= ~8;
+
+            return false;
+        }
         public static void PostDrawHook(Item item, Vector2 position, Rectangle sourceRectangle, Color color, float rotation, Vector2 origin, float scale)
         {
             if (item.ModItem is Items.Variable var)

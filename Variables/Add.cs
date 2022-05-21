@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Xna.Framework;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -20,6 +21,9 @@ namespace TerraIntegration.Variables
 
         private Type ReturnTypeCache;
         public override Type VariableReturnType => ReturnTypeCache;
+
+        public override SpriteSheet SpriteSheet => MathSheet;
+        public override Point SpritesheetPos => new(0, 0);
 
         public Add() { }
         public Add(Guid first, Guid second) 

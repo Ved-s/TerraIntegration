@@ -33,14 +33,16 @@ namespace TerraIntegration.Components
                 Variable masterVar = master.GetVariable(0);
                 if (masterVar is null)
                 {
-                    masterVar = v;
+                    master.SetVariable(0, v);
                     ClearVariable(0);
                     master.Component.OnVariableChanged(MasterPos, 0);
+                    Component.OnVariableChanged(pos, 0);
                     return;
                 }
 
                 Util.DropItemInWorld(GetVariableItem(0).Item, pos.X * 16, pos.Y * 16);
                 ClearVariable(0);
+                Component.OnVariableChanged(pos, 0);
             }
         }
     }
@@ -101,7 +103,7 @@ namespace TerraIntegration.Components
 
             Rectangle screenRect = new();
 
-            Vector2 screen = (new Vector2(data.MasterPos.X + 12, data.MasterPos.Y + 12) * 16) - Main.screenPosition;
+            Vector2 screen = Util.WorldToScreen(data.MasterPos);
             screenRect.X = (int)screen.X;
             screenRect.Y = (int)screen.Y;
             screenRect.Width = 16 * data.DisplaySize.X;
@@ -139,6 +141,8 @@ namespace TerraIntegration.Components
             if (!data.HasVariable(0))
             {
                 data.Master.DisplayValue = null;
+                data.Master.Errors = null;
+                SyncNull(pos, data.Master);
                 return;
             }
             Errors.Clear();

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Xna.Framework;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -43,6 +44,8 @@ namespace TerraIntegration.Variables
         }
 
         public abstract string PropertyName { get; }
+        public abstract string PropertyDisplay { get; }
+        public virtual string PropertyDescription => "";
 
         public Guid VariableId { get; set; }
 
@@ -67,8 +70,7 @@ namespace TerraIntegration.Variables
                 return result;
             }
         }
-
-        public virtual string PropertyDescription => "";
+        public override string TypeDisplay => PropertyDisplay;
 
         public UIPanel Interface { get; set; }
         public UIVariableSlot InterfaceSlot { get; set; }
@@ -87,6 +89,12 @@ namespace TerraIntegration.Variables
         {
             VariableValue val = system.GetVariableValue(VariableId, errors);
             if (val is null) return null;
+
+            if (!ValueType.IsAssignableFrom(val.GetType()))
+            {
+                errors.Add(new(ErrorType.ExpectedValue, VariableValue.TypeToName(ValueType, out _)));
+                return null;
+            }
 
             return GetProperty(val, errors);
         }
@@ -131,6 +139,8 @@ namespace TerraIntegration.Variables
             AllProperties.Clear();
         }
 
+        public virtual bool AppliesTo(VariableValue value) => true;
+
         protected override void SaveCustomData(BinaryWriter writer)
         {
             writer.Write(VariableId.ToByteArray());
@@ -168,12 +178,16 @@ namespace TerraIntegration.Variables
             UIPanel p = new();
             Interface = p;
 
+            string type = VariableValue.TypeToName(ValueType, out Color color);
+
             InterfaceSlot = new()
             {
                 DisplayOnly = true,
                 Top = new(-21, .5f),
                 Left = new(-21, .5f),
-                VariableValidator = (var) => ValueType?.IsAssignableFrom(var.VariableReturnType) ?? false
+                VariableValidator = (var) => ValueType?.IsAssignableFrom(var.VariableReturnType) ?? false,
+                HoverText = Util.ColorTag(color, type)
+                
             };
             p.Append(InterfaceSlot);
         }

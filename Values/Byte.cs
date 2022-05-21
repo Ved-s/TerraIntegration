@@ -21,7 +21,10 @@ namespace TerraIntegration.Values
         public override Point SpritesheetPos => new(2, 0);
 
         public byte Value { get; set; }
+
         public long NumericValue => Value;
+        public long NumericMax => byte.MaxValue;
+        public long NumericMin => byte.MinValue;
 
         public Byte() { }
         public Byte(byte value) { Value = value; }
@@ -74,6 +77,21 @@ namespace TerraIntegration.Values
         public override int GetHashCode()
         {
             return HashCode.Combine(Type, Value);
+        }
+
+        public VariableValue FromNumeric(long value, List<Error> errors)
+        {
+            if (value < byte.MinValue)
+            {
+                errors.Add(new(ErrorType.ValueTooSmallForType, value, TypeDisplay));
+                return null;
+            }
+            if (value > byte.MaxValue)
+            {
+                errors.Add(new(ErrorType.ValueTooBigForType, value, TypeDisplay));
+                return null;
+            }
+            return new Byte((byte)value);
         }
     }
 }

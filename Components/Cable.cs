@@ -13,7 +13,7 @@ namespace TerraIntegration.Components
 {
     public class Cable : Component
     {
-        public override string ComponentType => "cable";
+		public override string ComponentType => "cable";
 
 		public override bool ShouldSaveData(ComponentData data) => false;
 
@@ -42,9 +42,9 @@ namespace TerraIntegration.Components
 			return false;
         }
 
-		private static bool CanConnectTo(int type)
+		private bool CanConnectTo(int type)
 		{
-			return TileTypes.Contains(type);
+			return type == Type || Components.Component.TileTypes.Contains(type);
 		}
     }
 }

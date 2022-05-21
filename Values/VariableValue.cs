@@ -120,6 +120,18 @@ namespace TerraIntegration.Values
                     foreach (ValueProperty prop in intprops.Values)
                         yield return (interf, prop);
         }
+        public bool HasProperties()
+        {
+            Type type = GetType();
+            if (ValueProperty.ByValueType.ContainsKey(type))
+                return true;
+
+            foreach (Type interf in type.GetInterfaces())
+                if (ValueProperty.ByValueType.ContainsKey(interf))
+                    return true;
+                 
+            return false;
+        }
     }
 
     public class UnloadedVariableValue : VariableValue

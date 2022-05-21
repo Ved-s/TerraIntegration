@@ -9,5 +9,6 @@ namespace TerraIntegration
     public static class Ext
     {
         public static bool IsNullEmptyOrWhitespace(this string str) => string.IsNullOrWhiteSpace(str) || str.Length == 0;
+        public static string NullIfEmpty(this string str) => str.IsNullEmptyOrWhitespace() ? null : str;
     }
 }

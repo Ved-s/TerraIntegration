@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Xna.Framework;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -17,6 +18,9 @@ namespace TerraIntegration.Variables
         public VariableValue Value { get; set; } = new();
 
         public override Type VariableReturnType => Value.GetType();
+
+        public override SpriteSheet SpriteSheet => BasicSheet;
+        public override Point SpritesheetPos => new(2, 0);
 
         public Constant() { }
 

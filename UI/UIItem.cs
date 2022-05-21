@@ -24,6 +24,8 @@ namespace TerraIntegration.UI
         public abstract Item Item { get; set; }
         public virtual ItemMatchDelegate ItemValidator { get; set; }
 
+        public virtual string HoverText { get; set; }
+
         static Item PlayerHeldItem
         {
             get
@@ -56,9 +58,10 @@ namespace TerraIntegration.UI
                 Main.LocalPlayer.mouseInterface = true;
 
                 if (Item is not null)
-                {
                     ModContent.GetInstance<ComponentWorld>().HoverItem = Item;
-                }
+                
+                else if (HoverText is not null)
+                    ModContent.GetInstance<ComponentWorld>().HoverText = HoverText;
 
                 OnHover();
                 Item playerHeld = PlayerHeldItem;

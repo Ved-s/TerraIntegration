@@ -14,7 +14,9 @@ namespace TerraIntegration.Variables
 {
     public class Variable
     {
-        public readonly static SpriteSheet BasicSheet = new("TerraIntegration/Assets/Types/basic", new(32, 32));
+        internal readonly static SpriteSheet BasicSheet = new("TerraIntegration/Assets/Types/basic", new(32, 32));
+        internal readonly static SpriteSheet MathSheet = new("TerraIntegration/Assets/Types/math", new(32, 32));
+        internal readonly static SpriteSheet StringSheet = new("TerraIntegration/Assets/Types/string", new(32, 32));
 
         public virtual Mod Mod => ModContent.GetInstance<TerraIntegration>();
         public static ComponentWorld World => ModContent.GetInstance<ComponentWorld>();
@@ -37,7 +39,10 @@ namespace TerraIntegration.Variables
 
         public virtual string TypeDescription => null;
 
-        public virtual Type VariableReturnType => typeof(VariableValue);
+        public virtual Type VariableReturnType => GetReturnTypeCache() ?? typeof(VariableValue);
+
+        public string ReturnTypeCacheName;
+        public Type ReturnTypeCacheType;
 
         public Variable()
         {
@@ -59,6 +64,7 @@ namespace TerraIntegration.Variables
                 writer.Write(Name ?? "");
                 writer.Write((ushort)unloaded.UnloadedData.Length);
                 writer.Write(Id.ToByteArray());
+                writer.Write(unloaded.ReturnTypeCacheName ?? "");
                 writer.Write(unloaded.UnloadedData);
                 return;
             }
@@ -75,7 +81,8 @@ namespace TerraIntegration.Variables
             writer.Write((ushort)0);
 
             writer.Write(Id.ToByteArray());
-            
+            writer.Write(ReturnTypeCacheName ?? "");
+
             long startPos = writer.BaseStream.Position;
             SaveCustomData(writer);
             long endPos = writer.BaseStream.Position;
@@ -97,22 +104,31 @@ namespace TerraIntegration.Variables
             ushort length = reader.ReadUInt16();
 
             Guid id;
+            string @return;
 
             if (!ByTypeName.TryGetValue(type, out Variable var))
             {
                 id = new Guid(reader.ReadBytes(16));
+                @return = reader.ReadString().NullIfEmpty();
                 byte[] data = reader.ReadBytes(length);
-                return new UnloadedVariable(type, data, null) { Id = id, Name = name };
+                return new UnloadedVariable(type, data, null) 
+                {
+                    Id = id,
+                    Name = name,
+                    ReturnTypeCacheName = @return,
+                };
             }
 
             if (var.IsEmpty) return var;
 
             id = new Guid(reader.ReadBytes(16));
+            @return = reader.ReadString().NullIfEmpty();
 
             long pos = reader.BaseStream.Position;
             var = var.LoadCustomData(reader);
             var.Id = id;
             var.Name = name;
+            var.ReturnTypeCacheName = @return;
             World.Guids.AddToDictionary(id);
 
             long diff = (reader.BaseStream.Position - pos) - length;
@@ -153,6 +169,9 @@ namespace TerraIntegration.Variables
                 if (unloaded.Name is not null)
                     tag["name"] = unloaded.Name;
 
+                if (unloaded.ReturnTypeCacheName is not null)
+                    tag["return"] = unloaded.ReturnTypeCacheName;
+
                 return tag;
             }
 
@@ -164,6 +183,9 @@ namespace TerraIntegration.Variables
             if (IsEmpty) return tag;
 
             tag["id"] = Id.ToByteArray();
+
+            if (ReturnTypeCacheName is not null)
+                tag["return"] = ReturnTypeCacheName;
 
             object custom = SaveCustomTag();
             if (custom is not null)
@@ -190,6 +212,10 @@ namespace TerraIntegration.Variables
             if (tag.ContainsKey("name"))
                 name = tag.GetString("name");
 
+            string @return = null;
+            if (tag.ContainsKey("return"))
+                @return = tag.GetString("return");
+
             if (!ByTypeName.TryGetValue(type, out Variable var))
             {
                 object tagData = null;
@@ -201,7 +227,12 @@ namespace TerraIntegration.Variables
                 if (tag.ContainsKey("bytes")) byteData = tag.GetByteArray("bytes");
 
 
-                return new UnloadedVariable(type, byteData, tagData) { Id = id, Name = name };
+                return new UnloadedVariable(type, byteData, tagData) 
+                {
+                    Id = id, 
+                    Name = name,
+                    ReturnTypeCacheName = @return
+                };
             }
 
             Variable newVar = null;
@@ -224,6 +255,7 @@ namespace TerraIntegration.Variables
 
             newVar.Id = id;
             newVar.Name = name;
+            newVar.ReturnTypeCacheName = @return;
 
             return newVar;
         }
@@ -247,6 +279,49 @@ namespace TerraIntegration.Variables
             return var;
         }
         public virtual Variable CloneCustom() => (Variable)MemberwiseClone();
+
+        public void SetReturnTypeCache(Type t) 
+        {
+            if (t is null)
+            {
+                ReturnTypeCacheType = null;
+                ReturnTypeCacheName = null;
+            }
+            else if (VariableValue.ByType.TryGetValue(t, out VariableValue val))
+            {
+                ReturnTypeCacheType = t;
+                ReturnTypeCacheName = "V" + val.Type;
+            }
+            else
+            {
+                ReturnTypeCacheType = t;
+                ReturnTypeCacheName = "T" + t.FullName;
+            }
+        }
+        public Type GetReturnTypeCache()
+        {
+            if (ReturnTypeCacheName is null && ReturnTypeCacheType is null)
+                return null;
+
+            if (ReturnTypeCacheType is not null)
+                return ReturnTypeCacheType;
+
+            string name = ReturnTypeCacheName;
+            bool type = name.StartsWith('T');
+            name = name[1..];
+
+            if (type)
+            {
+                ReturnTypeCacheType = System.Type.GetType(name);
+                return ReturnTypeCacheType;
+            }
+            else if (VariableValue.ByTypeName.TryGetValue(name, out VariableValue val))
+            {
+                ReturnTypeCacheType = val.GetType();
+                return ReturnTypeCacheType;
+            }
+            return null;
+        }
     }
 
     public class UnloadedVariable : Variable

@@ -192,6 +192,7 @@ namespace TerraIntegration
             ModContent.GetInstance<ComponentInterface>().Draw();
         }
 
+
         public bool DrawUI()
         {
             ProgrammerInterface.Draw();

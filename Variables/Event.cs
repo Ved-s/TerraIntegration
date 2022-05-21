@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Xna.Framework;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -14,6 +15,9 @@ namespace TerraIntegration.Variables
         public override string TypeDisplay => "Event";
 
         public override Type VariableReturnType => null;
+
+        public override SpriteSheet SpriteSheet => BasicSheet;
+        public override Point SpritesheetPos => new(3, 0);
 
         private static HashSet<Point16> TriggeredPoints = new();
 

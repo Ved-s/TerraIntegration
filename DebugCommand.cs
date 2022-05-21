@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TerraIntegration.Values;
 using TerraIntegration.Variables;
 using Terraria;
 using Terraria.ModLoader;
@@ -21,7 +22,7 @@ namespace TerraIntegration
 
             if (arg.Count == 0)
             {
-                caller.Reply("Expected subcommand: var, gen");
+                caller.Reply("Expected subcommand: var, gen, notex");
                 return;
             }
             string sub = arg[0];
@@ -34,6 +35,11 @@ namespace TerraIntegration
             if (sub == "gen")
             {
                 ModContent.GetInstance<ComponentWorld>().PostWorldGen();
+                return;
+            }
+            if (sub == "notex")
+            {
+                MissingTexCommand(caller);
                 return;
             }
 
@@ -86,6 +92,30 @@ namespace TerraIntegration
             Vector2 vec = Main.LocalPlayer.Center;
 
             Util.DropItemInWorld(i, (int)vec.X, (int)vec.Y);
+        }
+        private void MissingTexCommand(CommandCaller caller)
+        {
+            List<string> values = new();
+            List<string> variables = new();
+
+            foreach (VariableValue val in VariableValue.ByTypeName.Values)
+                if (val.Type != "any" && val.Type != "unloaded" && val.Texture is null && val.SpriteSheet is null)
+                    values.Add(val.Type);
+
+            foreach (Variable var in Variable.ByTypeName.Values)
+                if (var.Type != "any" && var.Type != "unloaded" && var.Texture is null && var.SpriteSheet is null)
+                    variables.Add(var.Type);
+
+            string valstr = values.Count == 0 ?
+                    "All values are textured" :
+                    $"Not textured values:\n    {string.Join(", ", values)}";
+
+            string varstr = variables.Count == 0 ?
+                    "All variables are textured" :
+                    $"Not textured variables:\n    {string.Join(", ", variables)}";
+
+            caller.Reply($"{valstr}\n{varstr}");
+            
         }
     }
 }

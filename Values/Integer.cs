@@ -21,9 +21,12 @@ namespace TerraIntegration.Values
         public override Point SpritesheetPos => new(0, 0);
 
         public int Value { get; set; }
-        public long NumericValue => Value;
 
         public Type[] ValidAddTypes => new[] { typeof(INumeric) };
+
+        public long NumericValue => Value;
+        public long NumericMax => int.MaxValue;
+        public long NumericMin => int.MinValue;
 
         public Integer() { }
         public Integer(int value) { Value = value; }
@@ -98,6 +101,21 @@ namespace TerraIntegration.Values
         public override int GetHashCode()
         {
             return HashCode.Combine(Type, Value);
+        }
+
+        public VariableValue FromNumeric(long value, List<Error> errors)
+        {
+            if (value > int.MaxValue)
+            {
+                errors.Add(new(ErrorType.ValueTooBigForType, value, TypeDisplay));
+                return null;
+            }
+            if (value < int.MinValue)
+            {
+                errors.Add(new(ErrorType.ValueTooSmallForType, value, TypeDisplay));
+                return null;
+            }
+            return new Integer((int)value);
         }
     }
 }
