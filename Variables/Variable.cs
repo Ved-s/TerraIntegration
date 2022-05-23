@@ -39,7 +39,14 @@ namespace TerraIntegration.Variables
 
         public virtual string TypeDescription => null;
 
-        public virtual Type VariableReturnType => GetReturnTypeCache() ?? typeof(VariableValue);
+        public virtual Type VariableReturnType
+        {
+            get
+            {
+                return GetReturnTypeCache() ?? typeof(VariableValue);
+            }
+            set => SetReturnTypeCache(value);
+        }
 
         public string ReturnTypeCacheName;
         public Type ReturnTypeCacheType;

@@ -107,6 +107,11 @@ namespace TerraIntegration.Values
             color = new(0xff, 0xaa, 0xaa);
             return $"unregistered type {type.Name}";
         }
+        public static string TypeToColorTagName(Type type)
+        {
+            string name = TypeToName(type, out Color color);
+            return Util.ColorTag(color, name);
+        }
 
         public IEnumerable<(Type, ValueProperty)> GetProperties() 
         {

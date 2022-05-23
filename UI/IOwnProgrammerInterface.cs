@@ -9,7 +9,7 @@ namespace TerraIntegration.UI
 {
     public interface IOwnProgrammerInterface
     {
-        UIPanel Interface { get; }
+        UIPanel Interface { get; set; }
 
         void SetupInterface();
 

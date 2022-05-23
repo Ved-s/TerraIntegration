@@ -301,15 +301,15 @@ namespace TerraIntegration.UI
             PopulateVariables();
         }
 
-        private static void ResultSlot_VariableChanged()
+        private static void ResultSlot_VariableChanged(Items.Variable var)
         {
-            if (ResultSlot.Var?.Var is null)
+            if (var?.Var is null)
             {
                 VariableName.SetText("");
             }
-            else if (ResultSlot.Var.Var.Name is not null)
+            else if (var.Var.Name is not null)
             {
-                VariableName.SetText(ResultSlot.Var.Var.Name);
+                VariableName.SetText(var.Var.Name);
             }
         }
 

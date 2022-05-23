@@ -99,10 +99,10 @@ namespace TerraIntegration.UI
             }
         }
 
-        private void Slot_VariableChanged()
+        private void Slot_VariableChanged(Items.Variable var)
         {
-            if (Slot.Var is null) return;
-            DefineVariable?.Invoke(Slot.Var);
+            if (var is null) return;
+            DefineVariable?.Invoke(var);
         }
     }
 }

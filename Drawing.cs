@@ -12,11 +12,11 @@ namespace TerraIntegration
 {
     public static class Drawing
     {
-        public static void DrawLine(Vector2 pos, float angle, float length, Color color, float thickness = 1) 
+        public static void DrawLine(this SpriteBatch spriteBatch, Vector2 pos, float angle, float length, Color color, float thickness = 1) 
         {
-            Main.spriteBatch.Draw(TextureAssets.MagicPixel.Value, pos, new Rectangle(0, 0, 1, 1), color, angle, Vector2.Zero, new Vector2(length, thickness), SpriteEffects.None, 0);
+            spriteBatch.Draw(TextureAssets.MagicPixel.Value, pos, new Rectangle(0, 0, 1, 1), color, angle, Vector2.Zero, new Vector2(length, thickness), SpriteEffects.None, 0);
         }
-        public static void DrawRect(Rectangle rect, Color? stroke = null, Color? fill = null, float strokeThickness = 1)
+        public static void DrawRect(this SpriteBatch spriteBatch, Rectangle rect, Color? stroke = null, Color? fill = null, float strokeThickness = 1)
         {
             if (fill.HasValue) 
             {
@@ -24,11 +24,11 @@ namespace TerraIntegration
             }
             if (stroke.HasValue)
             {
-                DrawLine(new(rect.X, rect.Y), 0, rect.Width - strokeThickness, stroke.Value, strokeThickness);
-                DrawLine(new(rect.X, rect.Y), (float)Math.PI/2, rect.Height - strokeThickness, stroke.Value, strokeThickness);
+                spriteBatch.DrawLine(new(rect.X, rect.Y), 0, rect.Width - strokeThickness, stroke.Value, strokeThickness);
+                spriteBatch.DrawLine(new(rect.X, rect.Y), (float)Math.PI/2, rect.Height - strokeThickness, stroke.Value, strokeThickness);
 
-                DrawLine(new(rect.X-1, rect.Y + rect.Height - strokeThickness), 0, rect.Width, stroke.Value, strokeThickness);
-                DrawLine(new(rect.X + rect.Width - strokeThickness, rect.Y), (float)Math.PI/2, rect.Height, stroke.Value, strokeThickness);
+                spriteBatch.DrawLine(new(rect.X-1, rect.Y + rect.Height - strokeThickness), 0, rect.Width, stroke.Value, strokeThickness);
+                spriteBatch.DrawLine(new(rect.X + rect.Width - strokeThickness, rect.Y), (float)Math.PI/2, rect.Height, stroke.Value, strokeThickness);
             }
         }
     }

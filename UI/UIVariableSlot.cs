@@ -19,12 +19,12 @@ namespace TerraIntegration.UI
             set
             {
                 var = value;
-                VariableChanged?.Invoke();
+                VariableChanged?.Invoke(var);
             }
         }
         public virtual Point WorldPos { get; set; }
 
-        public event Action VariableChanged;
+        public Action<Variable> VariableChanged;
 
         public override void OnDeactivate()
         {
