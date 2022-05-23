@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Terraria.ModLoader;
 using Terraria;
 
-namespace TerraIntegration.Items
+namespace TerraIntegration.Items.Materials
 {
     public class CrystallizedSap : ModItem
     {

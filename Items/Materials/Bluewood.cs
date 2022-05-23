@@ -7,7 +7,7 @@ using Terraria.ID;
 using Terraria.ModLoader;
 using Terraria;
 
-namespace TerraIntegration.Items
+namespace TerraIntegration.Items.Materials
 {
     public class Bluewood : ModItem
     {

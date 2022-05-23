@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using TerraIntegration.Values;
 using Terraria;
 using Terraria.GameContent;
+using Terraria.ID;
 using Terraria.ModLoader;
 using Terraria.ModLoader.IO;
 
@@ -108,6 +109,16 @@ namespace TerraIntegration.Items
         public override void NetReceive(BinaryReader reader)
         {
             Var = Variables.Variable.LoadData(reader);
+        }
+
+        public override void AddRecipes()
+        {
+            CreateRecipe()
+                .AddTile(TileID.WorkBenches)
+                .AddIngredient<Materials.Bluewood>()
+                .AddIngredient<Materials.CrystallizedSap>(4)
+                .AddIngredient<Materials.ChipSmall>()
+                .Register();
         }
 
         public static Item CreateVarItem(Variables.Variable var) 

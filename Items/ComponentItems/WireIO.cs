@@ -28,5 +28,16 @@ namespace TerraIntegration.Items.ComponentItems
             Item.value = Item.sellPrice(copper: 20);
             Item.createTile = ModContent.TileType<Components.WireIO>();
         }
+
+        public override void AddRecipes()
+        {
+            CreateRecipe()
+                .AddTile(TileID.WorkBenches)
+                .AddIngredient<Materials.Chip>()
+                .AddIngredient<Materials.ChipSmall>()
+                .AddIngredient<Materials.CrystallizedSap>(10)
+                .AddIngredient(ItemID.Wire, 4)
+                .Register();
+        }
     }
 }

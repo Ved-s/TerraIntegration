@@ -28,5 +28,15 @@ namespace TerraIntegration.Items.ComponentItems
             Item.value = Item.sellPrice(copper: 20);
             Item.createTile = ModContent.TileType<Components.Camo>();
         }
+
+        public override void AddRecipes()
+        {
+            CreateRecipe(8)
+                .AddTile(TileID.WorkBenches)
+                .AddIngredient<Materials.Chip>(8)
+                .AddIngredient<Materials.CrystallizedSap>(16)
+                .AddIngredient(ItemID.RainbowDye)
+                .Register();
+        }
     }
 }

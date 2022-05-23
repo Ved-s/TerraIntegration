@@ -33,5 +33,18 @@ namespace TerraIntegration.Items
             Item.value = Item.sellPrice(copper: 20);
             Item.createTile = ModContent.TileType<Tiles.Cable>();
         }
+
+        public override void AddRecipes()
+        {
+            CreateRecipe(16)
+                .AddTile(TileID.WorkBenches)
+                .AddIngredient<Materials.Bluewood>(4)
+                .AddIngredient<Materials.CrystallizedSap>(8)
+                .Register();
+
+            CreateRecipe()
+                .AddIngredient<CableWall>()
+                .Register();
+        }
     }
 }

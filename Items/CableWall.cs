@@ -34,5 +34,12 @@ namespace TerraIntegration.Items
             Item.value = Item.sellPrice(copper: 20);
             Item.createWall = ModContent.WallType<Walls.Cable>();
         }
+
+        public override void AddRecipes()
+        {
+            CreateRecipe()
+                .AddIngredient<Cable>()
+                .Register();
+        }
     }
 }

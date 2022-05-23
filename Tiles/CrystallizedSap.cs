@@ -13,7 +13,7 @@ namespace TerraIntegration.Tiles
             Main.tileFrameImportant[Type] = true;
             Main.tileMergeDirt[Type] = false;
 
-            ItemDrop = ModContent.ItemType<Items.CrystallizedSap>();
+            ItemDrop = ModContent.ItemType<Items.Materials.CrystallizedSap>();
         }
 
         public override bool TileFrame(int i, int j, ref bool resetFrame, ref bool noBreak)

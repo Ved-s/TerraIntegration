@@ -39,5 +39,15 @@ namespace TerraIntegration.Items.ComponentItems
             Item.value = Item.sellPrice(silver: 2);
             Item.createTile = ModContent.TileType<Components.Display>();
         }
+
+        public override void AddRecipes()
+        {
+            CreateRecipe(4)
+                .AddTile(TileID.WorkBenches)
+                .AddIngredient<Materials.Chip>()
+                .AddIngredient(ItemID.Glass, 6)
+                .AddIngredient<Materials.CrystallizedSap>(16)
+                .Register();
+        }
     }
 }

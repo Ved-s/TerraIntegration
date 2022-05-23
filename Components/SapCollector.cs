@@ -18,7 +18,7 @@ namespace TerraIntegration.Components
 {
     public class SapCollectorData : ComponentData
     {
-        public Items.CrystallizedSap Item;
+        public Items.Materials.CrystallizedSap Item;
     }
 
     public class SapCollector : Component<SapCollectorData>
@@ -54,7 +54,7 @@ namespace TerraIntegration.Components
                 if (data.Item is null || data.Item.Item.stack < SlotCap)
                 {
                     if (data.Item is null)
-                        data.Item = Util.CreateModItem<Items.CrystallizedSap>();
+                        data.Item = Util.CreateModItem<Items.Materials.CrystallizedSap>();
                     
                     else data.Item.Item.stack++;
                 }
@@ -92,7 +92,7 @@ namespace TerraIntegration.Components
 
                 MaxSlotCapacity = SlotCap,
 
-                ItemValidator = (item) => item.type == ModContent.ItemType<Items.CrystallizedSap>(),
+                ItemValidator = (item) => item.type == ModContent.ItemType<Items.Materials.CrystallizedSap>(),
 
                 GetItem = () =>
                 ModContent.GetInstance<ComponentInterface>()
@@ -105,7 +105,7 @@ namespace TerraIntegration.Components
                     SapCollectorData data = component.GetDataOrNull<SapCollectorData>();
                     if (data is not null)
                     {
-                        data.Item = (item?.ModItem as Items.CrystallizedSap);
+                        data.Item = (item?.ModItem as Items.Materials.CrystallizedSap);
                         NotifyItemChange(data.Item, component.Pos);
                     }
                 }
@@ -192,7 +192,7 @@ namespace TerraIntegration.Components
             return efficiency;
         }
 
-        private void NotifyItemChange(Items.CrystallizedSap item, Point16 pos) 
+        private void NotifyItemChange(Items.Materials.CrystallizedSap item, Point16 pos) 
         {
             if (Main.netMode == NetmodeID.SinglePlayer) return;
 
@@ -212,7 +212,7 @@ namespace TerraIntegration.Components
                 else 
                 {
                     if (data.Item is null) 
-                        data.Item = Util.CreateModItem<Items.CrystallizedSap>(stack);
+                        data.Item = Util.CreateModItem<Items.Materials.CrystallizedSap>(stack);
                     else data.Item.Item.stack = stack;
                 }
 
@@ -236,7 +236,7 @@ namespace TerraIntegration.Components
             else
             {
                 if (data.Item is null)
-                    data.Item = Util.CreateModItem<Items.CrystallizedSap>(stack);
+                    data.Item = Util.CreateModItem<Items.Materials.CrystallizedSap>(stack);
                 else data.Item.Item.stack = stack;
             }
 
@@ -264,7 +264,7 @@ namespace TerraIntegration.Components
                     if (stack > 0)
                     {
                         if (sdata.Item is null)
-                            sdata.Item = Util.CreateModItem<Items.CrystallizedSap>(stack);
+                            sdata.Item = Util.CreateModItem<Items.Materials.CrystallizedSap>(stack);
                         else sdata.Item.Item.stack = stack;
                     }
                 }

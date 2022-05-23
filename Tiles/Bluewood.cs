@@ -14,7 +14,7 @@ namespace TerraIntegration.Tiles
             Main.tileFrameImportant[Type] = false;
             Main.tileMergeDirt[Type] = false;
 
-            ItemDrop = ModContent.ItemType<Items.Bluewood>();
+            ItemDrop = ModContent.ItemType<Items.Materials.Bluewood>();
         }
     }
 }

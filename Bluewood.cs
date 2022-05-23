@@ -53,7 +53,7 @@ namespace TerraIntegration
                 Item.NewItem(WorldGen.GetItemSource_FromTileBreak(x, y), new Vector2(x, y) * 16, Acorn.Type);
 
             if (Main.rand.NextBool(2))
-                Item.NewItem(WorldGen.GetItemSource_FromTileBreak(x, y), new Vector2(x, y) * 16, ModContent.ItemType<Items.Bluewood>(), Main.rand.Next(1,3));
+                Item.NewItem(WorldGen.GetItemSource_FromTileBreak(x, y), new Vector2(x, y) * 16, ModContent.ItemType<Items.Materials.Bluewood>(), Main.rand.Next(1,3));
 
             return false;
         }

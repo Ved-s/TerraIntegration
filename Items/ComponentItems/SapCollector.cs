@@ -28,5 +28,15 @@ namespace TerraIntegration.Items.ComponentItems
             Item.value = Item.sellPrice(silver: 5);
             Item.createTile = ModContent.TileType<Components.SapCollector>();
         }
+
+        public override void AddRecipes()
+        {
+            CreateRecipe()
+                .AddTile(TileID.WorkBenches)
+                .AddIngredient<Materials.Bluewood>(10)
+                .AddIngredient<Materials.ChipSmall>()
+                .AddIngredient<Materials.CrystallizedSap>(10)
+                .Register();
+        }
     }
 }
