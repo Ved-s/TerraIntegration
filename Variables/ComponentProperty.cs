@@ -91,46 +91,6 @@ namespace TerraIntegration.Variables
             return GetProperty(new(ComponentPos, c), errors);
         }
 
-        public static void ComponentRegistered()
-        {
-            List<ComponentProperty> success = new();
-
-            foreach (ComponentProperty pv in WaitingComponent) 
-            {
-                if (pv.ComponentType is null) 
-                    continue;
-
-                Register(pv);
-                success.Add(pv);
-            }
-
-            foreach (ComponentProperty pv in success)
-                WaitingComponent.Remove(pv);
-        }
-
-        public static void Register(ComponentProperty property)
-        {
-            if (property.ComponentType is null)
-            {
-                WaitingComponent.Add(property);
-                return;
-            }
-
-            if (!ByComponentType.TryGetValue(property.ComponentType, out var prop))
-            {
-                prop = new();
-                ByComponentType[property.ComponentType] = prop;
-            }
-            prop[property.PropertyName] = property;
-            Variable.ByTypeName[property.Type] = property;
-        }
-
-        public static void Unregister() 
-        {
-            ByComponentType.Clear();
-            AllProperties.Clear();
-        }
-
         protected override void SaveCustomData(BinaryWriter writer)
         {
             writer.Write(ComponentPos.X);
@@ -152,7 +112,6 @@ namespace TerraIntegration.Variables
                 ["comy"] = ComponentPos.Y,
             };
         }
-
         protected override Variable LoadCustomTag(object data)
         {
             ComponentProperty pv = (ComponentProperty)Activator.CreateInstance(GetType());
@@ -172,6 +131,44 @@ namespace TerraIntegration.Variables
             }
 
             return pv;
+        }
+
+        internal static void ComponentRegistered()
+        {
+            List<ComponentProperty> success = new();
+
+            foreach (ComponentProperty pv in WaitingComponent)
+            {
+                if (pv.ComponentType is null)
+                    continue;
+
+                Register(pv);
+                success.Add(pv);
+            }
+
+            foreach (ComponentProperty pv in success)
+                WaitingComponent.Remove(pv);
+        }
+        public static void Register(ComponentProperty property)
+        {
+            if (property.ComponentType is null)
+            {
+                WaitingComponent.Add(property);
+                return;
+            }
+
+            if (!ByComponentType.TryGetValue(property.ComponentType, out var prop))
+            {
+                prop = new();
+                ByComponentType[property.ComponentType] = prop;
+            }
+            prop[property.PropertyName] = property;
+            Variable.ByTypeName[property.Type] = property;
+        }
+        public static new void Unregister()
+        {
+            ByComponentType.Clear();
+            AllProperties.Clear();
         }
     }
 

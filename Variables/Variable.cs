@@ -322,6 +322,30 @@ namespace TerraIntegration.Variables
             }
             return null;
         }
+
+        public static void Register(Variable v)
+        {
+            if (v is ComponentProperty pv)
+            {
+                ComponentProperty.Register(pv);
+                return;
+            }
+            if (v is ValueProperty valpr)
+            {
+                ValueProperty.Register(valpr);
+                return;
+            }
+
+            if (v?.Type is null) return;
+            ByTypeName[v.Type] = v;
+        }
+        internal static void Unregister() 
+        {
+            ByTypeName.Clear();
+
+            ComponentProperty.Unregister();
+            ValueProperty.Unregister();
+        }
     }
 
     public class UnloadedVariable : Variable

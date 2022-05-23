@@ -23,98 +23,52 @@ namespace TerraIntegration
 
 		public override void Load()
         {
-            Component.TileTypes.Clear();
-			Component.ByType.Clear();
-			Component.ByTypeName.Clear();
-			Component.ByTileType.Clear();
-			Variable.ByTypeName.Clear();
-			VariableValue.ByTypeName.Clear();
-			VariableValue.ByType.Clear();
-			ComponentProperty.Unregister();
-			ValueProperty.Unregister();
+            Unregister();
 
-			RegisterVariable(new Variable());
-			RegisterVariableValue(new VariableValue());
+            Variable.Register(new Variable());
+            VariableValue.Register(new VariableValue());
 
-			Assembly asm = Assembly.GetExecutingAssembly();
-			foreach (Type t in asm.GetTypes())
-			{
-				if (t.IsAbstract) continue;
+            Assembly asm = Assembly.GetExecutingAssembly();
+            foreach (Type t in asm.GetTypes())
+            {
+                if (t.IsAbstract) continue;
 
-				if (t.IsSubclassOf(typeof(Component)))
-				{
-					Type generic = typeof(ContentInstance<>).MakeGenericType(t);
-					Component c = (Component)generic.GetProperty("Instance").GetValue(null);
+                if (t.IsSubclassOf(typeof(Component)))
+                {
+                    Type generic = typeof(ContentInstance<>).MakeGenericType(t);
+                    Component c = (Component)generic.GetProperty("Instance").GetValue(null);
 
-					RegisterComponent(c);
-				}
-				else if (t.IsSubclassOf(typeof(Variable)))
-				{
-					RegisterVariable(Activator.CreateInstance(t) as Variable);
-				}
-				else if (t.IsSubclassOf(typeof(VariableValue)))
-				{
-					RegisterVariableValue(Activator.CreateInstance(t) as VariableValue);
-				}
-			}
+                    Component.Register(c);
+                }
+                else if (t.IsSubclassOf(typeof(Variable)))
+                {
+                    Variable.Register(Activator.CreateInstance(t) as Variable);
+                }
+                else if (t.IsSubclassOf(typeof(VariableValue)))
+                {
+                    VariableValue.Register(Activator.CreateInstance(t) as VariableValue);
+                }
+            }
         }
-
         public override void Unload()
         {
-			Component.TileTypes.Clear();
-			Component.ByType.Clear();
-			Component.ByTypeName.Clear();
-			Component.ByTileType.Clear();
-			Variable.ByTypeName.Clear();
-			VariableValue.ByTypeName.Clear();
-			VariableValue.ByType.Clear();
-			ComponentProperty.Unregister();
-			ValueProperty.Unregister();
-
+			Unregister();
 			VariableRenderer.Unload();
 		}
 
-		public override void HandlePacket(BinaryReader reader, int whoAmI)
+		private static void Unregister()
+        {
+            Component.Unregister();
+			Variable.Unregister();
+			VariableValue.Unregister();
+
+            ComponentSystem.Unregister();
+        }
+
+        public override void HandlePacket(BinaryReader reader, int whoAmI)
         {
             Networking.HandlePacket(reader, whoAmI);
         }
-
-        public void RegisterComponent(Component c)
-		{
-			if (c?.ComponentType is null) return;
-
-			Component.TileTypes.Add(c.Type);
-			Component.ByType[c.GetType()] = c;
-			Component.ByTileType[c.Type] = c;
-			Component.ByTypeName[c.ComponentType] = c;
-
-			ComponentProperty.ComponentRegistered();
-		}
-		public void RegisterVariable(Variable v)
-		{
-			if (v is ComponentProperty pv)
-			{
-				ComponentProperty.Register(pv);
-				return;
-			}
-			if (v is ValueProperty valpr)
-			{
-				ValueProperty.Register(valpr);
-				return;
-			}
-
-			if (v?.Type is null) return;
-			Variable.ByTypeName[v.Type] = v;
-		}
-		public void RegisterVariableValue(VariableValue v)
-		{
-			if (v?.Type is null) return;
-
-			VariableValue.ByTypeName[v.Type] = v;
-			VariableValue.ByType[v.GetType()] = v;
-
-			ValueProperty.ValueRegistered();
-		}
 	}
 
 	public record struct PositionedComponent(Point16 Pos, Component Component)

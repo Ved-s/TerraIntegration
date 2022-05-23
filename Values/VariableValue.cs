@@ -132,6 +132,21 @@ namespace TerraIntegration.Values
                  
             return false;
         }
+
+        public static void Register(VariableValue v)
+        {
+            if (v?.Type is null) return;
+
+            ByTypeName[v.Type] = v;
+            ByType[v.GetType()] = v;
+
+            ValueProperty.ValueRegistered();
+        }
+        internal static void Unregister() 
+        {
+            ByTypeName.Clear();
+            ByType.Clear();
+        }
     }
 
     public class UnloadedVariableValue : VariableValue

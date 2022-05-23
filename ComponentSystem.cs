@@ -15,8 +15,8 @@ namespace TerraIntegration
         public static TerraIntegration Mod => ModContent.GetInstance<TerraIntegration>();
         public static ComponentWorld World => ModContent.GetInstance<ComponentWorld>();
 
-        public static HashSet<int> CableTiles = new() { ModContent.TileType<Tiles.Cable>() };
-        public static HashSet<int> CableWalls = new() { ModContent.WallType<Walls.CableWall>() };
+        public static HashSet<int> CableTiles = new();
+        public static HashSet<int> CableWalls = new();
 
         public HashSet<WorldPoint> AllPoints { get; } = new();
         public HashSet<PositionedComponent> AllComponents { get; } = new();
@@ -30,172 +30,11 @@ namespace TerraIntegration
 
         internal ComponentSystem() { }
 
-        //public static void UpdateSystem(IEnumerable<Point16> positions)
-        //{
-        //    HashSet<Guid> ids = new();
-
-        //    foreach (Point16 pos in positions)
-        //    {
-        //        Tile t = Framing.GetTileSafely(pos);
-        //        if (!t.HasTile || !Component.TileTypes.Contains(t.TileType)) continue;
-
-        //        ComponentData data = World.GetData(pos);
-        //        if (data is not null && data.System is not null && ids.Contains(data.System.TempId)) continue;
-        //        ComponentSystem sys = UpdateSystem(pos);
-        //        if (sys is not null) ids.Add(sys.TempId);
-        //    }
-        //}
-
-        //public static ComponentSystem UpdateSystem(Point16 pos)
-        //{
-        //    if (Main.netMode == NetmodeID.MultiplayerClient) return null;
-
-        //    Tile t = Main.tile[pos.X, pos.Y];
-        //    if (!t.HasTile || !Component.TileTypes.Contains(t.TileType))
-        //    {
-        //        HashSet<Guid> ids = new();
-
-        //        foreach (Point16 component in GetComponentsAround(pos))
-        //        {
-        //            ComponentData data = World.GetData(component);
-        //            if (data is not null && data.System is not null && ids.Contains(data.System.TempId)) continue;
-        //            ComponentSystem sys = UpdateSystem(component);
-        //            if (sys is not null) ids.Add(sys.TempId);
-        //        }
-
-        //        return null;
-        //    }
-
-        //    ComponentSystem system = new();
-
-        //    foreach (PositionedComponent component in ComponentRunner(pos))
-        //    {
-        //        system.AllComponents.Add(component);
-
-        //        if (component.Component.CanHaveVariables)
-        //            system.ComponentsWithVariables.Add(component);
-
-        //        string type = component.Component.ComponentType;
-        //        if (!system.ComponentsByType.TryGetValue(type, out var componentsByType))
-        //        {
-        //            componentsByType = new();
-        //            system.ComponentsByType[type] = componentsByType;
-        //        }
-        //        componentsByType.Add(component);
-
-        //        system.ComponentsByPos[component.Pos] = component.Component;
-
-        //        component.Component.GetData(component.Pos).System = system;
-        //    }
-        //    foreach (PositionedComponent component in system.AllComponents)
-        //        component.Component.OnSystemUpdate(component.Pos);
-
-        //    return system;
-        //}
-
-        //public static void UpdateSystemWalls(Point16 pos) => UpdateSystem(CableWallRunner(pos));
-
-        //public static IEnumerable<PositionedComponent> ComponentRunner(Point16 pos)
-        //{
-        //    HashSet<Point16> found = new();
-        //    HashSet<Point16> foundWalls = new();
-        //    Queue<Point16> queue = new();
-        //    queue.Enqueue(pos);
-
-        //    int cableWallType = ModContent.WallType<Walls.CableWall>();
-
-        //    while (queue.Count > 0)
-        //    {
-        //        Point16 p = queue.Dequeue();
-        //        if (found.Contains(p))
-        //            continue;
-
-        //        found.Add(p);
-        //        Tile t = Main.tile[p.X, p.Y];
-
-        //        if (t.WallType == cableWallType && !foundWalls.Contains(p))
-        //        {
-        //            foreach (Point16 wallpos in CableWallRunner(p))
-        //                if (!foundWalls.Contains(wallpos))
-        //                {
-        //                    foundWalls.Add(wallpos);
-        //                    if (!found.Contains(wallpos))
-        //                        queue.Enqueue(wallpos);
-        //                }
-        //        }
-        //        if (Component.TileTypes.Contains(t.TileType))
-        //            yield return new(p, Component.ByTileType[t.TileType]);
-        //        else continue;
-
-        //        Point16 check = new(p.X, p.Y - 1);
-        //        t = Main.tile[check.X, check.Y];
-        //        if (t.HasTile && !found.Contains(check))
-        //            queue.Enqueue(check);
-
-        //        check = new(p.X - 1, p.Y);
-        //        t = Main.tile[check.X, check.Y];
-        //        if (t.HasTile && !found.Contains(check))
-        //            queue.Enqueue(check);
-
-        //        check = new(p.X, p.Y + 1);
-        //        t = Main.tile[check.X, check.Y];
-        //        if (t.HasTile && !found.Contains(check))
-        //            queue.Enqueue(check);
-
-        //        check = new(p.X + 1, p.Y);
-        //        t = Main.tile[check.X, check.Y];
-        //        if (t.HasTile && !found.Contains(check))
-        //            queue.Enqueue(check);
-        //    }
-        //}
-
-        //public static IEnumerable<Point16> CableWallRunner(Point16 pos)
-        //{
-        //    HashSet<Point16> found = new();
-        //    Queue<Point16> queue = new();
-        //    queue.Enqueue(new(pos.X, pos.Y - 1));
-        //    queue.Enqueue(new(pos.X, pos.Y + 1));
-        //    queue.Enqueue(new(pos.X - 1, pos.Y));
-        //    queue.Enqueue(new(pos.X + 1, pos.Y));
-        //    queue.Enqueue(pos);
-
-        //    int cableWallType = ModContent.WallType<Walls.CableWall>();
-
-        //    while (queue.Count > 0)
-        //    {
-        //        Point16 p = queue.Dequeue();
-        //        if (found.Contains(p))
-        //            continue;
-
-        //        found.Add(p);
-        //        Tile t = Main.tile[p.X, p.Y];
-
-        //        if (t.WallType != cableWallType) continue;
-
-        //        yield return p;
-
-        //        Point16 check = new(p.X, p.Y - 1);
-        //        t = Main.tile[check.X, check.Y];
-        //        if (!found.Contains(check))
-        //            queue.Enqueue(check);
-
-        //        check = new(p.X - 1, p.Y);
-        //        t = Main.tile[check.X, check.Y];
-        //        if (!found.Contains(check))
-        //            queue.Enqueue(check);
-
-        //        check = new(p.X, p.Y + 1);
-        //        t = Main.tile[check.X, check.Y];
-        //        if (!found.Contains(check))
-        //            queue.Enqueue(check);
-
-        //        check = new(p.X + 1, p.Y);
-        //        t = Main.tile[check.X, check.Y];
-        //        if (!found.Contains(check))
-        //            queue.Enqueue(check);
-        //    }
-        //}
-
+        public static void RegisterCable(int type, bool wall)
+        {
+            if (wall) CableWalls.Add(type);
+            else CableTiles.Add(type);
+        }
         public static void UpdateSystem(WorldPoint start, out List<ComponentSystem> systems)
         {
             HashSet<WorldPoint> checks = new();
@@ -224,34 +63,37 @@ namespace TerraIntegration
             }
         }
 
+        internal static void Unregister() 
+        {
+            CableTiles.Clear();
+            CableWalls.Clear();
+        }
+
         public static IEnumerable<WorldPoint> GetConnectorsAround(WorldPoint p)
         {
-            if (p.Wall && IsConnector(p.WithWall(false)))
-                yield return p.WithWall(false);
+            WorldPoint check = p.WithWall(false);
+            if (p.Wall && IsConnector(check))
+                yield return check;
 
-            if (!p.Wall && IsConnector(p.WithWall(true)))
-                yield return p.WithWall(true);
+            check = p.WithWall(true);
+            if (!p.Wall && IsConnector(check))
+                yield return check;
 
-            WorldPoint check = p.WithOffset(0, -1);
-            if (IsConnector(check)) yield return check;
+            check = p.WithOffset(0, -1);
+            if (IsConnector(check))
+                yield return check;
 
             check = p.WithOffset(0, 1);
-            if (IsConnector(check)) yield return check;
+            if (IsConnector(check))
+                yield return check;
 
             check = p.WithOffset(-1, 0);
-            if (IsConnector(check)) yield return check;
+            if (IsConnector(check)) 
+                yield return check;
 
             check = p.WithOffset(1, 0);
-            if (IsConnector(check)) yield return check;
-        }
-        public static bool IsConnector(WorldPoint p)
-        {
-            Tile t = Framing.GetTileSafely(p.ToPoint());
-
-            if (p.Wall)
-                return CableWalls.Contains(t.WallType);
-            else
-                return CableTiles.Contains(t.TileType) || Component.TileTypes.Contains(t.TileType);
+            if (IsConnector(check)) 
+                yield return check;
         }
         public static IEnumerable<WorldPoint> EnumerateConnectors(WorldPoint start)
         {
@@ -282,6 +124,15 @@ namespace TerraIntegration
                 queue.Enqueue(p.WithOffset(0, 1));
                 queue.Enqueue(p.WithOffset(-1, 0));
             }
+        }
+        public static bool IsConnector(WorldPoint p)
+        {
+            Tile t = Framing.GetTileSafely(p.ToPoint());
+
+            if (p.Wall)
+                return CableWalls.Contains(t.WallType);
+            else
+                return CableTiles.Contains(t.TileType) || Component.TileTypes.Contains(t.TileType);
         }
 
         public void Add(WorldPoint point)

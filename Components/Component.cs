@@ -338,6 +338,25 @@ namespace TerraIntegration.Components
         {
             World.InitData(pos, this);
         }
+
+        public static void Register(Component c)
+        {
+            if (c?.ComponentType is null) return;
+
+            TileTypes.Add(c.Type);
+            ByType[c.GetType()] = c;
+            ByTileType[c.Type] = c;
+            ByTypeName[c.ComponentType] = c;
+
+            ComponentProperty.ComponentRegistered();
+        }
+        internal static void Unregister()
+        {
+            TileTypes.Clear();
+            ByType.Clear();
+            ByTypeName.Clear();
+            ByTileType.Clear();
+        }
     }
 
     public class ComponentData
