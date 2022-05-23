@@ -7,7 +7,7 @@ using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
 
-namespace TerraIntegration.Items
+namespace TerraIntegration.Items.ComponentItems
 {
     public class Camo : ModItem
     {

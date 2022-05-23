@@ -40,7 +40,7 @@ namespace TerraIntegration.Components
             SetupNewTile();
             TileObjectData.addTile(Type);
 
-            ItemDrop = ModContent.ItemType<Items.Camo>();
+            ItemDrop = ModContent.ItemType<Items.ComponentItems.Camo>();
         }
 
         public override UIPanel SetupInterface()

@@ -34,7 +34,7 @@ namespace TerraIntegration.Components
             SetupNewTile();
             TileObjectData.addTile(Type);
 
-            ItemDrop = ModContent.ItemType<Items.VarStore>();
+            ItemDrop = ModContent.ItemType<Items.ComponentItems.VarStore>();
         }
 
         public override void OnEvent(Point16 pos, int variableIndex)

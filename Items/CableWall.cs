@@ -12,7 +12,7 @@ namespace TerraIntegration.Items
 {
     public class CableWall : ModItem
     {
-        public override string Texture => $"{nameof(TerraIntegration)}/Assets/Items/Cable";
+        public override string Texture => $"TerraIntegration/Assets/Items/CableWall";
 
         public override void SetStaticDefaults()
         {
@@ -32,7 +32,7 @@ namespace TerraIntegration.Items
             Item.consumable = true;
             Item.rare = ItemRarityID.White;
             Item.value = Item.sellPrice(copper: 20);
-            Item.createWall = ModContent.WallType<Walls.CableWall>();
+            Item.createWall = ModContent.WallType<Walls.Cable>();
         }
     }
 }

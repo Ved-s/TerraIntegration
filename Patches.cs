@@ -134,15 +134,15 @@ namespace TerraIntegration
         {
             orig(i, j, type, mute);
             if (Main.netMode == NetmodeID.MultiplayerClient) return;
-            if (Framing.GetTileSafely(i, j).WallType == ModContent.WallType<Walls.CableWall>())
+            if (Framing.GetTileSafely(i, j).WallType == ModContent.WallType<Walls.Cable>())
                 ComponentSystem.UpdateSystem(new((short)i, (short)j, true), out _);
         }
         private void WorldGen_KillWall(On.Terraria.WorldGen.orig_KillWall orig, int i, int j, bool fail)
         {
-            bool cable = Framing.GetTileSafely(i, j).WallType == ModContent.WallType<Walls.CableWall>();
+            bool cable = Framing.GetTileSafely(i, j).WallType == ModContent.WallType<Walls.Cable>();
             orig(i, j, fail);
             if (cable && Main.netMode != NetmodeID.MultiplayerClient &&
-                Framing.GetTileSafely(i, j).WallType != ModContent.WallType<Walls.CableWall>())
+                Framing.GetTileSafely(i, j).WallType != ModContent.WallType<Walls.Cable>())
             {
                 ComponentSystem.UpdateSystem(new((short)i, (short)j, true), out _);
             }
@@ -360,7 +360,7 @@ namespace TerraIntegration
 
         public static void PostWallDrawHook()
         {
-            Walls.CableWall.DelayedDraw();
+            Walls.Cable.DelayedDraw();
         }
         // false to skip outline render
         public static bool WallOutlineHook(int x, int y, int side) 
@@ -373,11 +373,11 @@ namespace TerraIntegration
                 case 3: y++; break;
             }
 
-            return Framing.GetTileSafely(x, y).WallType != ModContent.WallType<Walls.CableWall>();
+            return Framing.GetTileSafely(x, y).WallType != ModContent.WallType<Walls.Cable>();
         }
         public static bool WallFramingHook(int x, int y, ref int framing)
         {
-            int cable = ModContent.WallType<Walls.CableWall>();
+            int cable = ModContent.WallType<Walls.Cable>();
 
             //if (Framing.GetTileSafely(x, y).WallType == cable)
             //{

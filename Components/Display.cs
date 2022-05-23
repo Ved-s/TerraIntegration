@@ -80,7 +80,7 @@ namespace TerraIntegration.Components
             SetupNewTile();
             TileObjectData.addTile(Type);
 
-            ItemDrop = ModContent.ItemType<Items.Display>();
+            ItemDrop = ModContent.ItemType<Items.ComponentItems.Display>();
         }
         public override bool TileFrame(int i, int j, ref bool resetFrame, ref bool noBreak)
         {

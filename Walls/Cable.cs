@@ -12,9 +12,9 @@ using Terraria.ModLoader;
 
 namespace TerraIntegration.Walls
 {
-    public class CableWall : ModWall
+    public class Cable : ModWall
     {
-        public override string Texture => "TerraIntegration/Assets/Walls/CableWall";
+        public override string Texture => "TerraIntegration/Assets/Walls/Cable";
 
         static List<(Point pos, Rectangle frame)> DelayedDraws = new();
 
@@ -29,12 +29,10 @@ namespace TerraIntegration.Walls
         {
             short fx = 0, fy = 0;
 
-            int cable = ModContent.WallType<CableWall>();
-
-            if (Framing.GetTileSafely(i, j - 1).WallType == cable) fy += 18;
-            if (Framing.GetTileSafely(i - 1, j).WallType == cable) fx += 18;
-            if (Framing.GetTileSafely(i, j + 1).WallType == cable) fy += 36;
-            if (Framing.GetTileSafely(i + 1, j).WallType == cable) fx += 36;
+            if (ComponentSystem.CableWalls.Contains(Framing.GetTileSafely(i, j - 1).WallType)) fy += 18;
+            if (ComponentSystem.CableWalls.Contains(Framing.GetTileSafely(i - 1, j).WallType)) fx += 18;
+            if (ComponentSystem.CableWalls.Contains(Framing.GetTileSafely(i, j + 1).WallType)) fy += 36;
+            if (ComponentSystem.CableWalls.Contains(Framing.GetTileSafely(i + 1, j).WallType)) fx += 36;
 
             DelayedDraws.Add((new(i, j), new Rectangle(fx, fy, 16, 16)));
 

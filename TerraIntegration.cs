@@ -27,6 +27,8 @@ namespace TerraIntegration
 
             Variable.Register(new Variable());
             VariableValue.Register(new VariableValue());
+            ComponentSystem.RegisterCable(ModContent.TileType<Tiles.Cable>(), false);
+            ComponentSystem.RegisterCable(ModContent.WallType<Walls.Cable>(), true);
 
             Assembly asm = Assembly.GetExecutingAssembly();
             foreach (Type t in asm.GetTypes())
@@ -88,6 +90,4 @@ namespace TerraIntegration
 		public CallSide Side { get; set; }
 		public CallSideAttribute(CallSide side) { Side = side; }
 	}
-
-	
 }

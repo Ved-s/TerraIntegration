@@ -7,11 +7,11 @@ using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
 
-namespace TerraIntegration.Items
+namespace TerraIntegration.Items.ComponentItems
 {
-    public class VarStore : ModItem
+    public class SapCollector : ModItem
     {
-        public override string Texture => $"{nameof(TerraIntegration)}/Assets/Tiles/{Name}";
+        public override string Texture => "TerraIntegration/Assets/Tiles/SapCollector";
 
         public override void SetDefaults()
         {
@@ -25,8 +25,8 @@ namespace TerraIntegration.Items
             Item.useStyle = ItemUseStyleID.Swing;
             Item.consumable = true;
             Item.rare = ItemRarityID.White;
-            Item.value = Item.sellPrice(copper: 20);
-            Item.createTile = ModContent.TileType<Components.VarStore>();
+            Item.value = Item.sellPrice(silver: 5);
+            Item.createTile = ModContent.TileType<Components.SapCollector>();
         }
     }
 }

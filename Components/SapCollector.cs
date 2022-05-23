@@ -69,7 +69,7 @@ namespace TerraIntegration.Components
             SetupNewTile();
             TileObjectData.addTile(Type);
 
-            ItemDrop = ModContent.ItemType<Items.SapCollector>();
+            ItemDrop = ModContent.ItemType<Items.ComponentItems.SapCollector>();
         }
 
         public override UIPanel SetupInterface()

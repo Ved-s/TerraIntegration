@@ -33,7 +33,7 @@ namespace TerraIntegration.Components
             SetupNewTile();
             TileObjectData.addTile(Type);
 
-            ItemDrop = ModContent.ItemType<Items.VarStore>();
+            ItemDrop = ModContent.ItemType<Items.ComponentItems.VarStore>();
         }
 
         public override UIPanel SetupInterface()
