@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Mono.Cecil.Cil;
 using MonoMod.Cil;
 using System.Collections.Generic;
+using System.Linq;
 using Terraria;
 using Terraria.GameContent.Drawing;
 using Terraria.ID;
@@ -29,8 +30,6 @@ namespace TerraIntegration
 
             Terraria.IO.WorldFile.OnWorldLoad += WorldFile_OnWorldLoad;
         }
-
-        
 
         public void Unload()
         {
@@ -59,15 +58,18 @@ namespace TerraIntegration
             int type = Main.tile[i, j].TileType;
             orig(i, j, fail, effectOnly, noItem);
             if (!Main.tile[i, j].HasTile && Components.Component.TileTypes.Contains(type))
-            {
                 Components.Component.ByTileType[type].OnKilled(new(i, j));
-            }
+            if (!Main.tile[i, j].HasTile && ComponentSystem.CableTiles.Contains(type))
+                ComponentSystem.UpdateSystem(new((short)i, (short)j, false), out _);
+
         }
         private bool TileObject_Place(On.Terraria.TileObject.orig_Place orig, TileObject toBePlaced)
         {
             bool result = orig(toBePlaced);
             if (Components.Component.ByTileType.TryGetValue(toBePlaced.type, out Components.Component c))
                 c.OnPlaced(new(toBePlaced.xCoord, toBePlaced.yCoord));
+            if (ComponentSystem.CableTiles.Contains(toBePlaced.type))
+                ComponentSystem.UpdateSystem(new((short)toBePlaced.xCoord, (short)toBePlaced.yCoord, false), out _);
 
             return result;
         }
@@ -75,8 +77,8 @@ namespace TerraIntegration
         {
             HashSet<Point16> updated = new();
 
-            for (int y = 0; y < Main.maxTilesY; y++)
-                for (int x = 0; x < Main.maxTilesX; x++)
+            for (short y = 0; y < Main.maxTilesY; y++)
+                for (short x = 0; x < Main.maxTilesX; x++)
                 {
                     Tile t = Main.tile[x, y];
                     if (!t.HasTile) continue;
@@ -84,8 +86,10 @@ namespace TerraIntegration
                     Components.Component.ByTileType[t.TileType].OnLoaded(new(x, y));
                     if (updated.Contains(new(x, y))) continue;
 
-                    ComponentSystem system = ComponentSystem.UpdateSystem(new Point16(x, y));
-                    updated.UnionWith(system.ComponentsByPos.Keys);
+                    ComponentSystem.UpdateSystem(new(x, y, false), out var systems);
+                    updated.UnionWith(systems.SelectMany(s => s.AllPoints)
+                        .Where(p => p.Wall == false)
+                        .Select(p => p.ToPoint16()));
                 }
         }
         private void Framing_WallFrame(ILContext il)
@@ -131,7 +135,7 @@ namespace TerraIntegration
             orig(i, j, type, mute);
             if (Main.netMode == NetmodeID.MultiplayerClient) return;
             if (Framing.GetTileSafely(i, j).WallType == ModContent.WallType<Walls.CableWall>())
-                ComponentSystem.UpdateSystemWalls(new(i, j));
+                ComponentSystem.UpdateSystem(new((short)i, (short)j, true), out _);
         }
         private void WorldGen_KillWall(On.Terraria.WorldGen.orig_KillWall orig, int i, int j, bool fail)
         {
@@ -140,7 +144,7 @@ namespace TerraIntegration
             if (cable && Main.netMode != NetmodeID.MultiplayerClient &&
                 Framing.GetTileSafely(i, j).WallType != ModContent.WallType<Walls.CableWall>())
             {
-                ComponentSystem.UpdateSystemWalls(new(i, j));
+                ComponentSystem.UpdateSystem(new((short)i, (short)j, true), out _);
             }
         }
 

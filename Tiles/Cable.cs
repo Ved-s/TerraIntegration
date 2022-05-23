@@ -9,18 +9,23 @@ using Terraria.Enums;
 using Terraria.ModLoader;
 using Terraria.ObjectData;
 
-namespace TerraIntegration.Components
+namespace TerraIntegration.Tiles
 {
-    public class Cable : Component
+    public class Cable : ModTile
     {
-		public override string ComponentType => "cable";
-
-		public override bool ShouldSaveData(ComponentData data) => false;
+        public override string Texture => "TerraIntegration/Assets/Tiles/Cable";
 
         public override void SetStaticDefaults()
         {
 			Main.tileSolid[Type] = false;
-			SetupNewTile();
+			TileObjectData.newTile.Width = 1;
+			TileObjectData.newTile.Height = 1;
+			TileObjectData.newTile.Origin = new(0, 0);
+			TileObjectData.newTile.CoordinateHeights = new[] { 16 };
+			TileObjectData.newTile.CoordinateWidth = 16;
+			TileObjectData.newTile.CoordinatePadding = 2;
+			TileObjectData.newTile.HookCheckIfCanPlace = new PlacementHook((_, _, _, _, _, _) => 0, -1, 0, true);
+			TileObjectData.newTile.UsesCustomCanPlace = true;
 			TileObjectData.addTile(Type);
 
 			ItemDrop = ModContent.ItemType<Items.Cable>();
@@ -44,7 +49,7 @@ namespace TerraIntegration.Components
 
 		private bool CanConnectTo(int type)
 		{
-			return type == Type || Components.Component.TileTypes.Contains(type);
+			return ComponentSystem.CableTiles.Contains(type) || Components.Component.TileTypes.Contains(type);
 		}
     }
 }

@@ -99,14 +99,14 @@ namespace TerraIntegration.Components
         public virtual void OnPlaced(Point16 pos)
         {
             InitData(pos);
-            ComponentSystem.UpdateSystem(pos);
+            ComponentSystem.UpdateSystem(new(pos, false), out _);
             if (DefaultUpdateFrequency > 0)
                 World.ComponentUpdates[pos] = this;
         }
         [CallSide(CallSide.Both)]
         public virtual void OnKilled(Point16 pos)
         {
-            ComponentSystem.UpdateSystem(pos);
+            ComponentSystem.UpdateSystem(new(pos, false), out _);
             World.RemoveAll(pos);
         }
         [CallSide(CallSide.Both)]

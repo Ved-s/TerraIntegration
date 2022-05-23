@@ -60,10 +60,7 @@ namespace TerraIntegration
 
         public override void TileFrame(int x, int y)
         {
-            TreeTileInfo info = TreeTileInfo.GetInfo(x, y);
-
-            if (Main.tile[x, y + 1].TileType == Tile.Type || info.WithRoots) return;
-            base.TileFrame(x, y);
+            TreeGrowing.CheckTree(x, y, GetTreeSettings(), true, false);
         }
 
         public override void RandomUpdate(int x, int y)

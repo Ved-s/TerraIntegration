@@ -31,7 +31,7 @@ namespace TerraIntegration.Items
             Item.consumable = true;
             Item.rare = ItemRarityID.White;
             Item.value = Item.sellPrice(copper: 20);
-            Item.createTile = ModContent.TileType<Components.Cable>();
+            Item.createTile = ModContent.TileType<Tiles.Cable>();
         }
     }
 }
