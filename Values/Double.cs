@@ -15,7 +15,7 @@ using Terraria.ModLoader;
 
 namespace TerraIntegration.Values
 {
-    public class Double : VariableValue, IToString, IOwnProgrammerInterface
+    public class Double : VariableValue, IToString, IDecimal, IOwnProgrammerInterface
     {
         public override string Type => "double";
         public override string TypeDisplay => "Double";
@@ -27,6 +27,11 @@ namespace TerraIntegration.Values
 
         public double Value { get; set; }
         public UIPanel Interface { get; set; }
+
+        public double DecimalValue => Value;
+        public double DecimalMax => double.MaxValue;
+        public double DecimalMin => double.MinValue;
+
         public UIFocusInputTextField InterfaceValue;
         static Regex NotDigitOrDot = new(@"[^\d\.]+", RegexOptions.Compiled);
 
@@ -111,6 +116,11 @@ namespace TerraIntegration.Values
         {
             if (double.TryParse(InterfaceValue.CurrentString, out double value))
                 var.Var = new Constant(new Double(value));
+        }
+
+        public VariableValue FromDecimalChecked(double value, List<Error> errors)
+        {
+            return new Double(value);
         }
     }
 }

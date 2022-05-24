@@ -3,11 +3,8 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using TerraIntegration.Interfaces;
-using TerraIntegration.Items;
 using TerraIntegration.UI;
 using TerraIntegration.Variables;
 using Terraria.GameContent.UI.Elements;
@@ -26,8 +23,6 @@ namespace TerraIntegration.Values
         public override Point SpritesheetPos => new(0, 0);
 
         public int Value { get; set; }
-
-        public Type[] ValidAddTypes => new[] { typeof(INumeric) };
 
         public long NumericValue => Value;
         public long NumericMax => int.MaxValue;
@@ -73,28 +68,6 @@ namespace TerraIntegration.Values
             return new Integer(val);
         }
 
-        public VariableValue Add(VariableValue value, List<Error> errors)
-        {
-            if (value is INumeric numeric)
-            {
-                long num = numeric.NumericValue;
-                if (num > int.MaxValue)
-                {
-                    errors.Add(new(ErrorType.ValueTooBigForType, num, TypeDisplay));
-                    return null;
-                }
-                if (num < int.MinValue)
-                {
-                    errors.Add(new(ErrorType.ValueTooSmallForType, num, TypeDisplay));
-                    return null;
-                }
-                return new Integer(Value + (int)num);
-            }
-
-            errors.Add(new(ErrorType.ExpectedValue, TypeToName(typeof(INumeric), out _)));
-            return null;
-        }
-
         public override string ToString()
         {
             return Value.ToString();
@@ -127,7 +100,7 @@ namespace TerraIntegration.Values
                 Left = new(20, 0),
                 Width = new(-40, 1),
                 Height = new(25, 0),
-                ModifyTextInput = (@new, old) => 
+                ModifyTextInput = (@new, old) =>
                 {
                     if (@new.IsNullEmptyOrWhitespace()) return "";
 

@@ -72,7 +72,9 @@ namespace TerraIntegration.Variables
             }
 
             VariableValue result = addable.Add(second, errors);
-            SetReturnTypeCache(result.GetType());
+
+            if (result is not null)
+                SetReturnTypeCache(result.GetType());
             return result;
         }
 

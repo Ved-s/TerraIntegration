@@ -1,36 +1,33 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using TerraIntegration.Values;
 using Terraria.ModLoader;
 
 namespace TerraIntegration.Interfaces
 {
-    public interface INumeric : IAddable
+    public interface IDecimal : IAddable
     {
-        public long NumericValue { get; }
-        public long NumericMax { get; }
-        public long NumericMin { get; }
+        public double DecimalValue { get; }
+        public double DecimalMax { get; }
+        public double DecimalMin { get; }
 
         Type[] IAddable.ValidAddTypes => new[] { typeof(INumeric), typeof(IDecimal) };
 
-        public VariableValue GetFromNumeric(long value, List<Error> errors) 
+        public VariableValue GetFromDecimal(double value, List<Error> errors)
         {
-            if (!CheckNumericValue(value, errors)) return null;
-            return FromNumericChecked(value, errors);
+            if (!CheckDecimalValue(value, errors)) return null;
+            return FromDecimalChecked(value, errors);
         }
-        public bool CheckNumericValue(long value, List<Error> errors)
+        public bool CheckDecimalValue(double value, List<Error> errors)
         {
             string type = (this as VariableValue)?.TypeDisplay;
 
-            if (value > NumericMax)
+            if (value > DecimalMax)
             {
                 errors?.Add(new(ErrorType.ValueTooBigForType, value, type));
                 return false;
             }
-            if (value < NumericMin)
+            if (value < DecimalMin)
             {
                 errors?.Add(new(ErrorType.ValueTooSmallForType, value, type));
                 return false;
@@ -38,12 +35,12 @@ namespace TerraIntegration.Interfaces
             return true;
         }
 
-        protected VariableValue FromNumericChecked(long value, List<Error> errors);
+        protected VariableValue FromDecimalChecked(double value, List<Error> errors);
 
         [NoJIT]
         VariableValue IAddable.Add(VariableValue value, List<Error> errors)
         {
-            long val;
+            double val;
 
             if (value is INumeric numeric)
                 val = numeric.NumericValue;
@@ -51,8 +48,8 @@ namespace TerraIntegration.Interfaces
                 val = (long)@decimal.DecimalValue;
             else return null;
 
-            long num = val + NumericValue;
-            return GetFromNumeric(num, errors);
+            double num = val + DecimalValue;
+            return GetFromDecimal(num, errors);
         }
     }
 }
