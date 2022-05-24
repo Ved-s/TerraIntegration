@@ -32,6 +32,7 @@ namespace TerraIntegration.Components
 
         public abstract string ComponentType { get; }
         public virtual string ComponentDisplayName { get; }
+        public virtual string ComponentDescription { get; }
 
         public override string Texture
         {
@@ -533,5 +534,6 @@ namespace TerraIntegration.Components
 
         public string VariableName { get; set; }
         public string VariableSlot { get; set; }
+        public string VariableDescription { get; set; }
     }
 }

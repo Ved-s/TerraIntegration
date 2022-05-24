@@ -132,9 +132,15 @@ namespace TerraIntegration.UI
                     hover.Append("[c/aaaa00:");
                     hover.Append("Returns");
                     hover.Append(":] ");
-                    hover.Append(string.Join(", ", VariableReturnTypes.Select(VariableValue.TypeToColorTagName)));
+                    hover.AppendLine(string.Join(", ", VariableReturnTypes.Select(VariableValue.TypeToColorTagName)));
                 }
-                if (VariableReturnTypes is null && VariableTypes is null) hover.Append("Accepts any variable");
+                if (VariableReturnTypes is null && VariableTypes is null) hover.AppendLine("Accepts any variable");
+
+                if (!VariableDescription.IsNullEmptyOrWhitespace())
+                {
+                    hover.AppendLine();
+                    hover.Append(VariableDescription);
+                }
 
                 ModContent.GetInstance<ComponentWorld>().HoverText = hover.ToString();
             }

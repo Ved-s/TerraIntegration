@@ -41,6 +41,10 @@ namespace TerraIntegration.UI
                 () => InterfaceComponent.Component.VariableInfo?.Length is not null and > 0,
                 SetupVariables));
 
+            Tabs.Add(new ComponentUITab("Description",
+                () => !InterfaceComponent.Component.ComponentDescription.IsNullEmptyOrWhitespace(),
+                SetupDescription));
+
             Tabs.Add(new ComponentUITab("Config",
                 () => InterfaceComponent.Component.DefaultUpdateFrequency > 0 
                 && InterfaceComponent.Component.ConfigurableFrequency,
@@ -128,45 +132,14 @@ namespace TerraIntegration.UI
             };
             s.Append(btn);
         }
-        private void SetupComponentConfig(Vector2 pos)
+
+        private void SetupInterface(Vector2 pos)
         {
-            ComponentData data = InterfaceComponent.GetData();
+            UIPanel p = InterfaceComponent.Component.Interface;
+            p.Top = new(pos.Y, 0);
+            p.Left = new(pos.X, 0);
 
-            UIPanel panel = new()
-            {
-                Top = new(pos.Y, 0),
-                Left = new(pos.X, 0),
-
-                Width = new(0, 1),
-                Height = new(32, 0),
-
-                PaddingTop = 0,
-                PaddingLeft = 0,
-                PaddingRight = 0,
-                PaddingBottom = 0,
-            };
-            UIText freq = new("Frequency: " + data.UpdateFrequency)
-            {
-                Top = new(8, 0),
-                Left = new(8, 0),
-                Height = new(20, 0),
-            };
-            UIStepButton freqStep = new()
-            {
-                Top = new(4, 0),
-                Left = new(-28, 1),
-            };
-
-            freqStep.OnStep += (s) =>
-            {
-                ComponentData data = InterfaceComponent.GetData();
-                InterfaceComponent.Component.SetUpdates(InterfaceComponent.Pos, (ushort)Math.Max(0, s + data.UpdateFrequency));
-                freq.SetText("Frequency: " + data.UpdateFrequency);
-            };
-
-            panel.Append(freq);
-            panel.Append(freqStep);
-            Interface.CurrentState.Append(panel);
+            Interface.CurrentState.Append(p);
         }
         private void SetupProperties(Vector2 pos)
         {
@@ -211,6 +184,7 @@ namespace TerraIntegration.UI
                         VariableReturnTypes = inf.AcceptVariableReturnTypes,
                         VariableName = inf.VariableName,
                         VariableSlot = inf.VariableSlot,
+                        VariableDescription = inf.VariableDescription,
                         Component = InterfaceComponent
                     };
                     Interface.CurrentState.Append(var);
@@ -219,14 +193,61 @@ namespace TerraIntegration.UI
                 }
             
         }
-        private void SetupInterface(Vector2 pos)
+        private void SetupDescription(Vector2 pos) 
         {
-            UIPanel p = InterfaceComponent.Component.Interface;
-            p.Top = new(pos.Y, 0);
-            p.Left = new(pos.X, 0);
+            if (InterfaceComponent.Component.ComponentDescription.IsNullEmptyOrWhitespace()) return;
 
-            Interface.CurrentState.Append(p);
+            float height = 32f * (InterfaceComponent.Component.ComponentDescription.Count(c => c == '\n') + 1);
+
+            Interface.CurrentState.Append(new UITextPanel<string>(InterfaceComponent.Component.ComponentDescription)
+            {
+                MinWidth = new(200, 0),
+                Height = new(height, 0),
+                Top = new(pos.Y, 0),
+                Left = new(pos.X, 0),
+            });
         }
+        private void SetupComponentConfig(Vector2 pos)
+        {
+            ComponentData data = InterfaceComponent.GetData();
+
+            UIPanel panel = new()
+            {
+                Top = new(pos.Y, 0),
+                Left = new(pos.X, 0),
+
+                Width = new(0, 1),
+                Height = new(32, 0),
+
+                PaddingTop = 0,
+                PaddingLeft = 0,
+                PaddingRight = 0,
+                PaddingBottom = 0,
+            };
+            UIText freq = new("Frequency: " + data.UpdateFrequency)
+            {
+                Top = new(8, 0),
+                Left = new(8, 0),
+                Height = new(20, 0),
+            };
+            UIStepButton freqStep = new()
+            {
+                Top = new(4, 0),
+                Left = new(-28, 1),
+            };
+
+            freqStep.OnStep += (s) =>
+            {
+                ComponentData data = InterfaceComponent.GetData();
+                InterfaceComponent.Component.SetUpdates(InterfaceComponent.Pos, (ushort)Math.Max(0, s + data.UpdateFrequency));
+                freq.SetText("Frequency: " + data.UpdateFrequency);
+            };
+
+            panel.Append(freq);
+            panel.Append(freqStep);
+            Interface.CurrentState.Append(panel);
+        }
+
         public void SetupTabSwitch()
         {
             if (GetTabsAvailable() < 2) return;
@@ -248,7 +269,11 @@ namespace TerraIntegration.UI
 
                     PaddingTop = 5,
                     PaddingBottom = 0,
+
                 };
+                if (i == CurrentTab) 
+                    tabpanel.BackgroundColor = new Color(100, 160, 180);
+
                 tabpanel.OnClick += (s, e) =>
                 {
                     CurrentTab = tabind;

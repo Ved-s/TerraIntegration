@@ -21,6 +21,7 @@ namespace TerraIntegration.Components
 
         public override string ComponentType => "wire";
         public override string ComponentDisplayName => "Wire IO";
+        public override string ComponentDescription => "Wire IO allows to interact with\nTerraria wiring system";
 
         public override bool CanHaveVariables => true;
 
@@ -35,12 +36,14 @@ namespace TerraIntegration.Components
                     AcceptVariableTypes = new[] { "event" },
                     VariableName = "On Signal",
                     VariableSlot = OnSignalVariableSlot,
+                    VariableDescription = "An event that will be triggered\nonce wire signal been received"
                 },
                 new()
                 {
                     AcceptVariableTypes = new[] { "eventsub" },
                     VariableName = "Do Signal",
                     VariableSlot = DoSignalVariableSlot,
+                    VariableDescription = "Wire signal will be sent on this triggered"
                 }
 
             };
