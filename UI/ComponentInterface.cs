@@ -30,12 +30,16 @@ namespace TerraIntegration.UI
         public void Load(Mod mod)
         {
             Tabs.Add(new ComponentUITab("Interface",
-                    () => true,
+                    () => InterfaceComponent.Component.HasCustomInterface,
                     SetupInterface));
 
             Tabs.Add(new ComponentUITab("Properties",
-                () => ComponentProperty.ByComponentType.ContainsKey(InterfaceComponent.Component.ComponentType),
+                () => InterfaceComponent.Component.HasProperties(),
                 SetupProperties));
+
+            Tabs.Add(new ComponentUITab("Variables",
+                () => InterfaceComponent.Component.VariableInfo?.Length is not null and > 0,
+                SetupVariables));
 
             Tabs.Add(new ComponentUITab("Config",
                 () => InterfaceComponent.Component.DefaultUpdateFrequency > 0 
@@ -188,6 +192,33 @@ namespace TerraIntegration.UI
                 }
             }
         }
+        private void SetupVariables(Vector2 pos)
+        {
+            ComponentVariableInfo[] info = InterfaceComponent.Component.VariableInfo;
+            if (info is null || info.Length == 0) return;
+
+                int y = (int)pos.Y;
+
+                foreach (ComponentVariableInfo inf in info)
+                {
+                    var var = new UIComponentNamedVariable()
+                    {
+                        Top = new(y, 0),
+                        Left = new(pos.X, 0),
+                        Width = new(0, 1),
+
+                        VariableTypes = inf.AcceptVariableTypes,
+                        VariableReturnTypes = inf.AcceptVariableReturnTypes,
+                        VariableName = inf.VariableName,
+                        VariableSlot = inf.VariableSlot,
+                        Component = InterfaceComponent
+                    };
+                    Interface.CurrentState.Append(var);
+
+                    y += (int)(var.Height.Pixels) + 4;
+                }
+            
+        }
         private void SetupInterface(Vector2 pos)
         {
             UIPanel p = InterfaceComponent.Component.Interface;
@@ -221,6 +252,7 @@ namespace TerraIntegration.UI
                 tabpanel.OnClick += (s, e) =>
                 {
                     CurrentTab = tabind;
+                    SoundEngine.PlaySound(SoundID.MenuTick);
                     SetupUI();
                 };
                 Interface.CurrentState.Append(tabpanel);
@@ -363,7 +395,27 @@ namespace TerraIntegration.UI
             {
                 Interface.Update(Main.gameTimeCache);
                 if (Interface.CurrentState.IsMouseHovering)
-                    Main.LocalPlayer.mouseInterface = true;
+                {
+                    UIElement e = Interface.CurrentState.GetElementAt(Main.MouseScreen);
+
+                    if (e is not null)
+                    {
+                        bool hasPanel = false;
+
+                        do
+                        {
+                            if (e is UIPanel)
+                            {
+                                hasPanel = true;
+                                break;
+                            }
+                            e = e.Parent;
+                        }
+                        while (e is not null && e.Parent is not null && e is not UIState);
+
+                        Main.LocalPlayer.mouseInterface = hasPanel;
+                    }
+                }
             }
         }
     }

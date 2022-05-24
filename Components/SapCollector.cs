@@ -28,7 +28,7 @@ namespace TerraIntegration.Components
         public override string ComponentType => "sap";
         public override string ComponentDisplayName => "Sap collector";
 
-        public override bool HasRightClickInterface => true;
+        public override bool HasCustomInterface => true;
         public override ushort DefaultUpdateFrequency => 30;
         public override bool ConfigurableFrequency => false;
 

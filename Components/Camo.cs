@@ -29,7 +29,7 @@ namespace TerraIntegration.Components
         public override string ComponentType => "camo";
         public override string ComponentDisplayName => "Camouflage block";
 
-        public override bool HasRightClickInterface => true;
+        public override bool HasCustomInterface => true;
 
         public override Vector2 InterfaceOffset => new(24, 0);
 

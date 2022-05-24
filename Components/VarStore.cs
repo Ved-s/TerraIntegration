@@ -20,7 +20,7 @@ namespace TerraIntegration.Components
 
         public override bool CanHaveVariables => true;
 
-        public override bool HasRightClickInterface => true;
+        public override bool HasCustomInterface => true;
 
         public override Vector2 InterfaceOffset => new(24, 0);
 

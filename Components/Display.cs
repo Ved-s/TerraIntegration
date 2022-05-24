@@ -65,7 +65,7 @@ namespace TerraIntegration.Components
         public override string ComponentType => "display";
         public override string ComponentDisplayName => "Variable display";
 
-        public override bool HasRightClickInterface => true;
+        public override bool HasCustomInterface => true;
 
         public override ushort DefaultUpdateFrequency => 15;
 

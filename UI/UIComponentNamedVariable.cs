@@ -16,8 +16,8 @@ namespace TerraIntegration.UI
 {
     public class UIComponentNamedVariable : UIPanel
     {
-        public string VariableType { get; set; } = null;
-        public Type VariableReturnType { get; set; } = typeof(VariableValue);
+        public string[] VariableTypes { get; set; } = null;
+        public Type[] VariableReturnTypes { get; set; } = null;
         public string VariableDescription { get; set; }
 
         public Action<Items.Variable> DefineVariable;
@@ -51,6 +51,8 @@ namespace TerraIntegration.UI
             Width = new(0, 1);
             Height = new(58, 0);
 
+            MinWidth = new(200, 0);
+
             TextName = new("unnamed variable")
             {
                 Left = new(44, 0),
@@ -70,14 +72,14 @@ namespace TerraIntegration.UI
 
             Slot.VariableValidator = (var) =>
             {
-                if (VariableType is not null && var.Type != VariableType)
+                if (VariableTypes is not null && !VariableTypes.Contains(var.Type))
                     return false;
 
-                if (VariableReturnType is not null)
+                if (VariableReturnTypes is not null)
                 {
                     if (var.VariableReturnType is null)
                         return false;
-                    if (!var.VariableReturnType.IsSubclassOf(VariableReturnType))
+                    if (!VariableReturnTypes.Any(t => var.VariableReturnType.IsAssignableTo(t)))
                         return false;
                 }
 
@@ -89,6 +91,7 @@ namespace TerraIntegration.UI
         {
             base.DrawSelf(spriteBatch);
 
+            ComponentWorld world = ModContent.GetInstance<ComponentWorld>();
             const float size = 40;
 
             CalculatedStyle dim = GetDimensions();
@@ -96,49 +99,45 @@ namespace TerraIntegration.UI
             Vector2 pos = new Vector2(8, (dim.Height - size) / 2);
             pos += dim.Position();
 
-            VariableRenderer.DrawVariableOverlay(spriteBatch, true, VariableReturnType, VariableType, pos, new(size), Color.White, 0f, Vector2.Zero);
+            uint change = world.UpdateCounter / 60;
+
+            if (VariableTypes is not null)
+                VariableRenderer.DrawVariableOverlay(spriteBatch, true, null, VariableTypes[change % VariableTypes.Length], pos, new(size), Color.White, 0f, Vector2.Zero);
+            else if (VariableReturnTypes is not null)
+                VariableRenderer.DrawVariableOverlay(spriteBatch, true, VariableReturnTypes[change % VariableReturnTypes.Length], null, pos, new(size), Color.White, 0f, Vector2.Zero);
+            else
+                VariableRenderer.DrawVariableOverlay(spriteBatch, true, null, null, pos, new(size), Color.White, 0f, Vector2.Zero);
 
             Rectangle hitbox = new((int)pos.X, (int)pos.Y, (int)size, (int)size);
             if (hitbox.Contains(Main.MouseScreen.ToPoint()))
             {
-                string returns;
+                StringBuilder hover = new();
 
-                if (VariableReturnType is null) returns = null;
-                else if (Values.VariableValue.ByType.TryGetValue(VariableReturnType, out Values.VariableValue val))
+                if (VariableTypes is not null)
                 {
-                    returns = Util.ColorTag(val.TypeColor, val.TypeDisplay);
+                    hover.Append("[c/aaaa00:");
+                    hover.Append(VariableTypes.Length == 1 ? "Type" : "Types");
+                    hover.Append(":] ");
+                    hover.AppendLine(string.Join(", ", VariableTypes.Select(t =>
+                    {
+                        if (Variable.ByTypeName.TryGetValue(t, out Variable var))
+                        {
+                            return var.TypeDisplay;
+                        }
+                        return $"Unregistered ({t})";
+                    })));
                 }
-                else if (VariableReturnType.IsInterface)
+                if (VariableReturnTypes is not null)
                 {
-                    string i = VariableReturnType.Name;
-                    if (i.StartsWith('I')) i = i[1..];
-
-                    returns = $"[c/aabb00:{i}]";
+                    hover.Append("[c/aaaa00:");
+                    hover.Append("Returns");
+                    hover.Append(":] ");
+                    hover.Append(string.Join(", ", VariableReturnTypes.Select(VariableValue.TypeToColorTagName)));
                 }
-                else returns = $"[c/ffaaaa:unregistered type ({VariableReturnType.Name})]";
+                if (VariableReturnTypes is null && VariableTypes is null) hover.Append("Accepts any variable");
 
-                string typeDisplay = null;
-
-                if (Variable.ByTypeName.TryGetValue(VariableType, out Variable var))
-                {
-                    typeDisplay = var.TypeDisplay;
-                }
-                else
-                {
-                    typeDisplay = $"unregistered variable ({VariableType})";
-                }
-
-                ModContent.GetInstance<ComponentWorld>().HoverText =
-                    $"[c/aaaa00:Type:] {typeDisplay}" +
-                    (returns is null ? "" : $"\n[c/aaaa00:Returns:] {returns}") +
-                    (VariableDescription is null ? "" : "\n" + VariableDescription);
+                ModContent.GetInstance<ComponentWorld>().HoverText = hover.ToString();
             }
-        }
-
-        private void Slot_VariableChanged()
-        {
-            if (Slot.Var is null) return;
-            DefineVariable?.Invoke(Slot.Var);
         }
     }
 }

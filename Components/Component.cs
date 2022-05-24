@@ -23,6 +23,8 @@ namespace TerraIntegration.Components
         public static Dictionary<int, Component> ByTileType = new();
         public static Dictionary<Type, Component> ByType = new();
 
+        public ComponentVariableInfo[] VariableInfo = null;
+
         private UIPanel @interface;
 
         public new static TerraIntegration Mod => ModContent.GetInstance<TerraIntegration>();
@@ -48,7 +50,8 @@ namespace TerraIntegration.Components
         public virtual SpriteSheet DefaultPropertySpriteSheet => null;
         public virtual Point DefaultPropertySpriteSheetPos => default;
 
-        public virtual bool HasRightClickInterface => false;
+        public bool HasInterface => HasCustomInterface || VariableInfo?.Length is not null and > 0 || HasProperties();
+        public virtual bool HasCustomInterface => false;
         public virtual Vector2 InterfaceOffset { get; protected set; }
         public UIPanel Interface
         {
@@ -66,7 +69,7 @@ namespace TerraIntegration.Components
 
         public override bool RightClick(int i, int j)
         {
-            if (HasRightClickInterface)
+            if (HasInterface)
             {
                 Point16 pos = new(i, j);
                 pos = GetInterfaceTarget(pos);
@@ -91,7 +94,7 @@ namespace TerraIntegration.Components
 
         public void SetupInterfaceIfNeeded()
         {
-            if (@interface is null && HasRightClickInterface)
+            if (@interface is null && HasCustomInterface)
                 @interface = SetupInterface();
         }
 
@@ -150,6 +153,10 @@ namespace TerraIntegration.Components
         public virtual bool ShouldSaveData(ComponentData data) => true;
         public virtual bool ShouldSyncData(ComponentData data) => CanHaveVariables || DefaultUpdateFrequency > 0;
 
+        public virtual bool HasProperties()
+        {
+            return ComponentProperty.ByComponentType.ContainsKey(ComponentType);
+        }
         public virtual IEnumerable<ComponentProperty> GetProperties()
         {
             if (!ComponentProperty.ByComponentType.TryGetValue(ComponentType, out var props))
@@ -160,7 +167,7 @@ namespace TerraIntegration.Components
 
         public void ReloadInterface()
         {
-            if (!HasRightClickInterface) return;
+            if (!HasCustomInterface) return;
             @interface = SetupInterface();
         }
 
@@ -211,7 +218,7 @@ namespace TerraIntegration.Components
             for (int i = 0; i < count; i++)
             {
                 string index = reader.ReadString();
-                Variables.Variable var = Variables.Variable.LoadData(reader);
+                Variables.Variable var = Variable.LoadData(reader);
 
                 if (var is null) continue;
 
@@ -387,20 +394,23 @@ namespace TerraIntegration.Components
             Variables.Clear();
         }
 
-        public Variable GetVariable(string slot) 
+        public Variable GetVariable(string slot)
         {
+            if (slot is null) return null;
             if (Variables.TryGetValue(slot, out Items.Variable var))
                 return var?.Var;
             return null;
         }
         public Items.Variable GetVariableItem(string slot)
         {
+            if (slot is null) return null;
             if (Variables.TryGetValue(slot, out Items.Variable var))
                 return var;
             return null;
         }
         public void SetVariable(string slot, Variable var)
         {
+            if (slot is null) return;
             Items.Variable v = Util.CreateModItem<Items.Variable>();
             v.Var = var;
             Variables[slot] = v;
@@ -415,7 +425,7 @@ namespace TerraIntegration.Components
         }
         public bool HasVariable(string slot)
         {
-            return Variables.ContainsKey(slot) && Variables[slot] is not null;
+            return slot is not null && Variables.ContainsKey(slot) && Variables[slot] is not null;
         }
     }
 
@@ -514,5 +524,14 @@ namespace TerraIntegration.Components
     public class UnloadedComponent : Component
     {
         public override string ComponentType => null;
+    }
+
+    public class ComponentVariableInfo
+    {
+        public string[] AcceptVariableTypes { get; set; }
+        public Type[] AcceptVariableReturnTypes { get; set; }
+
+        public string VariableName { get; set; }
+        public string VariableSlot { get; set; }
     }
 }
