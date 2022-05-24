@@ -2,9 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using TerraIntegration.Variables;
 using Terraria.ModLoader;
 
@@ -64,7 +61,6 @@ namespace TerraIntegration.Values
                 byte[] data = reader.ReadBytes(length);
                 return new UnloadedVariableValue(type, data);
             }
-
             long pos = reader.BaseStream.Position;
             value = value.LoadCustomData(reader);
             long diff = (reader.BaseStream.Position - pos) - length;
@@ -84,9 +80,9 @@ namespace TerraIntegration.Values
         protected virtual void SaveCustomData(BinaryWriter writer) { }
         protected virtual VariableValue LoadCustomData(BinaryReader reader) { return (VariableValue)Activator.CreateInstance(GetType()); }
 
-        public static string TypeToName(Type type, out Color color) 
+        public static string TypeToName(Type type, out Color color)
         {
-            if (type is null) 
+            if (type is null)
             {
                 color = Color.White;
                 return null;
@@ -115,7 +111,7 @@ namespace TerraIntegration.Values
             return Util.ColorTag(color, name);
         }
 
-        public IEnumerable<(Type, ValueProperty)> GetProperties() 
+        public IEnumerable<(Type, ValueProperty)> GetProperties()
         {
             Type type = GetType();
             if (ValueProperty.ByValueType.TryGetValue(type, out var props))
@@ -136,7 +132,7 @@ namespace TerraIntegration.Values
             foreach (Type interf in type.GetInterfaces())
                 if (ValueProperty.ByValueType.ContainsKey(interf))
                     return true;
-                 
+
             return false;
         }
 
@@ -156,7 +152,7 @@ namespace TerraIntegration.Values
 
             ValueProperty.ValueRegistered();
         }
-        internal static void Unregister() 
+        internal static void Unregister()
         {
             ByTypeName.Clear();
             ByType.Clear();

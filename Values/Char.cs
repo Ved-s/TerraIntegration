@@ -6,12 +6,15 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using TerraIntegration.Interfaces;
+using TerraIntegration.Items;
+using TerraIntegration.UI;
+using TerraIntegration.Variables;
+using Terraria.GameContent.UI.Elements;
 using Terraria.ModLoader;
 
 namespace TerraIntegration.Values
 {
-    [Autoload(false)]
-    public class Char : VariableValue, IToString
+    public class Char : VariableValue, IToString, IOwnProgrammerInterface
     {
         public override string Type => "char";
         public override string TypeDisplay => "Char";
@@ -22,6 +25,8 @@ namespace TerraIntegration.Values
         public override Point SpritesheetPos => new(3, 0);
 
         public char Value { get; set; }
+        public UIPanel Interface { get; set; }
+        UIFocusInputTextField InterfaceValue;
 
         public Char() { }
         public Char(char value) { Value = value; }
@@ -74,6 +79,36 @@ namespace TerraIntegration.Values
         public override int GetHashCode()
         {
             return HashCode.Combine(Type, Value);
+        }
+
+        public void SetupInterface()
+        {
+            UIPanel p = new();
+
+            InterfaceValue = new("")
+            {
+                Top = new(-12, .5f),
+                Left = new(-20, .5f),
+                Width = new(40, 0),
+                Height = new(25, 0),
+
+                PaddingLeft = 15,
+
+                ModifyTextInput = (@new, old) =>
+                {
+                    if (@new.Length == 0) return "";
+                    return @new.Last().ToString();
+                }
+            };
+            p.Append(InterfaceValue);
+            Interface = p;
+        }
+
+        public void WriteVariable(Items.Variable var)
+        {
+            if (InterfaceValue.CurrentString.Length == 0) return;
+
+            var.Var = new Constant(new Char(InterfaceValue.CurrentString[0]));
         }
     }
 }

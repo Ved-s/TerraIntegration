@@ -14,7 +14,7 @@ using Terraria.ModLoader;
 
 namespace TerraIntegration.Values
 {
-    public class String : VariableValue, IToString, IAddable, IOwnProgrammerInterface
+    public class String : VariableValue, IToString, IAddable, ICollection, IOwnProgrammerInterface
     {
         public override string Type => "str";
         public override string TypeDisplay => "String";
@@ -28,6 +28,8 @@ namespace TerraIntegration.Values
         public Type[] ValidAddTypes => new[] { typeof(IToString) };
 
         public UIPanel Interface { get; set; }
+        public Type CollectionType => typeof(Char);
+
         UIFocusInputTextField InterfaceValue;
 
         public String() { }
@@ -106,6 +108,12 @@ namespace TerraIntegration.Values
         public void WriteVariable(Items.Variable var)
         {
             var.Var = new Constant(new String(InterfaceValue.CurrentString));
+        }
+
+        public IEnumerable<VariableValue> Enumerate()
+        {
+            foreach (char c in Value)
+                yield return new Char(c);
         }
     }
 }
