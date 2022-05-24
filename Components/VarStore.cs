@@ -24,6 +24,8 @@ namespace TerraIntegration.Components
 
         public override Vector2 InterfaceOffset => new(24, 0);
 
+        public const string SlotNames = "0123456789abcdef";
+
         public UIComponentVariable[] Slots = new UIComponentVariable[16];
 
         public override void SetStaticDefaults()
@@ -64,7 +66,7 @@ namespace TerraIntegration.Components
                     Top = new(y, 0),
                     Left = new(x, 0),
 
-                    VariableSlot = i,
+                    VariableSlot = SlotNames[i].ToString(),
                 };
                 Slots[i] = slot;
 

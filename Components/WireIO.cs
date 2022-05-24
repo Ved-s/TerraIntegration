@@ -16,6 +16,9 @@ namespace TerraIntegration.Components
 {
     public class WireIO : Component
     {
+        public const string OnSignalVariableSlot = "onsignal";
+        public const string DoSignalVariableSlot = "dosignal";
+
         public override string ComponentType => "wire";
         public override string ComponentDisplayName => "Wire IO";
 
@@ -37,10 +40,10 @@ namespace TerraIntegration.Components
             ItemDrop = ModContent.ItemType<Items.ComponentItems.VarStore>();
         }
 
-        public override void OnEvent(Point16 pos, int variableIndex)
+        public override void OnEvent(Point16 pos, string slot)
         {
-            base.OnEvent(pos, variableIndex);
-            if (variableIndex == 1)
+            base.OnEvent(pos, slot);
+            if (slot == DoSignalVariableSlot)
                 World.WireTrips.Add(new(pos.X, pos.Y, 1, 1, 0));
         }
 
@@ -74,7 +77,7 @@ namespace TerraIntegration.Components
                 VariableType = "event",
                 VariableName = "On Signal",
                 VariableReturnType = null,
-                VariableSlot = 0,
+                VariableSlot = OnSignalVariableSlot,
             });
 
             Variables.Add(new()
@@ -89,7 +92,7 @@ namespace TerraIntegration.Components
                 VariableType = "eventsub",
                 VariableName = "Do Signal",
                 VariableReturnType = null,
-                VariableSlot = 1,
+                VariableSlot = DoSignalVariableSlot,
             });
 
             foreach (UIElement e in Variables)
@@ -109,7 +112,7 @@ namespace TerraIntegration.Components
             Point16 pos = new(i, j);
 
             ComponentData data = GetData(pos);
-            if (data.GetVariable(0) is Event ev)
+            if (data.GetVariable(OnSignalVariableSlot) is Event ev)
                 ev.Trigger(pos, data.System);
         }
     }

@@ -26,23 +26,23 @@ namespace TerraIntegration.Components
 
         public void NoMoreMaster(Point16 pos)
         {
-            Variable v = GetVariable(0);
+            Variable v = GetVariable(Display.DisplayVariableSlot);
             if (v is not null)
             {
                 DisplayData master = (Component as Display).GetData(MasterPos);
-                Variable masterVar = master.GetVariable(0);
+                Variable masterVar = master.GetVariable(Display.DisplayVariableSlot);
                 if (masterVar is null)
                 {
-                    master.SetVariable(0, v);
-                    ClearVariable(0);
-                    master.Component.OnVariableChanged(MasterPos, 0);
-                    Component.OnVariableChanged(pos, 0);
+                    master.SetVariable(Display.DisplayVariableSlot, v);
+                    ClearVariable(Display.DisplayVariableSlot);
+                    master.Component.OnVariableChanged(MasterPos, Display.DisplayVariableSlot);
+                    Component.OnVariableChanged(pos, Display.DisplayVariableSlot);
                     return;
                 }
 
-                Util.DropItemInWorld(GetVariableItem(0).Item, pos.X * 16, pos.Y * 16);
-                ClearVariable(0);
-                Component.OnVariableChanged(pos, 0);
+                Util.DropItemInWorld(GetVariableItem(Display.DisplayVariableSlot).Item, pos.X * 16, pos.Y * 16);
+                ClearVariable(Display.DisplayVariableSlot);
+                Component.OnVariableChanged(pos, Display.DisplayVariableSlot);
             }
         }
     }
@@ -58,6 +58,8 @@ namespace TerraIntegration.Components
 
     public class Display : Component<DisplayData>
     {
+        public const string DisplayVariableSlot = "display";
+
         public readonly static SpriteSheet TypeSheet = new("TerraIntegration/Assets/Types/display", new(32, 32));
 
         public override string ComponentType => "display";
@@ -138,7 +140,7 @@ namespace TerraIntegration.Components
             DisplayData data = GetData(pos);
 
             if (data.Master is null) return;
-            if (!data.HasVariable(0))
+            if (!data.HasVariable(DisplayVariableSlot))
             {
                 data.Master.DisplayValue = null;
                 data.Master.Errors = null;
@@ -149,7 +151,7 @@ namespace TerraIntegration.Components
 
             if (Main.netMode != NetmodeID.MultiplayerClient)
             {
-                Values.VariableValue value = data.GetVariable(0).GetValue(data.System, Errors);
+                Values.VariableValue value = data.GetVariable(DisplayVariableSlot).GetValue(data.System, Errors);
 
                 if (Errors.Count > 0)
                 {
@@ -340,7 +342,7 @@ namespace TerraIntegration.Components
             {
                 Top = new(8, 0),
                 Left = new(-21, 0.5f),
-                VariableSlot = 0,
+                VariableSlot = DisplayVariableSlot,
             };
             p.Append(Slot);
 

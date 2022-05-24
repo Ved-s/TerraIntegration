@@ -240,7 +240,7 @@ namespace TerraIntegration
             v.HandlePacket(pos, type, reader, whoAmI, ref broadcast);
         }
 
-        public static void SendComponentVariable(Point16 pos, int slot) 
+        public static void SendComponentVariable(Point16 pos, string slot) 
         {
             if (Main.netMode == NetmodeID.SinglePlayer) return;
 
@@ -267,7 +267,7 @@ namespace TerraIntegration
             ComponentWorld world = ModContent.GetInstance<ComponentWorld>();
 
             Point16 pos = new(reader.ReadInt16(), reader.ReadInt16());
-            int slot = reader.ReadInt32();
+            string slot = reader.ReadString();
             Variable v = Variable.LoadData(reader);
 
             ComponentData data = world.GetDataOrNull(pos);

@@ -29,6 +29,6 @@ namespace TerraIntegration.UI
         }
 
         public PositionedComponent Component { get; set; }
-        public int VariableSlot { get; set; }
+        public string VariableSlot { get; set; }
     }
 }

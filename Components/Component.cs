@@ -122,15 +122,15 @@ namespace TerraIntegration.Components
         [CallSide(CallSide.Both)]
         public virtual void OnUpdate(Point16 pos) { }
         [CallSide(CallSide.Server)]
-        public virtual void OnEvent(Point16 pos, int variableIndex) { }
+        public virtual void OnEvent(Point16 pos, string variableSlot) { }
         [CallSide(CallSide.Server)]
         public virtual void OnSystemUpdate(Point16 pos) { }
         [CallSide(CallSide.Both)]
-        public virtual void OnVariableChanged(Point16 pos, int varIndex)
+        public virtual void OnVariableChanged(Point16 pos, string variableSlot)
         {
             ComponentData data = GetData(pos);
-            Networking.SendComponentVariable(pos, varIndex);
-            Variable v = data.GetVariable(varIndex);
+            Networking.SendComponentVariable(pos, variableSlot);
+            Variable v = data.GetVariable(variableSlot);
             if (v is null) return;
             World.Guids.AddToDictionary(v.Id);
         }
@@ -205,12 +205,12 @@ namespace TerraIntegration.Components
         internal static ComponentData NetReceiveData(BinaryReader reader)
         {
             string component = reader.ReadString();
-            Dictionary<int, Variable> vars = new();
+            Dictionary<string, Variable> vars = new();
 
             ushort count = reader.ReadUInt16();
             for (int i = 0; i < count; i++)
             {
-                int index = reader.ReadInt16();
+                string index = reader.ReadString();
                 Variables.Variable var = Variables.Variable.LoadData(reader);
 
                 if (var is null) continue;
@@ -252,7 +252,7 @@ namespace TerraIntegration.Components
                 if (kvp.Value is null) continue;
                 
                 TagCompound vartag = kvp.Value.Var.SaveTag();
-                vartag["index"] = kvp.Key;
+                vartag["slot"] = kvp.Key;
                 variables.Add(vartag);
             }
             tag["var"] = variables;
@@ -270,31 +270,24 @@ namespace TerraIntegration.Components
             if (!tag.ContainsKey("type")) return null;
             string component = tag.GetString("type");
 
-            Dictionary<int, Variable> vars = null;
+            Dictionary<string, Variable> vars = null;
             if (tag.ContainsKey("var"))
             {
                 IList<TagCompound> variables = tag.GetList<TagCompound>("var");
                 vars = new();
 
-                int oldIndex = 0;
-
                 foreach (TagCompound vartag in variables)
                 {
-                    int index;
-
-                    if (!vartag.ContainsKey("index")) 
-                        index = oldIndex;
-                    else 
-                        index = vartag.GetInt("index");
+                    if (!vartag.ContainsKey("slot"))
+                        continue;
+                    
+                    string slot = vartag.GetString("slot");
 
                     Variable var = Variable.LoadTag(vartag);
 
                     if (var is null) continue;
 
-                    vars[index] = var;
-
-                    do oldIndex++;
-                    while (vars.ContainsKey(oldIndex));
+                    vars[slot] = var;
                 }
             }
 
@@ -365,7 +358,7 @@ namespace TerraIntegration.Components
         public ComponentSystem System { get; internal set; }
 
         public ushort UpdateFrequency { get; set; } = 1;
-        public Dictionary<int, Items.Variable> Variables { get; internal set; }
+        public Dictionary<string, Items.Variable> Variables { get; internal set; }
 
         public void CopyTo(ComponentData data)
         {
@@ -394,35 +387,35 @@ namespace TerraIntegration.Components
             Variables.Clear();
         }
 
-        public Variable GetVariable(int index) 
+        public Variable GetVariable(string slot) 
         {
-            if (Variables.TryGetValue(index, out Items.Variable var))
+            if (Variables.TryGetValue(slot, out Items.Variable var))
                 return var?.Var;
             return null;
         }
-        public Items.Variable GetVariableItem(int index)
+        public Items.Variable GetVariableItem(string slot)
         {
-            if (Variables.TryGetValue(index, out Items.Variable var))
+            if (Variables.TryGetValue(slot, out Items.Variable var))
                 return var;
             return null;
         }
-        public void SetVariable(int index, Variable var)
+        public void SetVariable(string slot, Variable var)
         {
             Items.Variable v = Util.CreateModItem<Items.Variable>();
             v.Var = var;
-            Variables[index] = v;
+            Variables[slot] = v;
         }
-        public void SetVariable(int index, Items.Variable var)
+        public void SetVariable(string slot, Items.Variable var)
         {
-            Variables[index] = var;
+            Variables[slot] = var;
         }
-        public void ClearVariable(int index)
+        public void ClearVariable(string slot)
         {
-            Variables.Remove(index);
+            Variables.Remove(slot);
         }
-        public bool HasVariable(int index)
+        public bool HasVariable(string slot)
         {
-            return Variables.ContainsKey(index) && Variables[index] is not null;
+            return Variables.ContainsKey(slot) && Variables[slot] is not null;
         }
     }
 

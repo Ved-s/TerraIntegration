@@ -27,7 +27,7 @@ namespace TerraIntegration.UI
             get => Slot.Component;
             set => Slot.Component = value;
         }
-        public int VariableSlot
+        public string VariableSlot
         {
             get => Slot.VariableSlot;
             set => Slot.VariableSlot = value;
