@@ -10,42 +10,26 @@ using Terraria.ModLoader;
 
 namespace TerraIntegration.Variables
 {
-    public class Reference : Variable
+    public class Reference : ReferenceVariable
     {
         public override string Type => "ref";
         public override string TypeDisplay => "Reference";
 
-        public override Type VariableReturnType => returnType;
-
         public override SpriteSheet SpriteSheet => BasicSheet;
         public override Point SpritesheetPos => new(1, 0);
 
-        public Guid RefId { get; set; }
-
-        private Type returnType = typeof(VariableValue);
-
         public Reference() { }
-        public Reference(Guid refId)
+        public Reference(Guid varId)
         {
-            RefId = refId;
+            VariableId = varId;
         }
 
         public override VariableValue GetValue(ComponentSystem system, List<Error> errors)
         {
-            VariableValue val = system.GetVariableValue(RefId, errors);
+            VariableValue val = system.GetVariableValue(VariableId, errors);
             if (val is not null && errors.Count == 0)
-                returnType = val.GetType();
+                SetReturnTypeCache(val.GetType());
             return val;
-        }
-
-        protected override void SaveCustomData(BinaryWriter writer)
-        {
-            writer.Write(RefId.ToByteArray());
-        }
-
-        protected override Variable LoadCustomData(BinaryReader reader)
-        {
-            return new Reference(new Guid(reader.ReadBytes(16)));
         }
 
         public override Variable GetFromCommand(CommandCaller caller, List<string> args)
@@ -66,12 +50,6 @@ namespace TerraIntegration.Variables
             args.RemoveAt(0);
 
             return new Reference(id.Value);
-        }
-
-        public override void ModifyTooltips(List<TooltipLine> tooltips)
-        {
-            if (RefId != default)
-                tooltips.Add(new(Mod, "TIReferencedId", $"[c/aaaa00:Referenced ID:] {World.Guids.GetShortGuid(RefId)}"));
         }
     }
 }

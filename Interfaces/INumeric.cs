@@ -13,6 +13,23 @@ namespace TerraIntegration.Interfaces
         public long NumericMax { get; }
         public long NumericMin { get; }
 
-        public VariableValue FromNumeric(long value, List<Error> errors);
+        public VariableValue GetFromNumeric(long value, List<Error> errors) 
+        {
+            string type = (this as VariableValue)?.TypeDisplay;
+
+            if (value < NumericMin)
+            {
+                errors.Add(new(ErrorType.ValueTooSmallForType, value, type));
+                return null;
+            }
+            if (value > NumericMax)
+            {
+                errors.Add(new(ErrorType.ValueTooBigForType, value, type));
+                return null;
+            }
+            return FromNumericChecked(value, errors);
+        }
+
+        protected VariableValue FromNumericChecked(long value, List<Error> errors);
     }
 }

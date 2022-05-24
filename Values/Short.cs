@@ -7,7 +7,6 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using TerraIntegration.Interfaces;
-using TerraIntegration.Items;
 using TerraIntegration.UI;
 using TerraIntegration.Variables;
 using Terraria.GameContent.UI.Elements;
@@ -15,30 +14,28 @@ using Terraria.ModLoader;
 
 namespace TerraIntegration.Values
 {
-    public class Integer : VariableValue, IAddable, INumeric, IToString, IOwnProgrammerInterface
+    public class Short : VariableValue, INumeric, IToString, IOwnProgrammerInterface
     {
-        public override string Type => "int";
-        public override string TypeDisplay => "Integer";
+        public override string Type => "short";
+        public override string TypeDisplay => "Short";
 
-        public override Color TypeColor => Color.Orange;
+        public override Color TypeColor => Color.BlueViolet;
 
-        public override SpriteSheet SpriteSheet => BasicSheet;
-        public override Point SpritesheetPos => new(0, 0);
+        //public override SpriteSheet SpriteSheet => BasicSheet;
+        //public override Point SpritesheetPos => new(2, 0);
 
-        public int Value { get; set; }
-
-        public Type[] ValidAddTypes => new[] { typeof(INumeric) };
+        public short Value { get; set; }
 
         public long NumericValue => Value;
-        public long NumericMax => int.MaxValue;
-        public long NumericMin => int.MinValue;
+        public long NumericMax => short.MaxValue;
+        public long NumericMin => short.MinValue;
 
         public UIPanel Interface { get; set; }
         public UIFocusInputTextField InterfaceValue;
         static Regex NotDigit = new(@"\D+", RegexOptions.Compiled);
 
-        public Integer() { }
-        public Integer(int value) { Value = value; }
+        public Short() { }
+        public Short(short value) { Value = value; }
 
         public override string Display()
         {
@@ -47,7 +44,7 @@ namespace TerraIntegration.Values
 
         protected override VariableValue LoadCustomData(BinaryReader reader)
         {
-            return new Integer(reader.ReadInt32());
+            return new Short(reader.ReadInt16());
         }
 
         protected override void SaveCustomData(BinaryWriter writer)
@@ -59,40 +56,18 @@ namespace TerraIntegration.Values
         {
             if (args.Count < 1)
             {
-                caller.Reply("Argument required: int value");
+                caller.Reply("Argument required: short value");
                 return null;
             }
 
-            if (!int.TryParse(args[0], out int val))
+            if (!short.TryParse(args[0], out short val))
             {
-                caller.Reply($"Value is not an integer: {args[0]}");
+                caller.Reply($"Value is not a short: {args[0]}");
                 return null;
             }
             args.RemoveAt(0);
 
-            return new Integer(val);
-        }
-
-        public VariableValue Add(VariableValue value, List<Error> errors)
-        {
-            if (value is INumeric numeric)
-            {
-                long num = numeric.NumericValue;
-                if (num > int.MaxValue)
-                {
-                    errors.Add(new(ErrorType.ValueTooBigForType, num, TypeDisplay));
-                    return null;
-                }
-                if (num < int.MinValue)
-                {
-                    errors.Add(new(ErrorType.ValueTooSmallForType, num, TypeDisplay));
-                    return null;
-                }
-                return new Integer(Value + (int)num);
-            }
-
-            errors.Add(new(ErrorType.ExpectedValue, TypeToName(typeof(INumeric), out _)));
-            return null;
+            return new Short(val);
         }
 
         public override string ToString()
@@ -102,9 +77,9 @@ namespace TerraIntegration.Values
 
         public override bool Equals(object obj)
         {
-            return obj is Integer integer &&
-                   Type == integer.Type &&
-                   Value == integer.Value;
+            return obj is Short @byte &&
+                   Type == @byte.Type &&
+                   Value == @byte.Value;
         }
 
         public override int GetHashCode()
@@ -114,7 +89,7 @@ namespace TerraIntegration.Values
 
         public VariableValue FromNumericChecked(long value, List<Error> errors)
         {
-            return new Integer((int)value);
+            return new Short((byte)value);
         }
 
         public void SetupInterface()
@@ -127,16 +102,13 @@ namespace TerraIntegration.Values
                 Left = new(20, 0),
                 Width = new(-40, 1),
                 Height = new(25, 0),
-                ModifyTextInput = (@new, old) => 
+                ModifyTextInput = (@new, old) =>
                 {
                     if (@new.IsNullEmptyOrWhitespace()) return "";
-
                     bool neg = @new.Count(c => c == '-') % 2 == 1;
                     @new = NotDigit.Replace(@new, "");
-
                     if (neg) @new = '-' + @new;
-
-                    if (int.TryParse(@new, out _)) return @new;
+                    if (short.TryParse(@new, out _)) return @new;
                     return old;
                 }
             };
@@ -146,8 +118,8 @@ namespace TerraIntegration.Values
 
         public void WriteVariable(Items.Variable var)
         {
-            if (int.TryParse(InterfaceValue.CurrentString, out int value))
-                var.Var = new Constant(new Integer(value));
+            if (short.TryParse(InterfaceValue.CurrentString, out short value))
+                var.Var = new Constant(new Short(value));
         }
     }
 }

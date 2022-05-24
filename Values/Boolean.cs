@@ -6,11 +6,17 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using TerraIntegration.Interfaces;
+using TerraIntegration.Items;
+using TerraIntegration.UI;
+using TerraIntegration.Variables;
+using Terraria.Audio;
+using Terraria.GameContent.UI.Elements;
+using Terraria.ID;
 using Terraria.ModLoader;
 
 namespace TerraIntegration.Values
 {
-    public class Boolean : VariableValue, IToString
+    public class Boolean : VariableValue, IToString, IOwnProgrammerInterface
     {
         public override string Type => "bool";
         public override string TypeDisplay => "Boolean";
@@ -21,6 +27,9 @@ namespace TerraIntegration.Values
         public override Point SpritesheetPos => new(1, 0);
 
         public bool Value { get; set; }
+        public UIPanel Interface { get; set; }
+        public UITextPanel<string> InterfaceInput;
+        public bool InterfaceValue;
 
         public Boolean() { }
         public Boolean(bool value) { Value = value; }
@@ -81,6 +90,30 @@ namespace TerraIntegration.Values
         public override int GetHashCode()
         {
             return HashCode.Combine(Type, Value);
+        }
+
+        public void SetupInterface()
+        {
+            Interface = new UIPanel();
+            Interface.Append(InterfaceInput = new(InterfaceValue.ToString())
+            {
+                Width = new(80, 0),
+
+                Top = new(-16, .5f),
+                Left = new(-40, .5f),
+                TextColor = TypeColor
+            });
+            InterfaceInput.OnClick += (ev, el) =>
+            {
+                SoundEngine.PlaySound(SoundID.MenuTick);
+                InterfaceValue = !InterfaceValue;
+                InterfaceInput.SetText(InterfaceValue.ToString());
+            };
+        }
+
+        public void WriteVariable(Items.Variable var)
+        {
+            var.Var = new Constant(new Boolean(InterfaceValue));
         }
     }
 }

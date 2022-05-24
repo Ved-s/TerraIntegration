@@ -318,7 +318,7 @@ namespace TerraIntegration.UI
             if (ResultSlot?.Var is null) return;
             if (CurrentOwner is not null)
             {
-                Guid id = ResultSlot.Var.Var.Id;
+                Guid id = ResultSlot.Var.Var.IsEmpty ? default : ResultSlot.Var.Var.Id;
                 CurrentOwner.WriteVariable(ResultSlot.Var);
                 if (id != default)
                     ResultSlot.Var.Var.Id = id;
@@ -478,7 +478,7 @@ namespace TerraIntegration.UI
 
                 foreach (var (type, prop) in CurrentValue.GetProperties())
                 {
-                    if (!prop.TypeDisplay.ToLower().Contains(VariablesSearch.CurrentString.ToLower())
+                    if (!prop.TypeDisplay.ToLower().Contains(PropertiesSearch.CurrentString.ToLower())
                         || !prop.AppliesTo(CurrentValue)) continue;
 
                     UITextPanel<string> panel = new UITextPanel<string>(prop.TypeDisplay)

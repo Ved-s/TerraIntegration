@@ -109,6 +109,8 @@ namespace TerraIntegration.Values
         }
         public static string TypeToColorTagName(Type type)
         {
+            if (type is null) return null;
+
             string name = TypeToName(type, out Color color);
             return Util.ColorTag(color, name);
         }
@@ -136,6 +138,13 @@ namespace TerraIntegration.Values
                     return true;
                  
             return false;
+        }
+
+        public static TValue GetInstance<TValue>() where TValue : VariableValue
+        {
+            if (ByType.TryGetValue(typeof(TValue), out VariableValue v))
+                return v as TValue;
+            return null;
         }
 
         public static void Register(VariableValue v)

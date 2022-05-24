@@ -31,7 +31,7 @@ namespace TerraIntegration.ValueProperties.Numeric
             INumeric numeric = (INumeric)value;
 
             long newVal = numeric.NumericValue + 1;
-            return numeric.FromNumeric(newVal, errors);
+            return numeric.GetFromNumeric(newVal, errors);
         }
     }
 }

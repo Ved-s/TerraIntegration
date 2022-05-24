@@ -4,13 +4,18 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using TerraIntegration.Interfaces;
+using TerraIntegration.Items;
+using TerraIntegration.UI;
+using TerraIntegration.Variables;
+using Terraria.GameContent.UI.Elements;
 using Terraria.ModLoader;
 
 namespace TerraIntegration.Values
 {
-    public class Double : VariableValue, IToString
+    public class Double : VariableValue, IToString, IOwnProgrammerInterface
     {
         public override string Type => "double";
         public override string TypeDisplay => "Double";
@@ -21,6 +26,9 @@ namespace TerraIntegration.Values
         public override Color TypeColor => Color.Lime;
 
         public double Value { get; set; }
+        public UIPanel Interface { get; set; }
+        public UIFocusInputTextField InterfaceValue;
+        static Regex NotDigitOrDot = new(@"[^\d\.]+", RegexOptions.Compiled);
 
         public Double() { }
         public Double(double value) { Value = value; }
@@ -73,6 +81,36 @@ namespace TerraIntegration.Values
         public override int GetHashCode()
         {
             return HashCode.Combine(Type, Value);
+        }
+
+        public void SetupInterface()
+        {
+            UIPanel p = new();
+
+            InterfaceValue = new("")
+            {
+                Top = new(-12, .5f),
+                Left = new(20, 0),
+                Width = new(-40, 1),
+                Height = new(25, 0),
+                ModifyTextInput = (@new, old) =>
+                {
+                    if (@new.IsNullEmptyOrWhitespace()) return "";
+                    bool neg = @new.Count(c => c == '-') % 2 == 1;
+                    @new = NotDigitOrDot.Replace(@new, "");
+                    if (neg) @new = '-' + @new;
+                    if (double.TryParse(@new, out _)) return @new;
+                    return old;
+                }
+            };
+            p.Append(InterfaceValue);
+            Interface = p;
+        }
+
+        public void WriteVariable(Items.Variable var)
+        {
+            if (double.TryParse(InterfaceValue.CurrentString, out double value))
+                var.Var = new Constant(new Double(value));
         }
     }
 }

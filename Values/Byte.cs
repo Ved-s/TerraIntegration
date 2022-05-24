@@ -4,13 +4,18 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using TerraIntegration.Interfaces;
+using TerraIntegration.Items;
+using TerraIntegration.UI;
+using TerraIntegration.Variables;
+using Terraria.GameContent.UI.Elements;
 using Terraria.ModLoader;
 
 namespace TerraIntegration.Values
 {
-    public class Byte : VariableValue, INumeric, IToString
+    public class Byte : VariableValue, INumeric, IToString, IOwnProgrammerInterface
     {
         public override string Type => "byte";
         public override string TypeDisplay => "Byte";
@@ -25,6 +30,10 @@ namespace TerraIntegration.Values
         public long NumericValue => Value;
         public long NumericMax => byte.MaxValue;
         public long NumericMin => byte.MinValue;
+
+        public UIPanel Interface { get; set; }
+        public UIFocusInputTextField InterfaceValue;
+        static Regex NotDigit = new(@"\D+", RegexOptions.Compiled);
 
         public Byte() { }
         public Byte(byte value) { Value = value; }
@@ -79,19 +88,37 @@ namespace TerraIntegration.Values
             return HashCode.Combine(Type, Value);
         }
 
-        public VariableValue FromNumeric(long value, List<Error> errors)
+        public VariableValue FromNumericChecked(long value, List<Error> errors)
         {
-            if (value < byte.MinValue)
-            {
-                errors.Add(new(ErrorType.ValueTooSmallForType, value, TypeDisplay));
-                return null;
-            }
-            if (value > byte.MaxValue)
-            {
-                errors.Add(new(ErrorType.ValueTooBigForType, value, TypeDisplay));
-                return null;
-            }
             return new Byte((byte)value);
+        }
+
+        public void SetupInterface()
+        {
+            UIPanel p = new();
+
+            InterfaceValue = new("")
+            {
+                Top = new(-12, .5f),
+                Left = new(20, 0),
+                Width = new(-40, 1),
+                Height = new(25, 0),
+                ModifyTextInput = (@new, old) =>
+                {
+                    if (@new.IsNullEmptyOrWhitespace()) return "";
+                    @new = NotDigit.Replace(@new, "");
+                    if (byte.TryParse(@new, out _)) return @new;
+                    return old;
+                }
+            };
+            p.Append(InterfaceValue);
+            Interface = p;
+        }
+
+        public void WriteVariable(Items.Variable var)
+        {
+            if (byte.TryParse(InterfaceValue.CurrentString, out byte value))
+                var.Var = new Constant(new Byte(value));
         }
     }
 }

@@ -21,6 +21,7 @@ namespace TerraIntegration.Variables
         public virtual Mod Mod => ModContent.GetInstance<TerraIntegration>();
         public static ComponentWorld World => ModContent.GetInstance<ComponentWorld>();
 
+        public static readonly Dictionary<Type, Variable> ByType = new();
         public static readonly Dictionary<string, Variable> ByTypeName = new();
 
         public virtual string Texture => null;
@@ -250,7 +251,7 @@ namespace TerraIntegration.Variables
 
             if (tag.ContainsKey("data"))
                 newVar = var.LoadCustomTag(tag["data"]);
-            else if (tag.ContainsKey("bytes"))
+            if (newVar is null && tag.ContainsKey("bytes"))
             {
                 MemoryStream ms = new MemoryStream(tag.GetByteArray("bytes"));
                 BinaryReader reader = new BinaryReader(ms);
@@ -271,7 +272,7 @@ namespace TerraIntegration.Variables
         protected virtual Variable LoadCustomData(BinaryReader reader) => (Variable)Activator.CreateInstance(GetType());
 
         protected virtual object SaveCustomTag() => null;
-        protected virtual Variable LoadCustomTag(object data) => (Variable)Activator.CreateInstance(GetType());
+        protected virtual Variable LoadCustomTag(object data) => null;
 
         public virtual void HandlePacket(Point16 pos, ushort messageType, BinaryReader reader, int whoAmI, ref bool broadcast) { }
         public ModPacket CreatePacket(Point16 pos, ushort messageType) => Networking.CreateVariablePacket(Type, pos, messageType);
@@ -330,6 +331,13 @@ namespace TerraIntegration.Variables
             return null;
         }
 
+        public static TVariable GetInstance<TVariable>() where TVariable : Variable
+        {
+            if (ByType.TryGetValue(typeof(TVariable), out Variable v))
+                return v as TVariable;
+            return null;
+        }
+
         public static void Register(Variable v)
         {
             if (v is ComponentProperty pv)
@@ -344,10 +352,12 @@ namespace TerraIntegration.Variables
             }
 
             if (v?.Type is null) return;
+            ByType[v.GetType()] = v;
             ByTypeName[v.Type] = v;
         }
         internal static void Unregister() 
         {
+            ByType.Clear();
             ByTypeName.Clear();
 
             ComponentProperty.Unregister();

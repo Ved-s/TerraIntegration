@@ -35,6 +35,9 @@ namespace TerraIntegration
             {
                 if (t.IsAbstract) continue;
 
+                if (t.GetCustomAttribute<AutoloadAttribute>()?.Value == false)
+                    continue;
+
                 if (t.IsSubclassOf(typeof(Component)))
                 {
                     Type generic = typeof(ContentInstance<>).MakeGenericType(t);

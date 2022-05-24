@@ -13,9 +13,13 @@ using Terraria.UI;
 
 namespace TerraIntegration.UI
 {
-	internal class UIFocusInputTextField : UIPanel
+	public class UIFocusInputTextField : UIPanel
 	{
 		public bool UnfocusOnTab { get; internal set; }
+
+		public delegate string ModifyTextInputDelegate(string newText, string oldText);
+
+		public ModifyTextInputDelegate ModifyTextInput;
 
 		public event Action OnTextChange;
 		public event Action OnUnfocus;
@@ -38,6 +42,8 @@ namespace TerraIntegration.UI
 			{
 				text = "";
 			}
+			if (ModifyTextInput is not null)
+				text = ModifyTextInput(text, CurrentString);
 			if (CurrentString != text)
 			{
 				CurrentString = text;
@@ -81,13 +87,16 @@ namespace TerraIntegration.UI
 				string newString = Main.GetInputText(CurrentString, false);
 				if (!newString.Equals(CurrentString))
 				{
-					CurrentString = newString;
-                    OnTextChange?.Invoke();
+					if (ModifyTextInput is not null)
+						newString = ModifyTextInput(newString, CurrentString);
+
+					if (!newString.Equals(CurrentString))
+					{
+						CurrentString = newString;
+						OnTextChange?.Invoke();
+					}
 				}
-				else
-				{
-					CurrentString = newString;
-				}
+
 				if (JustPressed(Keys.Tab))
 				{
 					if (UnfocusOnTab)

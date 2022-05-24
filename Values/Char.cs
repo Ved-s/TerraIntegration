@@ -10,6 +10,7 @@ using Terraria.ModLoader;
 
 namespace TerraIntegration.Values
 {
+    [Autoload(false)]
     public class Char : VariableValue, IToString
     {
         public override string Type => "char";

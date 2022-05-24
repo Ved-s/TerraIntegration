@@ -1,20 +1,15 @@
-﻿using Microsoft.Xna.Framework;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using TerraIntegration.Components;
-using TerraIntegration.UI;
 using TerraIntegration.Values;
 using TerraIntegration.Variables;
-using Terraria.GameContent.UI.Elements;
-using Terraria.ModLoader.IO;
 
 namespace TerraIntegration.Variables
 {
-    public abstract class ValueProperty : Variable, IOwnProgrammerInterface
+    public abstract class ValueProperty : ReferenceVariable
     {
         public static readonly Dictionary<Type, Dictionary<string, ValueProperty>> ByValueType = new();
         public static readonly List<ValueProperty> AllProperties = new();
@@ -47,43 +42,12 @@ namespace TerraIntegration.Variables
         public abstract string PropertyDisplay { get; }
         public virtual string PropertyDescription => "";
 
-        public Guid VariableId { get; set; }
+        public sealed override string TypeDescription => PropertyDescription;
+        public sealed override string TypeDisplay => PropertyDisplay;
 
-        public override string TypeDescription
-        {
-            get
-            {
-                string propd = PropertyDescription;
-
-                string result = "";
-                if (VariableId != default)
-                {
-                    result = $"[c/aaaa00:Variable ID:] {World.Guids.GetShortGuid(VariableId)}";
-                }
-
-                if (!propd.IsNullEmptyOrWhitespace())
-                {
-                    if (result.IsNullEmptyOrWhitespace()) result = propd;
-                    else result += "\n" + propd;
-                }
-
-                return result;
-            }
-        }
-        public override string TypeDisplay => PropertyDisplay;
-
-        public UIPanel Interface { get; set; }
-        public UIVariableSlot InterfaceSlot { get; set; }
+        public override Type ReferenceReturnType => ValueType;
 
         public abstract VariableValue GetProperty(VariableValue value, List<Error> errors);
-
-        public virtual ValueProperty CreateVariable(Variable var)
-        {
-            ValueProperty prop = (ValueProperty)Activator.CreateInstance(GetType());
-            prop.VariableId = var.Id;
-
-            return prop;
-        }
 
         public override VariableValue GetValue(ComponentSystem system, List<Error> errors)
         {
@@ -118,7 +82,7 @@ namespace TerraIntegration.Variables
 
         public static void Register(ValueProperty property)
         {
-            if (property.ValueType is null)
+            if (property.ValueType is null || property.PropertyName is null)
             {
                 WaitingValue.Add(property);
                 return;
@@ -133,72 +97,13 @@ namespace TerraIntegration.Variables
             ByTypeName[property.Type] = property;
         }
 
-        public static void Unregister() 
+        public new static void Unregister() 
         {
             ByValueType.Clear();
             AllProperties.Clear();
         }
 
         public virtual bool AppliesTo(VariableValue value) => true;
-
-        protected override void SaveCustomData(BinaryWriter writer)
-        {
-            writer.Write(VariableId.ToByteArray());
-        }
-        protected override Variable LoadCustomData(BinaryReader reader)
-        {
-            ValueProperty prop = (ValueProperty)Activator.CreateInstance(GetType());
-
-            prop.VariableId = new(reader.ReadBytes(16));
-            return prop;
-        }
-
-        protected override object SaveCustomTag()
-        {
-            return new TagCompound()
-            {
-                ["var"] = VariableId.ToByteArray(),
-            };
-        }
-        protected override Variable LoadCustomTag(object data)
-        {
-            ValueProperty prop = (ValueProperty)Activator.CreateInstance(GetType());
-
-            if (data is TagCompound tag)
-            {
-                if (tag.ContainsKey("var"))
-                    prop.VariableId = new(tag.GetByteArray("var"));
-            }
-
-            return prop;
-        }
-
-        public void SetupInterface()
-        {
-            UIPanel p = new();
-            Interface = p;
-
-            string type = VariableValue.TypeToName(ValueType, out Color color);
-
-            InterfaceSlot = new()
-            {
-                DisplayOnly = true,
-                Top = new(-21, .5f),
-                Left = new(-21, .5f),
-                VariableValidator = (var) => ValueType?.IsAssignableFrom(var.VariableReturnType) ?? false,
-                HoverText = Util.ColorTag(color, type)
-                
-            };
-            p.Append(InterfaceSlot);
-        }
-
-        public void WriteVariable(Items.Variable var)
-        {
-            if (InterfaceSlot.Var is not null)
-            {
-                var.Var = CreateVariable(InterfaceSlot.Var.Var);
-            }
-        }
     }
 
     public abstract class ValueProperty<TValue> : ValueProperty where TValue : VariableValue
