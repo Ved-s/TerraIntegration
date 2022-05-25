@@ -91,14 +91,16 @@ namespace TerraIntegration.Values
 
         public void SetupInterface()
         {
-            Interface = new UIPanel();
             Interface.Append(InterfaceInput = new(InterfaceValue.ToString())
             {
                 Width = new(80, 0),
 
                 Top = new(-16, .5f),
                 Left = new(-40, .5f),
-                TextColor = TypeColor
+                TextColor = TypeColor,
+                PaddingTop = 8,
+                PaddingBottom = 0,
+                Height = new(30, 0)
             });
             InterfaceInput.OnClick += (ev, el) =>
             {
@@ -108,9 +110,9 @@ namespace TerraIntegration.Values
             };
         }
 
-        public void WriteVariable(Items.Variable var)
+        public Variables.Variable WriteVariable()
         {
-            var.Var = new Constant(new Boolean(InterfaceValue));
+            return new Constant(new Boolean(InterfaceValue));
         }
     }
 }

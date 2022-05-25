@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Terraria.UI;
 
 namespace TerraIntegration
 {
@@ -27,5 +28,6 @@ namespace TerraIntegration
             builder.Append(text.Replace("\n", $"]\n[c/{v:x6}:"));
             builder.Append(']');
         }
+        public static Vector2 Size(this CalculatedStyle style) => new(style.Width, style.Height);
     }
 }

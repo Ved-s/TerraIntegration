@@ -20,9 +20,6 @@ namespace TerraIntegration.Variables
 
         public void SetupInterface()
         {
-            UIPanel p = new();
-            Interface = p;
-
             InterfaceSlot = new()
             {
                 DisplayOnly = true,
@@ -35,9 +32,9 @@ namespace TerraIntegration.Variables
                 InterfaceSlot.HoverText = VariableValue.TypeToName(ReferenceReturnType, true);
             }
 
-            p.Append(InterfaceSlot);
+            Interface.Append(InterfaceSlot);
         }
-        public void WriteVariable(Items.Variable var)
+        public Variables.Variable WriteVariable()
         {
             if (InterfaceSlot.Var is not null)
             {
@@ -45,9 +42,10 @@ namespace TerraIntegration.Variables
                 if (v is not null)
                 {
                     v.VariableId = InterfaceSlot.Var.Var.Id;
-                    var.Var = v;
+                    return v;
                 }
             }
+            return null;
         }
 
         public virtual ReferenceVariable CreateVariable(Variable var) => (ReferenceVariable)Activator.CreateInstance(GetType());

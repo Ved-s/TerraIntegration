@@ -119,6 +119,31 @@ namespace TerraIntegration.Values
                 return Util.ColorTag(new(0xff, 0xaa, 0xaa), $"unregistered type {type.Name}");
             return $"unregistered type {type.Name}";
         }
+        public static string TypeToString(Type type)
+        {
+            if (type is null) return null;
+
+            if (ByType.TryGetValue(type, out VariableValue val))
+                return "V" + val.Type;
+            
+            else
+                return "T" + type.FullName;
+        }
+        public static Type StringToType(string type) 
+        {
+            if (type is null) return null;
+
+            bool istype = type.StartsWith('T');
+            type = type[1..];
+
+            if (istype)     
+                return System.Type.GetType(type);
+            
+            else if (ByTypeName.TryGetValue(type, out VariableValue val))
+                return val.GetType();
+            
+            return null;
+        }
 
         public IEnumerable<(Type, ValueProperty)> GetProperties()
         {
@@ -166,6 +191,8 @@ namespace TerraIntegration.Values
             ByTypeName.Clear();
             ByType.Clear();
         }
+
+        public virtual VariableValue Clone() => (VariableValue)MemberwiseClone();
     }
 
     public class UnloadedVariableValue : VariableValue

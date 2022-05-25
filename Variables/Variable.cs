@@ -1,13 +1,8 @@
-﻿using Microsoft.Xna.Framework;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using TerraIntegration.Interfaces;
 using TerraIntegration.Values;
-using Terraria;
 using Terraria.ModLoader;
 using Terraria.ModLoader.IO;
 
@@ -65,7 +60,7 @@ namespace TerraIntegration.Variables
         }
         public virtual Variable GetFromCommand(CommandCaller caller, List<string> args) => (Variable)Activator.CreateInstance(GetType());
 
-        public void SaveData(BinaryWriter writer) 
+        public void SaveData(BinaryWriter writer)
         {
             if (this is UnloadedVariable unloaded)
             {
@@ -102,7 +97,7 @@ namespace TerraIntegration.Variables
             writer.Write((ushort)length);
             writer.BaseStream.Seek(endPos, SeekOrigin.Begin);
         }
-        public static Variable LoadData(BinaryReader reader) 
+        public static Variable LoadData(BinaryReader reader)
         {
             string type = reader.ReadString();
             if (type == "") return null;
@@ -120,7 +115,7 @@ namespace TerraIntegration.Variables
                 id = new Guid(reader.ReadBytes(16));
                 @return = reader.ReadString().NullIfEmpty();
                 byte[] data = reader.ReadBytes(length);
-                return new UnloadedVariable(type, data, null) 
+                return new UnloadedVariable(type, data, null)
                 {
                     Id = id,
                     Name = name,
@@ -145,13 +140,13 @@ namespace TerraIntegration.Variables
             if (diff != 0)
             {
                 if (diff > 0) var.Mod.Logger.WarnFormat("Variable {0} data overread: {1} bytes", type, diff);
-                else  var.Mod.Logger.WarnFormat("Variable {0} data underread: {1} bytes", type, -diff);
+                else var.Mod.Logger.WarnFormat("Variable {0} data underread: {1} bytes", type, -diff);
 
                 try
                 {
                     reader.BaseStream.Seek(pos + length, SeekOrigin.Begin);
                 }
-                catch 
+                catch
                 {
                     reader.BaseStream.Seek(pos, SeekOrigin.Begin);
                 }
@@ -164,7 +159,7 @@ namespace TerraIntegration.Variables
         {
             TagCompound tag = new();
 
-            if (this is UnloadedVariable unloaded) 
+            if (this is UnloadedVariable unloaded)
             {
                 tag["type"] = unloaded.UnloadedTypeName;
                 tag["id"] = Id.ToByteArray();
@@ -236,9 +231,9 @@ namespace TerraIntegration.Variables
                 if (tag.ContainsKey("bytes")) byteData = tag.GetByteArray("bytes");
 
 
-                return new UnloadedVariable(type, byteData, tagData) 
+                return new UnloadedVariable(type, byteData, tagData)
                 {
-                    Id = id, 
+                    Id = id,
                     Name = name,
                     ReturnTypeCacheName = @return
                 };
@@ -246,7 +241,7 @@ namespace TerraIntegration.Variables
 
             Variable newVar = null;
 
-            if (tag.ContainsKey("id")) 
+            if (tag.ContainsKey("id"))
                 id = new(tag.GetByteArray("id"));
             else id = Guid.NewGuid();
 
@@ -257,7 +252,7 @@ namespace TerraIntegration.Variables
                 MemoryStream ms = new MemoryStream(tag.GetByteArray("bytes"));
                 BinaryReader reader = new BinaryReader(ms);
                 newVar = var.LoadCustomData(reader);
-            } 
+            }
             else newVar = (Variable)Activator.CreateInstance(var.GetType());
 
             World.Guids.AddToDictionary(id);
@@ -282,29 +277,24 @@ namespace TerraIntegration.Variables
 
         public Variable Clone()
         {
-            Variable var = IsEmpty? new() : CloneCustom();
+            Variable var = IsEmpty ? new() : CloneCustom();
             var.Name = Name;
             var.Id = Id;
             return var;
         }
         public virtual Variable CloneCustom() => (Variable)MemberwiseClone();
 
-        public void SetReturnTypeCache(Type t) 
+        public void SetReturnTypeCache(Type t)
         {
             if (t is null)
             {
                 ReturnTypeCacheType = null;
                 ReturnTypeCacheName = null;
             }
-            else if (VariableValue.ByType.TryGetValue(t, out VariableValue val))
-            {
-                ReturnTypeCacheType = t;
-                ReturnTypeCacheName = "V" + val.Type;
-            }
             else
             {
                 ReturnTypeCacheType = t;
-                ReturnTypeCacheName = "T" + t.FullName;
+                ReturnTypeCacheName = VariableValue.TypeToString(t);
             }
         }
         public Type GetReturnTypeCache()
@@ -315,21 +305,8 @@ namespace TerraIntegration.Variables
             if (ReturnTypeCacheType is not null)
                 return ReturnTypeCacheType;
 
-            string name = ReturnTypeCacheName;
-            bool type = name.StartsWith('T');
-            name = name[1..];
-
-            if (type)
-            {
-                ReturnTypeCacheType = System.Type.GetType(name);
-                return ReturnTypeCacheType;
-            }
-            else if (VariableValue.ByTypeName.TryGetValue(name, out VariableValue val))
-            {
-                ReturnTypeCacheType = val.GetType();
-                return ReturnTypeCacheType;
-            }
-            return null;
+            ReturnTypeCacheType = VariableValue.StringToType(ReturnTypeCacheName);
+            return ReturnTypeCacheType;
         }
 
         public static TVariable GetInstance<TVariable>() where TVariable : Variable
@@ -356,7 +333,7 @@ namespace TerraIntegration.Variables
             ByType[v.GetType()] = v;
             ByTypeName[v.Type] = v;
         }
-        internal static void Unregister() 
+        internal static void Unregister()
         {
             ByType.Clear();
             ByTypeName.Clear();
@@ -376,8 +353,8 @@ namespace TerraIntegration.Variables
         }
         public TValue TryGetReturnType<TValue>() where TValue : VariableValue
         {
-            if (VariableReturnType is not null 
-                && VariableReturnType == typeof(TValue) 
+            if (VariableReturnType is not null
+                && VariableReturnType == typeof(TValue)
                 && VariableValue.ByType.TryGetValue(typeof(TValue), out VariableValue value))
                 return (TValue)value;
 
@@ -400,7 +377,7 @@ namespace TerraIntegration.Variables
 
         public UnloadedVariable() { }
 
-        public UnloadedVariable(string type, byte[] data, object tag) 
+        public UnloadedVariable(string type, byte[] data, object tag)
         {
             UnloadedTypeName = type;
             UnloadedData = data;

@@ -87,8 +87,6 @@ namespace TerraIntegration.Values
 
         public void SetupInterface()
         {
-            UIPanel p = new();
-
             InterfaceValue = new("")
             {
                 Top = new(-12, .5f),
@@ -105,14 +103,14 @@ namespace TerraIntegration.Values
                     return old;
                 }
             };
-            p.Append(InterfaceValue);
-            Interface = p;
+            Interface.Append(InterfaceValue);
         }
 
-        public void WriteVariable(Items.Variable var)
+        public Variables.Variable WriteVariable()
         {
             if (double.TryParse(InterfaceValue.CurrentString, out double value))
-                var.Var = new Constant(new Double(value));
+                return new Constant(new Double(value));
+            return null;
         }
 
         public VariableValue FromDecimalChecked(double value, List<Error> errors)

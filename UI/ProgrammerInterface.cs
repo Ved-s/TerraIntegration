@@ -258,6 +258,13 @@ namespace TerraIntegration.UI
                 });
                 Reload.OnClick += (s, e) =>
                 {
+                    if (CurrentOwner is not null)
+                    {
+                        CurrentOwner.Interface = null;
+                        CurrentOwner.SetupInterfaceIfNeeded();
+                        VariableInterface = CurrentOwner.Interface;
+                    }
+
                     SetupUI();
                     SoundEngine.PlaySound(SoundID.MenuTick);
                 };
@@ -319,9 +326,13 @@ namespace TerraIntegration.UI
             if (CurrentOwner is not null)
             {
                 Guid id = ResultSlot.Var.Var.IsEmpty ? default : ResultSlot.Var.Var.Id;
-                CurrentOwner.WriteVariable(ResultSlot.Var);
-                if (id != default)
-                    ResultSlot.Var.Var.Id = id;
+                Variable result = CurrentOwner.WriteVariable();
+                if (result is not null)
+                {
+                    ResultSlot.Var.Var = result;
+                    if (id != default)
+                        ResultSlot.Var.Var.Id = id;
+                }
             }
 
             if (ResultSlot.Var?.Var is not null && !VariableName.CurrentString.IsNullEmptyOrWhitespace())
@@ -537,8 +548,7 @@ namespace TerraIntegration.UI
         {
             CurrentOwner = owner;
 
-            if (owner?.Interface is null)
-                owner?.SetupInterface();
+            owner?.SetupInterfaceIfNeeded();
 
             if (VariableInterface is not null)
                 Back.RemoveChild(VariableInterface);

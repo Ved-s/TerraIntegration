@@ -63,6 +63,8 @@ namespace TerraIntegration
             {
                 Type drawType = drawTypes.Dequeue();
 
+                if (drawType is null) continue;
+
                 if (drawType.IsGenericType)
                 {
                     foreach (Type subtype in drawType.GetGenericArguments())

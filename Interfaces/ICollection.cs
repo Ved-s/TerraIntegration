@@ -4,12 +4,15 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using TerraIntegration.Values;
+using TerraIntegration.Variables;
 
 namespace TerraIntegration.Interfaces
 {
     public interface ICollection : IValueInterface
     {
         public IEnumerable<VariableValue> Enumerate();
+
+        public Type CollectionType { get; }
 
         public static Type TryGetCollectionType(Type collection) 
         {
@@ -25,9 +28,24 @@ namespace TerraIntegration.Interfaces
 
             return interf?.GetGenericArguments().FirstOrDefault();
         }
+
+        public static Type TryGetCollectionType(Variable var)
+        {
+            if (var is Constant @const)
+            {
+                if (@const.Value is ICollection collection)
+                {
+                    Type t = collection.CollectionType;
+                    if (t != typeof(VariableValue)) 
+                        return t;
+                }
+            }
+            return TryGetCollectionType(var.VariableReturnType);
+        }
     }
 
     public interface ICollection<T> : ICollection
     {
+        Type ICollection.CollectionType => typeof(T);
     }
 }

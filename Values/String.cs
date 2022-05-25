@@ -89,8 +89,6 @@ namespace TerraIntegration.Values
 
         public void SetupInterface()
         {
-            UIPanel p = new();
-
             InterfaceValue = new("")
             {
                 Top = new(-12, .5f),
@@ -98,13 +96,12 @@ namespace TerraIntegration.Values
                 Width = new(-40, 1),
                 Height = new(25, 0),
             };
-            p.Append(InterfaceValue);
-            Interface = p;
+            Interface.Append(InterfaceValue);
         }
 
-        public void WriteVariable(Items.Variable var)
+        public Variables.Variable WriteVariable()
         {
-            var.Var = new Constant(new String(InterfaceValue.CurrentString));
+            return new Constant(new String(InterfaceValue.CurrentString));
         }
 
         public IEnumerable<VariableValue> Enumerate()

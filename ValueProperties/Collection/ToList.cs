@@ -19,7 +19,7 @@ namespace TerraIntegration.ValueProperties.Collection
         {
             ToCollection result = new ToCollection();
 
-            Type collectionType = ICollection.TryGetCollectionType(var.VariableReturnType);
+            Type collectionType = ICollection.TryGetCollectionType(var);
 
             if (collectionType is not null)
             {

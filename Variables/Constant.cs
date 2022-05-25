@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using TerraIntegration.Values;
 using Terraria.ModLoader;
@@ -20,6 +21,8 @@ namespace TerraIntegration.Variables
         public override Type VariableReturnType => Value.GetType();
 
         public override SpriteSheetPos SpriteSheetPos => new(BasicSheet, 2, 0);
+
+        Regex LineBreaksWithPadding = new(@"\r?\n[ \t]*", RegexOptions.Compiled);
 
         public Constant() { }
 
@@ -72,7 +75,7 @@ namespace TerraIntegration.Variables
             if (Value is not null)
             {
                 string text = Value.Display().HoverText;
-
+                text = LineBreaksWithPadding.Replace(text, " ");
                 if (text is not null)
                     tooltips.Add(new(Mod, "TIConstantValue", $"[c/aaaa00:Value:] {text}"));
             }

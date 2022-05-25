@@ -80,8 +80,6 @@ namespace TerraIntegration.Values
 
         public void SetupInterface()
         {
-            UIPanel p = new();
-
             InterfaceValue = new("")
             {
                 Top = new(-12, .5f),
@@ -98,15 +96,14 @@ namespace TerraIntegration.Values
                     return @new.Last().ToString();
                 }
             };
-            p.Append(InterfaceValue);
-            Interface = p;
+            Interface.Append(InterfaceValue);
         }
 
-        public void WriteVariable(Items.Variable var)
+        public Variables.Variable WriteVariable()
         {
-            if (InterfaceValue.CurrentString.Length == 0) return;
+            if (InterfaceValue.CurrentString.Length == 0) return null;
 
-            var.Var = new Constant(new Char(InterfaceValue.CurrentString[0]));
+            return new Constant(new Char(InterfaceValue.CurrentString[0]));
         }
     }
 }

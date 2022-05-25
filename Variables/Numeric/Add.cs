@@ -117,10 +117,7 @@ namespace TerraIntegration.Variables.Numeric
 
         public void SetupInterface()
         {
-            UIPanel panel = new UIPanel();
-            Interface = panel;
-
-            panel.Append(SlotA = new()
+            Interface.Append(SlotA = new()
             {
                 Top = new(-21, .5f),
                 Left = new(-75, .5f),
@@ -146,7 +143,7 @@ namespace TerraIntegration.Variables.Numeric
                 }
             });
 
-            panel.Append(new UIDrawing()
+            Interface.Append(new UIDrawing()
             {
                 Top = new(-15, .5f),
                 Left = new(-15, .5f),
@@ -161,7 +158,7 @@ namespace TerraIntegration.Variables.Numeric
                 }
             });
 
-            panel.Append(SlotB = new()
+            Interface.Append(SlotB = new()
             {
                 Top = new(-21, .5f),
                 Left = new(30, .5f),
@@ -171,11 +168,11 @@ namespace TerraIntegration.Variables.Numeric
             });
         }
 
-        public void WriteVariable(Items.Variable var)
+        public Variables.Variable WriteVariable()
         {
-            if (SlotA?.Var is null || SlotB?.Var is null) return;
+            if (SlotA?.Var is null || SlotB?.Var is null) return null;
 
-            var.Var = new Add(SlotA.Var.Var.Id, SlotB.Var.Var.Id)
+            return new Add(SlotA.Var.Var.Id, SlotB.Var.Var.Id)
             {
                 VariableReturnType = SlotA.Var.Var.VariableReturnType
             };

@@ -9,6 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Terraria;
 using Terraria.GameContent;
+using Terraria.UI.Chat;
 
 namespace TerraIntegration.DisplayedValues
 {
@@ -17,9 +18,10 @@ namespace TerraIntegration.DisplayedValues
         public override string Type => "text";
 
         public virtual string Text { get; }
+
         public virtual Color Color { get; }
 
-        public override string HoverText => Util.ColorTag(Color, Text);
+        public override string HoverText => Color == Color.White ? Text : Util.ColorTag(Color, Text);
 
         public ColorTextDisplay() { }
         public ColorTextDisplay(string text, Color color)
@@ -32,8 +34,6 @@ namespace TerraIntegration.DisplayedValues
         {
             Vector2 size = FontAssets.MouseText.Value.MeasureString(Text);
 
-            size.Y *= 0.8f;
-
             float zoomH = screenRect.Width / size.X;
             float zoomV = screenRect.Height / size.Y;
 
@@ -43,8 +43,11 @@ namespace TerraIntegration.DisplayedValues
             else zoom = 1f;
 
             Vector2 pos = screenRect.Location.ToVector2() + (screenRect.Size() / 2 - size / 2);
+            pos.Y += 4;
 
-            spriteBatch.DrawString(FontAssets.MouseText.Value, Text, pos, Color, 0f, Vector2.Zero, zoom, SpriteEffects.None, 0);
+            TextSnippet[] snippets = ChatManager.ParseMessage(Text, Color).ToArray();
+            ChatManager.ConvertNormalSnippets(snippets);
+            ChatManager.DrawColorCodedString(spriteBatch, FontAssets.MouseText.Value, snippets, pos, Color.White, 0f, Vector2.Zero, new(zoom), out _, 0);
         }
 
         protected override void SendCustomData(BinaryWriter writer)

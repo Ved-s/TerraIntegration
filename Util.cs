@@ -87,7 +87,7 @@ namespace TerraIntegration
 			return nextItem;
 		}
 
-		public static string ColorTag(Color color, string text) 
+		public static string ColorTag(Color color, string text, bool fixNewlines = true) 
 		{
 			if (text is null)
 				return null;
@@ -96,7 +96,10 @@ namespace TerraIntegration
 
 			v = (v & 0xff0000) >> 16 | (v & 0x00ff00) | (v & 0x0000ff) << 16; // RRGGBB
 
-			return $"[c/{v:x6}:{text.Replace("\n", $"]\n[c/{v:x6}:")}]";
+			if (fixNewlines)
+				text = text.Replace("\n", $"]\n[c/{v:x6}:");
+
+			return $"[c/{v:x6}:{text}]";
 
 		}
 
