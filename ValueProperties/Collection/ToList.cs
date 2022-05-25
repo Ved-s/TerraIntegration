@@ -6,9 +6,11 @@ using System.Threading.Tasks;
 using TerraIntegration.Interfaces;
 using TerraIntegration.Values;
 using TerraIntegration.Variables;
+using Terraria.ModLoader;
 
 namespace TerraIntegration.ValueProperties.Collection
 {
+    [Autoload(false)]
     public class ToCollection : ValueProperty
     {
         public override Type ValueType => typeof(ICollection);

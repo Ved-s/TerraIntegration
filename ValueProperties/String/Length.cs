@@ -9,7 +9,7 @@ using TerraIntegration.Variables;
 
 namespace TerraIntegration.ValueProperties.String
 {
-    public class StringLength : ValueProperty<Values.String>
+    public class Length : ValueProperty<Values.String>
     {
         public override string PropertyName => "length";
         public override string PropertyDisplay => "Length";

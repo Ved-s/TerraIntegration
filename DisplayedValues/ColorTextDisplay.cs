@@ -43,7 +43,7 @@ namespace TerraIntegration.DisplayedValues
             else zoom = 1f;
 
             Vector2 pos = screenRect.Location.ToVector2() + (screenRect.Size() / 2 - size / 2);
-            pos.Y += 4;
+            pos.Y += 4 * zoom;
 
             TextSnippet[] snippets = ChatManager.ParseMessage(Text, Color).ToArray();
             ChatManager.ConvertNormalSnippets(snippets);
