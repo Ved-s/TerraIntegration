@@ -18,4 +18,25 @@ namespace TerraIntegration
             SpriteSize = spriteSize;
         }
     }
+
+    public struct SpriteSheetPos 
+    {
+        public SpriteSheet SpriteSheet;
+        public int X;
+        public int Y;
+
+        public SpriteSheetPos(SpriteSheet spriteSheet, int spriteX, int spriteY)
+        {
+            SpriteSheet = spriteSheet;
+            X = spriteX;
+            Y = spriteY;
+        }
+
+        public SpriteSheetPos(int spriteX, int spriteY)
+        {
+            SpriteSheet = null;
+            X = spriteX;
+            Y = spriteY;
+        }
+    }
 }

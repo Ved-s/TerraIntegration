@@ -132,7 +132,7 @@ namespace TerraIntegration.UI
                     hover.Append("[c/aaaa00:");
                     hover.Append("Returns");
                     hover.Append(":] ");
-                    hover.AppendLine(string.Join(", ", VariableReturnTypes.Select(VariableValue.TypeToColorTagName)));
+                    hover.AppendLine(string.Join(", ", VariableReturnTypes.Select(t => VariableValue.TypeToName(t, true))));
                 }
                 if (VariableReturnTypes is null && VariableTypes is null) hover.AppendLine("Accepts any variable");
 

@@ -22,7 +22,7 @@ namespace TerraIntegration.Variables
         public abstract string ComponentType { get; }
         public abstract string PropertyName { get; }
 
-        public override SpriteSheet SpriteSheet
+        public override SpriteSheet DefaultSpriteSheet
         {
             get
             {
@@ -185,7 +185,7 @@ namespace TerraIntegration.Variables
             }
         }
 
-        public override SpriteSheet SpriteSheet
+        public override SpriteSheet DefaultSpriteSheet
         {
             get
             {

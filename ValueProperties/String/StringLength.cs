@@ -15,8 +15,7 @@ namespace TerraIntegration.ValueProperties.String
         public override string PropertyDisplay => "Length";
         public override Type VariableReturnType => typeof(Integer);
 
-        public override SpriteSheet SpriteSheet => StringSheet;
-        public override Point SpritesheetPos => new(1, 0);
+        public override SpriteSheetPos SpriteSheetPos => new(StringSheet, 1, 0);
 
         public override VariableValue GetProperty(Values.String value, List<Error> errors)
         {

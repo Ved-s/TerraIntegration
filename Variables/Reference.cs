@@ -15,8 +15,7 @@ namespace TerraIntegration.Variables
         public override string Type => "ref";
         public override string TypeDisplay => "Reference";
 
-        public override SpriteSheet SpriteSheet => BasicSheet;
-        public override Point SpritesheetPos => new(1, 0);
+        public override SpriteSheetPos SpriteSheetPos => new(BasicSheet, 1, 0);
 
         public Reference() { }
         public Reference(Guid varId)

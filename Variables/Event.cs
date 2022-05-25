@@ -16,8 +16,7 @@ namespace TerraIntegration.Variables
 
         public override Type VariableReturnType => null;
 
-        public override SpriteSheet SpriteSheet => BasicSheet;
-        public override Point SpritesheetPos => new(3, 0);
+        public override SpriteSheetPos SpriteSheetPos => new(BasicSheet, 3, 0);
 
         private static HashSet<Point16> TriggeredPoints = new();
 

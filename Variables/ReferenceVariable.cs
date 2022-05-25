@@ -31,9 +31,8 @@ namespace TerraIntegration.Variables
             };
             if (ReferenceReturnType is not null)
             {
-                string type = VariableValue.TypeToName(ReferenceReturnType, out Color color);
                 InterfaceSlot.VariableValidator = (var) => ReferenceReturnType?.IsAssignableFrom(var.VariableReturnType) ?? false;
-                InterfaceSlot.HoverText = Util.ColorTag(color, type);        
+                InterfaceSlot.HoverText = VariableValue.TypeToName(ReferenceReturnType, true);
             }
 
             p.Append(InterfaceSlot);
@@ -42,19 +41,16 @@ namespace TerraIntegration.Variables
         {
             if (InterfaceSlot.Var is not null)
             {
-                Variable v = CreateVariable(InterfaceSlot.Var.Var);
+                ReferenceVariable v = CreateVariable(InterfaceSlot.Var.Var);
                 if (v is not null)
+                {
+                    v.VariableId = InterfaceSlot.Var.Var.Id;
                     var.Var = v;
+                }
             }
         }
 
-        public virtual Variable CreateVariable(Variable var)
-        {
-            ReferenceVariable prop = (ReferenceVariable)Activator.CreateInstance(GetType());
-            prop.VariableId = var.Id;
-
-            return prop;
-        }
+        public virtual ReferenceVariable CreateVariable(Variable var) => (ReferenceVariable)Activator.CreateInstance(GetType());
 
         protected override void SaveCustomData(BinaryWriter writer)
         {

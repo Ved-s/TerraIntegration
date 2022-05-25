@@ -16,8 +16,7 @@ namespace TerraIntegration.ValueProperties.Numeric
         public override string PropertyName => "dec";
         public override string PropertyDisplay => "Decrement";
 
-        public override SpriteSheet SpriteSheet => MathSheet;
-        public override Point SpritesheetPos => new(2, 0);
+        public override SpriteSheetPos SpriteSheetPos => new(MathSheet, 2, 0);
 
         public override ValueProperty CreateVariable(Variable var)
         {

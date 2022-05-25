@@ -8,7 +8,7 @@ using Terraria.ModLoader;
 
 namespace TerraIntegration.Interfaces
 {
-    public interface INumeric : IAddable
+    public interface INumeric : IAddable, IValueInterface
     {
         public long NumericValue { get; }
         public long NumericMax { get; }

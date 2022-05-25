@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TerraIntegration.Interfaces;
 using TerraIntegration.Values;
 using Terraria;
 using Terraria.ModLoader;
@@ -25,8 +26,8 @@ namespace TerraIntegration.Variables
         public static readonly Dictionary<string, Variable> ByTypeName = new();
 
         public virtual string Texture => null;
-        public virtual SpriteSheet SpriteSheet => null;
-        public virtual Point SpritesheetPos => default;
+        public virtual SpriteSheet DefaultSpriteSheet => null;
+        public virtual SpriteSheetPos SpriteSheetPos => default;
 
         public string Name { get; set; }
         public Guid Id { get; set; }
@@ -363,6 +364,25 @@ namespace TerraIntegration.Variables
             ComponentProperty.Unregister();
             ValueProperty.Unregister();
         }
+
+        public TValueInterface TryGetReturnTypeInterface<TValueInterface>() where TValueInterface : class, IValueInterface
+        {
+            if (VariableReturnType is not null
+                && VariableReturnType.IsAssignableTo(typeof(TValueInterface))
+                && VariableValue.ByType.TryGetValue(VariableReturnType, out VariableValue value))
+                return value as TValueInterface;
+
+            return null;
+        }
+        public TValue TryGetReturnType<TValue>() where TValue : VariableValue
+        {
+            if (VariableReturnType is not null 
+                && VariableReturnType == typeof(TValue) 
+                && VariableValue.ByType.TryGetValue(typeof(TValue), out VariableValue value))
+                return (TValue)value;
+
+            return null;
+        }
     }
 
     public class UnloadedVariable : Variable
@@ -370,8 +390,7 @@ namespace TerraIntegration.Variables
         public override string Type => "unloaded";
         public override string TypeDisplay => $"Unloaded variable ({UnloadedTypeName})";
 
-        public override SpriteSheet SpriteSheet => BasicSheet;
-        public override Point SpritesheetPos => new(0, 0);
+        public override SpriteSheetPos SpriteSheetPos => new(BasicSheet, 0, 0);
 
         public override Type VariableReturnType => typeof(UnloadedVariableValue);
 

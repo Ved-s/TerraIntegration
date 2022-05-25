@@ -6,8 +6,7 @@ using System.Threading.Tasks;
 
 namespace TerraIntegration.Interfaces
 {
-    public interface IToString : IValueInterface
+    public interface IValueInterface
     {
-        string ToString();
     }
 }

@@ -99,11 +99,11 @@ namespace TerraIntegration
             List<string> variables = new();
 
             foreach (VariableValue val in VariableValue.ByTypeName.Values)
-                if (val.Type != "any" && val.Type != "unloaded" && val.Texture is null && val.SpriteSheet is null)
+                if (val.Type != "any" && val.Type != "unloaded" && val.Texture is null && (val.SpriteSheetPos.SpriteSheet ?? val.DefaultSpriteSheet) is null)
                     values.Add(val.Type);
 
             foreach (Variable var in Variable.ByTypeName.Values)
-                if (var.Type != "any" && var.Type != "unloaded" && var.Texture is null && var.SpriteSheet is null)
+                if (var.Type != "any" && var.Type != "unloaded" && var.Texture is null && (var.SpriteSheetPos.SpriteSheet ?? var.DefaultSpriteSheet) is null)
                     variables.Add(var.Type);
 
             string valstr = values.Count == 0 ?

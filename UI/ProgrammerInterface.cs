@@ -500,12 +500,12 @@ namespace TerraIntegration.UI
 
                     if (type != valueType)
                     {
-                        string typeName = VariableValue.TypeToName(type, out Color typeColor);
+                        string typeName = VariableValue.TypeToName(type, true);
 
                         panel.Height = new(45, 0);
                         panel.PaddingTop = 18;
 
-                        panel.Append(new UIText($"from {Util.ColorTag(typeColor, typeName)}", .7f) 
+                        panel.Append(new UIText($"from {typeName}", .7f) 
                         {
                             Top = new(-13, 0)
                         });

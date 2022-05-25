@@ -26,6 +26,6 @@ namespace TerraIntegration.Variables
                 return $"conv.{to.Type}";
             }
         }
-        public override string PropertyDisplay => string.Format(DisplayName, VariableValue.TypeToColorTagName(ConvertTo));
+        public override string PropertyDisplay => string.Format(DisplayName, VariableValue.TypeToName(ConvertTo, true));
     }
 }

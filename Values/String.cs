@@ -15,15 +15,14 @@ using Terraria.ModLoader;
 
 namespace TerraIntegration.Values
 {
-    public class String : VariableValue, IToString, IAddable, ICollection, IOwnProgrammerInterface
+    public class String : VariableValue, IToString, IAddable, Interfaces.ICollection<Char>, IOwnProgrammerInterface
     {
         public override string Type => "str";
         public override string TypeDisplay => "String";
 
         public override Color TypeColor => Color.OrangeRed;
 
-        public override SpriteSheet SpriteSheet => BasicSheet;
-        public override Point SpritesheetPos => new(2, 1);
+        public override SpriteSheetPos SpriteSheetPos => new(BasicSheet, 2, 1);
 
         public string Value { get; set; }
         public Type[] ValidAddTypes => new[] { typeof(IToString) };
@@ -72,7 +71,7 @@ namespace TerraIntegration.Values
             if (value is IToString toString)
                 return new String(Value + toString.ToString());
             
-            errors.Add(new(ErrorType.ExpectedValue, TypeToName(typeof(IToString), out _)));
+            errors.Add(new(ErrorType.ExpectedValue, TypeToName(typeof(IToString), false)));
             return null;
         }
 

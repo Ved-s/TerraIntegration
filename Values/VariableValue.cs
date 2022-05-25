@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using TerraIntegration.DisplayedValues;
 using TerraIntegration.Variables;
 using Terraria.ModLoader;
@@ -18,8 +19,8 @@ namespace TerraIntegration.Values
         public virtual Mod Mod => ModContent.GetInstance<TerraIntegration>();
 
         public virtual string Texture => null;
-        public virtual SpriteSheet SpriteSheet => null;
-        public virtual Point SpritesheetPos => default;
+        public virtual SpriteSheet DefaultSpriteSheet => null;
+        public virtual SpriteSheetPos SpriteSheetPos => default;
 
         public virtual string Type => "any";
         public virtual string TypeDisplay => "Any";
@@ -81,35 +82,42 @@ namespace TerraIntegration.Values
         protected virtual void SaveCustomData(BinaryWriter writer) { }
         protected virtual VariableValue LoadCustomData(BinaryReader reader) { return (VariableValue)Activator.CreateInstance(GetType()); }
 
-        public static string TypeToName(Type type, out Color color)
+        public static string TypeToName(Type type, bool colored)
         {
             if (type is null)
-            {
-                color = Color.White;
                 return null;
-            }
+            
             if (ByType.TryGetValue(type, out Values.VariableValue val))
             {
-                color = val.TypeColor;
+                if (colored)
+                    return Util.ColorTag(val.TypeColor, val.TypeDisplay);
+
                 return val.TypeDisplay;
             }
             if (type.IsInterface)
             {
-                string i = type.Name;
-                if (i.StartsWith('I')) i = i[1..];
+                string name = type.Name;
+                if (name.StartsWith('I'))
+                    name = name[1..];
 
-                color = new(0xaa, 0xbb, 0x00);
-                return i;
+                if (type.IsGenericType)
+                {
+                    name = name.Split('`')[0];
+
+                    string generics = string.Join(", ", type.GenericTypeArguments.Select(t => TypeToName(t, colored)));
+                    if (colored)
+                        return $"{Util.ColorTag(new(0xaa, 0xbb, 0x00), name)} of {generics}";
+                    return $"{name} of {generics}";
+                }
+
+                if (colored)
+                    return Util.ColorTag(new(0xaa, 0xbb, 0x00), name);
+                return name;
             }
-            color = new(0xff, 0xaa, 0xaa);
-            return $"unregistered type {type.Name}";
-        }
-        public static string TypeToColorTagName(Type type)
-        {
-            if (type is null) return null;
 
-            string name = TypeToName(type, out Color color);
-            return Util.ColorTag(color, name);
+            if (colored) 
+                return Util.ColorTag(new(0xff, 0xaa, 0xaa), $"unregistered type {type.Name}");
+            return $"unregistered type {type.Name}";
         }
 
         public IEnumerable<(Type, ValueProperty)> GetProperties()

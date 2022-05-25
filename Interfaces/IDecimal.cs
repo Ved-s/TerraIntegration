@@ -5,7 +5,7 @@ using Terraria.ModLoader;
 
 namespace TerraIntegration.Interfaces
 {
-    public interface IDecimal : IAddable
+    public interface IDecimal : IAddable, IValueInterface
     {
         public double DecimalValue { get; }
         public double DecimalMax { get; }

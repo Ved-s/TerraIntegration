@@ -17,8 +17,7 @@ namespace TerraIntegration.Variables
 
         public override Type VariableReturnType => typeof(Values.Boolean);
 
-        public override SpriteSheet SpriteSheet => BasicSheet;
-        public override Point SpritesheetPos => new(0, 1);
+        public override SpriteSheetPos SpriteSheetPos => new(BasicSheet, 0, 1);
 
         public Guid EventId { get; set; }
         public bool Triggered { get; set; }

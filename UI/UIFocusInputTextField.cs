@@ -1,15 +1,18 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using ReLogic.Graphics;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Terraria;
+using Terraria.GameContent;
 using Terraria.GameContent.UI.Elements;
 using Terraria.GameInput;
 using Terraria.UI;
+using Terraria.UI.Chat;
 
 namespace TerraIntegration.UI
 {
@@ -24,6 +27,17 @@ namespace TerraIntegration.UI
 		public event Action OnTextChange;
 		public event Action OnUnfocus;
 		public event Action OnTab;
+
+		public StyleDimension TextHAlign = default;
+		public StyleDimension TextVAlign = new(0, .5f);
+
+		internal bool Focused;
+
+		public string CurrentString { get; private set; } = "";
+
+		private readonly string _hintText;
+		private int _textBlinkerCount;
+		private int _textBlinkerState;
 
 		public UIFocusInputTextField(string hintText)
 		{
@@ -115,28 +129,44 @@ namespace TerraIntegration.UI
 					_textBlinkerCount = 0;
 				}
 			}
-			string displayString = CurrentString;
-			if (_textBlinkerState == 1 && Focused)
-			{
-				displayString += "|";
-			}
-			CalculatedStyle space = GetDimensions();
-			space.X += PaddingLeft;
-			space.Y += PaddingTop;
+
 			if (CurrentString.Length == 0 && !Focused)
 			{
-				Utils.DrawBorderString(spriteBatch, _hintText, new Vector2(space.X, space.Y), Color.Gray, 1f, 0f, 0f, -1);
+
+				DrawAlignedText(spriteBatch, _hintText, Color.Gray, false);
 				return;
 			}
-			Utils.DrawBorderString(spriteBatch, displayString, new Vector2(space.X, space.Y), Color.White, 1f, 0f, 0f, -1);
+			DrawAlignedText(spriteBatch, CurrentString, Color.White, Focused && _textBlinkerState == 1);
 		}
-		internal bool Focused;
 
-		public string CurrentString { get; private set; } = "";
+		void DrawAlignedText(SpriteBatch spriteBatch, string text, Color color, bool blinker)
+		{
+			CalculatedStyle space = GetDimensions();
 
-		private readonly string _hintText;
-		private int _textBlinkerCount;
-		private int _textBlinkerState;
+			space.X += PaddingLeft;
+			space.Y += PaddingTop;
 
+			DynamicSpriteFont font = FontAssets.MouseText.Value;
+			Vector2 size = font.MeasureString(text);
+
+			if (size.Y <= 0)
+				size.Y = font.LineSpacing;
+
+			Vector2 pos = space.Position();
+			pos.X += TextHAlign.GetValue(space.Width - size.X);
+			pos.Y += TextHAlign.GetValue(space.Height - size.Y);
+
+			ChatManager.DrawColorCodedStringWithShadow(spriteBatch, font, text, pos, color, 0f, Vector2.Zero, Vector2.One);
+
+			if (blinker)
+			{
+				pos.X += size.X;
+				ChatManager.DrawColorCodedStringWithShadow(spriteBatch, font, "|", pos, color, 0f, Vector2.Zero, Vector2.One);
+			}
+
+			
+		}
 	}
+
+	
 }

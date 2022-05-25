@@ -19,8 +19,7 @@ namespace TerraIntegration.Variables
 
         public override Type VariableReturnType => Value.GetType();
 
-        public override SpriteSheet SpriteSheet => BasicSheet;
-        public override Point SpritesheetPos => new(2, 0);
+        public override SpriteSheetPos SpriteSheetPos => new(BasicSheet, 2, 0);
 
         public Constant() { }
 

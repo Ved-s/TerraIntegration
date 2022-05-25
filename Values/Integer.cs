@@ -20,8 +20,7 @@ namespace TerraIntegration.Values
 
         public override Color TypeColor => Color.Orange;
 
-        public override SpriteSheet SpriteSheet => BasicSheet;
-        public override Point SpritesheetPos => new(0, 0);
+        public override SpriteSheetPos SpriteSheetPos => new(BasicSheet, 0, 0);
 
         public int Value { get; set; }
 

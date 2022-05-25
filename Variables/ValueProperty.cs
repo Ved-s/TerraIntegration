@@ -56,7 +56,7 @@ namespace TerraIntegration.Variables
 
             if (!ValueType.IsAssignableFrom(val.GetType()))
             {
-                errors.Add(new(ErrorType.ExpectedValue, VariableValue.TypeToName(ValueType, out _)));
+                errors.Add(new(ErrorType.ExpectedValue, VariableValue.TypeToName(ValueType, false)));
                 return null;
             }
 

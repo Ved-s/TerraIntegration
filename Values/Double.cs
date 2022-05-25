@@ -21,8 +21,7 @@ namespace TerraIntegration.Values
         public override string Type => "double";
         public override string TypeDisplay => "Double";
 
-        public override SpriteSheet SpriteSheet => BasicSheet;
-        public override Point SpritesheetPos => new(0, 1);
+        public override SpriteSheetPos SpriteSheetPos => new(BasicSheet, 0, 1);
 
         public override Color TypeColor => Color.Lime;
 

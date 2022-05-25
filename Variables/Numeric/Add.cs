@@ -9,7 +9,7 @@ using TerraIntegration.Values;
 using Terraria.GameContent.UI.Elements;
 using Terraria.ModLoader;
 
-namespace TerraIntegration.Variables
+namespace TerraIntegration.Variables.Numeric
 {
     public class Add : Variable, IOwnProgrammerInterface
     {
@@ -19,8 +19,7 @@ namespace TerraIntegration.Variables
         public Guid First { get; set; }
         public Guid Second { get; set; }
 
-        public override SpriteSheet SpriteSheet => MathSheet;
-        public override Point SpritesheetPos => new(0, 0);
+        public override SpriteSheetPos SpriteSheetPos => new(MathSheet, 0, 0);
 
         public UIPanel Interface { get; set; }
         public UIVariableSlot SlotA, SlotB;
@@ -66,7 +65,7 @@ namespace TerraIntegration.Variables
                 }
             if (!anyMatch)
             {
-                IEnumerable<string> strings = addable.ValidAddTypes.Select(t => VariableValue.TypeToName(t, out _));
+                IEnumerable<string> strings = addable.ValidAddTypes.Select(t => VariableValue.TypeToName(t, false));
                 errors.Add(new(ErrorType.ExpectedValuesWithId, string.Join(", ", strings), World.Guids.GetShortGuid(Id)));
                 return null;
             }
@@ -128,7 +127,7 @@ namespace TerraIntegration.Variables
 
                 DisplayOnly = true,
                 VariableValidator = (var) => typeof(IAddable).IsAssignableFrom(var.VariableReturnType),
-                HoverText = VariableValue.TypeToColorTagName(typeof(IAddable)),
+                HoverText = VariableValue.TypeToName(typeof(IAddable), true),
 
                 VariableChanged = (var) =>
                 {
@@ -137,7 +136,7 @@ namespace TerraIntegration.Variables
                     && val is IAddable addable)
                     {
                         ValidAddTypes = addable.ValidAddTypes;
-                        SlotB.HoverText = string.Join(", ", ValidAddTypes.Select(VariableValue.TypeToColorTagName));
+                        SlotB.HoverText = string.Join(", ", ValidAddTypes.Select(t => VariableValue.TypeToName(t, true)));
                     }
                     else
                     {

@@ -15,7 +15,7 @@ namespace TerraIntegration.ComponentProperties.Display
         public override string TypeDisplay => "Display area";
         public override string PropertyName => "area";
 
-        public override Point SpritesheetPos => new(1, 0);
+        public override SpriteSheetPos SpriteSheetPos => new(1, 0);
 
         public override Type VariableReturnType => typeof(Integer);
 

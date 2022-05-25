@@ -18,8 +18,7 @@ namespace TerraIntegration.ValueProperties
 
         public override Type VariableReturnType => typeof(Values.String);
 
-        public override SpriteSheet SpriteSheet => StringSheet;
-        public override Point SpritesheetPos => new(0, 0);
+        public override SpriteSheetPos SpriteSheetPos => new(StringSheet, 0, 0);
 
         public override bool AppliesTo(VariableValue value) => value is not Values.String;
 

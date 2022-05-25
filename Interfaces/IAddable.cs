@@ -7,7 +7,7 @@ using TerraIntegration.Values;
 
 namespace TerraIntegration.Interfaces
 {
-    public interface IAddable
+    public interface IAddable : IValueInterface
     {
         public Type[] ValidAddTypes { get; }
         public VariableValue Add(VariableValue value, List<Error> errors);

@@ -11,6 +11,12 @@ namespace TerraIntegration.UI
     {
         UIPanel Interface { get; set; }
 
+        public void SetupInterfaceIfNeeded() 
+        {
+            if (Interface is null)
+                SetupInterface();
+        }
+
         void SetupInterface();
 
         void WriteVariable(Items.Variable var);

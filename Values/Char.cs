@@ -22,8 +22,7 @@ namespace TerraIntegration.Values
 
         public override Color TypeColor => Color.LightPink;
 
-        public override SpriteSheet SpriteSheet => BasicSheet;
-        public override Point SpritesheetPos => new(3, 0);
+        public override SpriteSheetPos SpriteSheetPos => new(BasicSheet, 3, 0);
 
         public char Value { get; set; }
         public UIPanel Interface { get; set; }
@@ -90,7 +89,8 @@ namespace TerraIntegration.Values
                 Width = new(40, 0),
                 Height = new(25, 0),
 
-                PaddingLeft = 15,
+                TextHAlign = new(0, .5f),
+                PaddingLeft = 0,
 
                 ModifyTextInput = (@new, old) =>
                 {

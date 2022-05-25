@@ -16,8 +16,7 @@ namespace TerraIntegration.ValueProperties.Numeric
         public override string PropertyName => "inc";
         public override string PropertyDisplay => "Increment";
 
-        public override SpriteSheet SpriteSheet => MathSheet;
-        public override Point SpritesheetPos => new(1, 0);
+        public override SpriteSheetPos SpriteSheetPos => new(MathSheet, 1, 0);
 
         public override ValueProperty CreateVariable(Variable var)
         {

@@ -16,9 +16,12 @@ namespace TerraIntegration
     {
         public static Dictionary<string, Texture2D> AssetCache = new();
 
+        public static Dictionary<Type, SpriteSheetPos> TypeSpritesheetOverrides = new();
+
         public static void Unload() 
         {
             AssetCache.Clear();
+            TypeSpritesheetOverrides.Clear();
         }
 
         public static Texture2D GetAsset(string path) 
@@ -53,42 +56,76 @@ namespace TerraIntegration
             Rectangle frame = default;
             Texture2D texture = null;
 
-            if (returnType is not null && Values.VariableValue.ByType.TryGetValue(returnType, out var val))
+            Queue<Type> drawTypes = new();
+            drawTypes.Enqueue(returnType);
+
+            while (drawTypes.Count > 0)
             {
-                if (val.SpriteSheet is not null)
+                Type drawType = drawTypes.Dequeue();
+
+                if (drawType.IsGenericType)
                 {
-                    texture = GetAsset(val.SpriteSheet.Texture);
-                    frame = new(
-                        val.SpritesheetPos.X * val.SpriteSheet.SpriteSize.X,
-                        val.SpritesheetPos.Y * val.SpriteSheet.SpriteSize.Y,
-                        val.SpriteSheet.SpriteSize.X,
-                        val.SpriteSheet.SpriteSize.Y);
+                    foreach (Type subtype in drawType.GetGenericArguments())
+                        drawTypes.Enqueue(subtype);
+                    drawType = drawType.GetGenericTypeDefinition();
                 }
-                else if (val.Texture is not null) 
+
+                SpriteSheetPos spriteSheetPos = default;
+                string drawTexture = null;
+
+                bool hasPos = false;
+
+                if (TypeSpritesheetOverrides.TryGetValue(drawType, out SpriteSheetPos ssp))
+                    spriteSheetPos = ssp;
+
+                else if (drawType is not null && Values.VariableValue.ByType.TryGetValue(drawType, out var val))
                 {
-                    texture = GetAsset(val.Texture);
+                    spriteSheetPos = val.SpriteSheetPos;
+                    if (spriteSheetPos.SpriteSheet is null)
+                        spriteSheetPos.SpriteSheet = val.DefaultSpriteSheet;
+                    drawTexture = val.Texture;
+                    hasPos = true;
+                }
+
+                if (hasPos)
+                {
+                    SpriteSheet ss = spriteSheetPos.SpriteSheet;
+                    if (ss is not null)
+                    {
+                        texture = GetAsset(ss.Texture);
+                        frame = new(
+                            spriteSheetPos.X * ss.SpriteSize.X,
+                            spriteSheetPos.Y * ss.SpriteSize.Y,
+                            ss.SpriteSize.X,
+                            ss.SpriteSize.Y);
+                    }
+                    else if (drawTexture is not null)
+                    {
+                        texture = GetAsset(drawTexture);
+                        if (texture is not null)
+                            frame = new(0, 0, texture.Width, texture.Height);
+                    }
+
                     if (texture is not null)
-                        frame = new(0, 0, texture.Width, texture.Height);
-                }
+                    {
+                        Vector2 scale = size / frame.Size();
 
-                if (texture is not null)
-                {
-                    Vector2 scale = size / frame.Size();
-
-                    spriteBatch.Draw(texture, pos, frame, color, rotation, origin, scale, SpriteEffects.None, 0);
+                        spriteBatch.Draw(texture, pos, frame, color, rotation, origin, scale, SpriteEffects.None, 0);
+                    }
                 }
             }
 
             if (type is not null && Variables.Variable.ByTypeName.TryGetValue(type, out var var))
             {
-                if (var.SpriteSheet is not null)
+                SpriteSheet ss = var.SpriteSheetPos.SpriteSheet ?? var.DefaultSpriteSheet;
+                if (ss is not null)
                 {
-                    texture = GetAsset(var.SpriteSheet.Texture);
+                    texture = GetAsset(ss.Texture);
                     frame = new(
-                        var.SpritesheetPos.X * var.SpriteSheet.SpriteSize.X,
-                        var.SpritesheetPos.Y * var.SpriteSheet.SpriteSize.Y,
-                        var.SpriteSheet.SpriteSize.X,
-                        var.SpriteSheet.SpriteSize.Y);
+                        var.SpriteSheetPos.X * ss.SpriteSize.X,
+                        var.SpriteSheetPos.Y * ss.SpriteSize.Y,
+                        ss.SpriteSize.X,
+                        ss.SpriteSize.Y);
                 }
                 else if (var.Texture is not null)
                 {
