@@ -4,6 +4,7 @@ using ReLogic.Graphics;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using TerraIntegration.DisplayedValues;
 using TerraIntegration.UI;
 using TerraIntegration.Values;
 using TerraIntegration.Variables;
@@ -49,11 +50,10 @@ namespace TerraIntegration.Components
 
     public class MasterDisplayData
     {
-        public string Errors;
-        public VariableValue DisplayValue;
+        public DisplayedValue DisplayValue;
 
         public string SentErrors;
-        public VariableValue SentDisplayValue;
+        public DisplayedValue SentDisplayValue;
     }
 
     public class Display : Component<DisplayData>
@@ -118,7 +118,7 @@ namespace TerraIntegration.Components
 
             data = GetData(data.MasterPos);
 
-            DisplayDraw(pos, data, screenRect, spriteBatch);
+            DisplayDraw(data, screenRect, spriteBatch);
         }
 
         public override void OnPlaced(Point16 pos)
@@ -143,7 +143,6 @@ namespace TerraIntegration.Components
             if (!data.HasVariable(DisplayVariableSlot))
             {
                 data.Master.DisplayValue = null;
-                data.Master.Errors = null;
                 SyncNull(pos, data.Master);
                 return;
             }
@@ -152,23 +151,19 @@ namespace TerraIntegration.Components
             if (Main.netMode != NetmodeID.MultiplayerClient)
             {
                 Values.VariableValue value = data.GetVariable(DisplayVariableSlot).GetValue(data.System, Errors);
-
                 if (Errors.Count > 0)
                 {
-                    data.Master.Errors = $"Errors:\n{string.Join('\n', Errors)}";
-                    data.Master.DisplayValue = null;
-                    SyncError(pos, data.Master);
+                    data.Master.DisplayValue = new ErrorDisplay(Errors.ToArray());
+                    SyncValue(pos, data.Master);
                     return;
                 }
                 if (value is null)
                 {
                     data.Master.DisplayValue = null;
-                    data.Master.Errors = null;
                     SyncNull(pos, data.Master);
                     return;
                 }
-                data.Master.Errors = null;
-                data.Master.DisplayValue = value;
+                data.Master.DisplayValue = value.Display();
                 SyncValue(pos, data.Master);
             }
         }
@@ -233,20 +228,12 @@ namespace TerraIntegration.Components
 
                 case MessageType.DisplayNull:
                     if (data.Master is null) break;
-                    data.Master.Errors = null;
-                    data.Master.DisplayValue = null;
-                    return true;
-
-                case MessageType.DisplayError:
-                    if (data.Master is null) break;
-                    data.Master.Errors = reader.ReadString();
                     data.Master.DisplayValue = null;
                     return true;
 
                 case MessageType.DisplayValue:
                     if (data.Master is null) break;
-                    data.Master.Errors = null;
-                    data.Master.DisplayValue = VariableValue.LoadData(reader);
+                    data.Master.DisplayValue = DisplayedValue.ReceiveData(reader);
                     return true;
             }
             return false;
@@ -267,20 +254,6 @@ namespace TerraIntegration.Components
             data.SentErrors = null;
             data.SentDisplayValue = null;
         }
-        public void SyncError(Point16 pos, MasterDisplayData data, bool changedOnly = true)
-        {
-            if (Main.netMode == NetmodeID.SinglePlayer) return;
-
-            if (changedOnly)
-                if (data.Errors == data.SentErrors)
-                    return;
-
-            ModPacket p = CreatePacket(pos, (ushort)MessageType.DisplayError);
-            p.Write(data.Errors);
-            p.Send();
-
-            data.SentErrors = data.Errors;
-        }
         public void SyncValue(Point16 pos, MasterDisplayData data, bool changedOnly = true)
         {
             if (Main.netMode == NetmodeID.SinglePlayer) return;
@@ -294,7 +267,7 @@ namespace TerraIntegration.Components
             if (data.DisplayValue is null)
                 p.Write("");
             else
-                data.DisplayValue.SaveData(p);
+                data.DisplayValue.SendData(p);
             p.Send();
             data.SentDisplayValue = data.DisplayValue;
         }
@@ -308,23 +281,11 @@ namespace TerraIntegration.Components
 
             data = GetData(data.MasterPos);
 
-            if (data.Master?.DisplayValue is null && data.Master.Errors is null)
+            if (data.Master?.DisplayValue is null)
                 return null;
 
 
-            string text = data.Master.Errors ?? data.Master.DisplayValue.Display();
-            Color color = data.Master.Errors is null ? data.Master.DisplayValue.TypeColor : Color.OrangeRed;
-
-            if (Main.keyState.PressingShift())
-                return Util.ColorTag(color, text);
-
-            Vector2 textSize = FontAssets.MouseText.Value.MeasureString(text);
-            Vector2 displaySize = data.DisplaySize.ToVector2() * 16 - new Vector2(4);
-
-            if (textSize.X > displaySize.X || textSize.Y > displaySize.Y)
-                return Util.ColorTag(color, text);
-
-            return null;
+            return data.Master.DisplayValue.HoverText;
         }
         public override bool ShouldSaveData(DisplayData data) => data.Master is not null;
         public override UIPanel SetupInterface()
@@ -544,33 +505,12 @@ namespace TerraIntegration.Components
             return new(width, height);
         }
 
-        public void DisplayDraw(Point16 pos, DisplayData data, Rectangle screenRect, SpriteBatch spriteBatch)
+        public void DisplayDraw(DisplayData data, Rectangle screenRect, SpriteBatch spriteBatch)
         {
-            if (data.Master is null || data.Master.DisplayValue is null && data.Master.Errors is null)
+            if (data.Master is null || data.Master.DisplayValue is null)
                 return;
 
-            if (data.Master.Errors is null)
-                DrawTextCentered(spriteBatch, data.Master.DisplayValue.Display(), screenRect, data.Master.DisplayValue.TypeColor);
-            else
-                DrawTextCentered(spriteBatch, data.Master.Errors, screenRect, Color.OrangeRed);
-        }
-        public void DrawTextCentered(SpriteBatch batch, string text, Rectangle rect, Color color)
-        {
-            Vector2 size = FontAssets.MouseText.Value.MeasureString(text);
-
-            size.Y *= 0.8f;
-
-            float zoomH = rect.Width / size.X;
-            float zoomV = rect.Height / size.Y;
-
-            float zoom = Math.Min(zoomH, zoomV);
-
-            if (zoom < 1) size *= zoom;
-            else zoom = 1f;
-
-            Vector2 pos = rect.Location.ToVector2() + (rect.Size() / 2 - size / 2);
-
-            batch.DrawString(FontAssets.MouseText.Value, text, pos, color, 0f, Vector2.Zero, zoom, SpriteEffects.None, 0);
+           data.Master.DisplayValue.Draw(screenRect, spriteBatch);
         }
 
         record struct DisplayBoundaryData(Point16 Master, Point16 Size);
@@ -578,7 +518,6 @@ namespace TerraIntegration.Components
         {
             DisplayBoundaries,
             DisplayNull,
-            DisplayError,
             DisplayValue
         }
     }

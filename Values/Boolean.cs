@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TerraIntegration.DisplayedValues;
 using TerraIntegration.Interfaces;
 using TerraIntegration.Items;
 using TerraIntegration.UI;
@@ -37,10 +38,7 @@ namespace TerraIntegration.Values
         private static HashSet<string> TrueValues = new() { "true", "1", "yes", "t" };
         private static HashSet<string> FalseValues = new() { "false", "0", "no", "f" };
 
-        public override string Display()
-        {
-            return Value.ToString();
-        }
+        public override DisplayedValue Display() => new ColorTextDisplay(Value.ToString(), TypeColor);
 
         protected override VariableValue LoadCustomData(BinaryReader reader)
         {

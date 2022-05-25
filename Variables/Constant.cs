@@ -71,7 +71,12 @@ namespace TerraIntegration.Variables
         public override void ModifyTooltips(List<TooltipLine> tooltips)
         {
             if (Value is not null)
-                tooltips.Add(new(Mod, "TIConstantValue", $"[c/aaaa00:Value:] {Util.ColorTag(Value.TypeColor, Value.Display())}"));
+            {
+                string text = Value.Display().HoverText;
+
+                if (text is not null)
+                    tooltips.Add(new(Mod, "TIConstantValue", $"[c/aaaa00:Value:] {text}"));
+            }
         }
     }
 }

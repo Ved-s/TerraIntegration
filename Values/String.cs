@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TerraIntegration.DisplayedValues;
 using TerraIntegration.Interfaces;
 using TerraIntegration.Items;
 using TerraIntegration.UI;
@@ -35,10 +36,7 @@ namespace TerraIntegration.Values
         public String() { }
         public String(string value) { Value = value; }
 
-        public override string Display()
-        {
-            return Value;
-        }
+        public override DisplayedValue Display() => new ColorTextDisplay(Value, TypeColor);
 
         protected override VariableValue LoadCustomData(BinaryReader reader)
         {

@@ -7,6 +7,7 @@ using System.Linq;
 using System.Reflection;
 using TerraIntegration.ComponentProperties;
 using TerraIntegration.Components;
+using TerraIntegration.DisplayedValues;
 using TerraIntegration.Values;
 using TerraIntegration.Variables;
 using Terraria;
@@ -52,6 +53,10 @@ namespace TerraIntegration
                 else if (t.IsSubclassOf(typeof(VariableValue)))
                 {
                     VariableValue.Register(Activator.CreateInstance(t) as VariableValue);
+                }
+                else if (t.IsSubclassOf(typeof(DisplayedValue)))
+                {
+                    DisplayedValue.Register(Activator.CreateInstance(t) as DisplayedValue);
                 }
             }
         }

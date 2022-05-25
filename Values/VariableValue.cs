@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using TerraIntegration.DisplayedValues;
 using TerraIntegration.Variables;
 using Terraria.ModLoader;
 
@@ -25,7 +26,7 @@ namespace TerraIntegration.Values
 
         public virtual Color TypeColor => Color.White;
 
-        public virtual string Display() { return "null"; }
+        public virtual DisplayedValue Display() { return new ColorTextDisplay("null", Color.White); }
 
         public void SaveData(BinaryWriter writer)
         {
@@ -165,10 +166,7 @@ namespace TerraIntegration.Values
         public override string TypeDisplay => "Unloaded value";
 
         public override Color TypeColor => Color.Red;
-        public override string Display()
-        {
-            return "Unloaded";
-        }
+        public override DisplayedValue Display() => new ColorTextDisplay("Unloaded", TypeColor);
 
         public string ValueType { get; private set; }
         public byte[] Data { get; private set; }

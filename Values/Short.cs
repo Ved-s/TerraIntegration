@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using TerraIntegration.DisplayedValues;
 using TerraIntegration.Interfaces;
 using TerraIntegration.UI;
 using TerraIntegration.Variables;
@@ -37,10 +38,7 @@ namespace TerraIntegration.Values
         public Short() { }
         public Short(short value) { Value = value; }
 
-        public override string Display()
-        {
-            return Value.ToString();
-        }
+        public override DisplayedValue Display() => new ColorTextDisplay(Value.ToString(), TypeColor);
 
         protected override VariableValue LoadCustomData(BinaryReader reader)
         {
