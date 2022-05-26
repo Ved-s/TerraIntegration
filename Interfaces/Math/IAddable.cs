@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using TerraIntegration.Values;
 
-namespace TerraIntegration.Interfaces
+namespace TerraIntegration.Interfaces.Math
 {
     public interface IAddable : IValueInterface
     {

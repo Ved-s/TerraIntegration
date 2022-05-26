@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using TerraIntegration.DisplayedValues;
 using TerraIntegration.Interfaces;
+using TerraIntegration.Interfaces.Math;
 using TerraIntegration.UI;
 using TerraIntegration.Variables;
 using Terraria.GameContent.UI.Elements;

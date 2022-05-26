@@ -78,7 +78,10 @@ namespace TerraIntegration
                 bool hasPos = false;
 
                 if (TypeSpritesheetOverrides.TryGetValue(drawType, out SpriteSheetPos ssp))
+                {
                     spriteSheetPos = ssp;
+                    hasPos = true;
+                }
 
                 else if (drawType is not null && Values.VariableValue.ByType.TryGetValue(drawType, out var val))
                 {

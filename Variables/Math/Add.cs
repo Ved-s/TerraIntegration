@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using TerraIntegration.Interfaces;
+using TerraIntegration.Interfaces.Math;
 using TerraIntegration.UI;
 using TerraIntegration.Values;
 using Terraria.GameContent.UI.Elements;
@@ -24,8 +25,7 @@ namespace TerraIntegration.Variables.Numeric
         {
             OnDraw = (e, sb, style) =>
             {
-                sb.DrawLine(style.Position() + new Vector2(1, -15), (float)Math.PI * 0.5f, 30, Color.White, 4);
-                sb.DrawLine(style.Position() + new Vector2(-16, -2), 0, 30, Color.White, 4);
+                VariableRenderer.DrawVariableOverlay(sb, false, null, Type, style.Position() - new Vector2(16), new(32), Color.White, 0f, Vector2.Zero);
             }
         };
 

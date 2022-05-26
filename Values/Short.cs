@@ -22,8 +22,7 @@ namespace TerraIntegration.Values
 
         public override Color TypeColor => Color.BlueViolet;
 
-        //public override SpriteSheet SpriteSheet => BasicSheet;
-        //public override Point SpritesheetPos => new(2, 0);
+        public override SpriteSheetPos SpriteSheetPos => new(BasicSheet, 3, 1);
 
         public short Value { get; set; }
 

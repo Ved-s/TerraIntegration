@@ -1,17 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
+using TerraIntegration.Interfaces.Math;
 using TerraIntegration.Values;
 using Terraria.ModLoader;
 
 namespace TerraIntegration.Interfaces
 {
-    public interface IDecimal : IAddable, IValueInterface
+    public interface IDecimal : IMathOperable, IValueInterface
     {
         public double DecimalValue { get; }
         public double DecimalMax { get; }
         public double DecimalMin { get; }
 
-        Type[] IAddable.ValidAddTypes => new[] { typeof(INumeric), typeof(IDecimal) };
+        Type[] IMathOperable.ValidMathValueTypes => new[] { typeof(INumeric), typeof(IDecimal) };
 
         public VariableValue GetFromDecimal(double value, List<Error> errors)
         {
@@ -51,5 +52,66 @@ namespace TerraIntegration.Interfaces
             double num = val + DecimalValue;
             return GetFromDecimal(num, errors);
         }
+
+        [NoJIT]
+        VariableValue ISubtractable.Subtract(VariableValue value, List<Error> errors)
+        {
+            double val;
+
+            if (value is INumeric numeric)
+                val = numeric.NumericValue;
+            else if (value is IDecimal @decimal)
+                val = (long)@decimal.DecimalValue;
+            else return null;
+
+            double num = DecimalValue - val;
+            return GetFromDecimal(num, errors);
+        }
+
+        [NoJIT]
+        VariableValue IMultipliable.Multiply(VariableValue value, List<Error> errors)
+        {
+            double val;
+
+            if (value is INumeric numeric)
+                val = numeric.NumericValue;
+            else if (value is IDecimal @decimal)
+                val = (long)@decimal.DecimalValue;
+            else return null;
+
+            double num = DecimalValue * val;
+            return GetFromDecimal(num, errors);
+        }
+
+        [NoJIT]
+        VariableValue IDivisible.Divide(VariableValue value, List<Error> errors)
+        {
+            double val;
+
+            if (value is INumeric numeric)
+                val = numeric.NumericValue;
+            else if (value is IDecimal @decimal)
+                val = (long)@decimal.DecimalValue;
+            else return null;
+
+            double num = DecimalValue / val;
+            return GetFromDecimal(num, errors);
+        }
+
+        [NoJIT]
+        VariableValue IModulable.Modulo(VariableValue value, List<Error> errors)
+        {
+            double val;
+
+            if (value is INumeric numeric)
+                val = numeric.NumericValue;
+            else if (value is IDecimal @decimal)
+                val = (long)@decimal.DecimalValue;
+            else return null;
+
+            double num = DecimalValue % val;
+            return GetFromDecimal(num, errors);
+        }
+
     }
 }

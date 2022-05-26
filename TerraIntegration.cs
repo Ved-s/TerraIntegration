@@ -1,28 +1,20 @@
-using Microsoft.Xna.Framework;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using System.Reflection;
-using TerraIntegration.ComponentProperties;
 using TerraIntegration.Components;
 using TerraIntegration.DisplayedValues;
 using TerraIntegration.Values;
 using TerraIntegration.Variables;
-using Terraria;
-using Terraria.DataStructures;
-using Terraria.IO;
 using Terraria.ModLoader;
-using Terraria.ObjectData;
 
 namespace TerraIntegration
 {
-	public class TerraIntegration : Mod
-	{
-		public static bool DebugMode => Debugger.IsAttached;
+    public class TerraIntegration : Mod
+    {
+        public static bool DebugMode => Debugger.IsAttached;
 
-		public override void Load()
+        public override void Load()
         {
             Unregister();
 
@@ -59,18 +51,21 @@ namespace TerraIntegration
                     DisplayedValue.Register(Activator.CreateInstance(t) as DisplayedValue);
                 }
             }
+
+            VariableRenderer.TypeSpritesheetOverrides[typeof(Interfaces.ICollection)] = new(VariableValue.BasicSheet, 0, 2);
+            VariableRenderer.TypeSpritesheetOverrides[typeof(Interfaces.ICollection<>)] = new(VariableValue.BasicSheet, 0, 2);
         }
         public override void Unload()
         {
-			Unregister();
-			VariableRenderer.Unload();
-		}
+            Unregister();
+            VariableRenderer.Unload();
+        }
 
-		private static void Unregister()
+        private static void Unregister()
         {
             Component.Unregister();
-			Variable.Unregister();
-			VariableValue.Unregister();
+            Variable.Unregister();
+            VariableValue.Unregister();
 
             ComponentSystem.Unregister();
         }
@@ -79,23 +74,23 @@ namespace TerraIntegration
         {
             Networking.HandlePacket(reader, whoAmI);
         }
-	}
+    }
 
-	public record struct PositionedComponent(Point16 Pos, Component Component)
-	{
-		public ComponentData GetData() => ModContent.GetInstance<ComponentWorld>().GetData(Pos, Component);
-		public ComponentData GetDataOrNull() => ModContent.GetInstance<ComponentWorld>().GetDataOrNull(Pos);
+    public record struct PositionedComponent(Point16 Pos, Component Component)
+    {
+        public ComponentData GetData() => ModContent.GetInstance<ComponentWorld>().GetData(Pos, Component);
+        public ComponentData GetDataOrNull() => ModContent.GetInstance<ComponentWorld>().GetDataOrNull(Pos);
 
-		public T GetData<T>() where T : ComponentData, new()
-			=> ModContent.GetInstance<ComponentWorld>().GetData<T>(Pos, Component);
-		public T GetDataOrNull<T>() where T : ComponentData, new()
-			=> ModContent.GetInstance<ComponentWorld>().GetDataOrNull<T>(Pos);
-	}
+        public T GetData<T>() where T : ComponentData, new()
+            => ModContent.GetInstance<ComponentWorld>().GetData<T>(Pos, Component);
+        public T GetDataOrNull<T>() where T : ComponentData, new()
+            => ModContent.GetInstance<ComponentWorld>().GetDataOrNull<T>(Pos);
+    }
 
-	public enum CallSide { Both, Client, Server }
-	public class CallSideAttribute : Attribute 
-	{
-		public CallSide Side { get; set; }
-		public CallSideAttribute(CallSide side) { Side = side; }
-	}
+    public enum CallSide { Both, Client, Server }
+    public class CallSideAttribute : Attribute
+    {
+        public CallSide Side { get; set; }
+        public CallSideAttribute(CallSide side) { Side = side; }
+    }
 }

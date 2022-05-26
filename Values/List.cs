@@ -21,6 +21,8 @@ namespace TerraIntegration.Values
         public override string TypeDisplay => "List";
         public override Color TypeColor => new(120, 120, 120);
 
+        public override SpriteSheetPos SpriteSheetPos => new(BasicSheet, 0, 2);
+
         public Type CollectionType { get; set; } = typeof(VariableValue);
 
         public UIPanel Interface { get; set; }
@@ -227,7 +229,10 @@ namespace TerraIntegration.Values
 
         public override DisplayedValue Display()
         {
-            return new ColorTextDisplay($"[\n {string.Join(",\n ", Values.Select(v => v.Display().HoverText))}\n]", Color.White);
+            return new ColorTextDisplay($"[\n {string.Join(",\n ", Values.Select(v => v.Display().HoverText))}\n]", Color.White)
+            {
+                TextAlign = new(0, .5f)
+            };
         }
 
         class ListEntry

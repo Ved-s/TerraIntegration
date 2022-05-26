@@ -1,5 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using TerraIntegration.Values;
 using TerraIntegration.Variables;
 using Terraria;
@@ -47,7 +49,10 @@ namespace TerraIntegration.UI
         static UIVariableSlot ResultSlot;
 
         static IOwnProgrammerInterface CurrentOwner;
+
         static VariableValue CurrentValue;
+        static Type CurrentType;
+
         static UIFocusInputTextField VariableName;
         static UIPanel SelectedPanel;
         static Color PreviousSelectedColor;
@@ -61,6 +66,11 @@ namespace TerraIntegration.UI
 
         public static void SetupUI()
         {
+            if (InterfaceSize == default)
+            {
+                InterfaceSize = new(Main.screenWidth - 700, Main.screenHeight - 420);
+            }
+
             State.Deactivate();
             State.RemoveAllChildren();
             State.Activate();
@@ -119,6 +129,7 @@ namespace TerraIntegration.UI
             {
                 Width = new(0, 1),
                 Height = new(0, 1),
+                ManualSortMethod = (i) => { }
             });
             Back.Append(VariablesScroll = new()
             {
@@ -175,6 +186,7 @@ namespace TerraIntegration.UI
             {
                 Width = new(0, 1),
                 Height = new(0, 1),
+                ManualSortMethod = (i) => { }
             });
             Back.Append(PropertiesScroll = new()
             {
@@ -428,8 +440,9 @@ namespace TerraIntegration.UI
 
             Select(null);
 
-            foreach (VariableValue v in VariableValue.ByTypeName.Values)
+            foreach (var kvp in VariableValue.ByType)
             {
+                VariableValue v = kvp.Value;
                 if (!v.TypeDisplay.ToLower().Contains(VariablesSearch.CurrentString.ToLower())
                     || (!v.HasProperties() && v is not IOwnProgrammerInterface)) continue;
 
@@ -443,13 +456,56 @@ namespace TerraIntegration.UI
                     MarginRight = 0,
                     MarginBottom = 0,
 
+                    PaddingLeft = 32,
+                    PaddingRight = 0,
+
                     TextColor = v.TypeColor,
                 };
+                panel.Append(new UIDrawing()
+                {
+                    Top = new(-8, 0),
+                    Left = new(-28, 0),
+                    OnDraw = (e, sb, st) => VariableRenderer.DrawVariableOverlay(sb, true, kvp.Key, "const", st.Position(), new(32), Color.White, 0f, Vector2.Zero)
+                });
+
                 panel.OnClick += (ev, el) =>
                 {
                     Select(panel);
                     SoundEngine.PlaySound(SoundID.MenuTick);
                     ValueClicked(v);
+                };
+                VariablesList.Add(panel);
+            }
+
+            foreach (Type t in ValueProperty.ByValueType.Keys)
+            {
+                if (!t.IsInterface || !t.Name.ToLower().Contains(VariablesSearch.CurrentString.ToLower())) continue;
+
+                UITextPanel<string> panel = new UITextPanel<string>(VariableValue.TypeToName(t, true))
+                {
+                    Width = new(0, 1),
+                    Height = new(30, 0),
+
+                    MarginTop = 0,
+                    MarginLeft = 0,
+                    MarginRight = 0,
+                    MarginBottom = 0,
+
+                    PaddingLeft = 32,
+                    PaddingRight = 0,
+                };
+                panel.Append(new UIDrawing()
+                {
+                    Top = new(-8, 0),
+                    Left = new(-28, 0),
+                    OnDraw = (e, sb, st) => VariableRenderer.DrawVariableOverlay(sb, true, t, null, st.Position(), new(32), Color.White, 0f, Vector2.Zero)
+                });
+
+                panel.OnClick += (ev, el) =>
+                {
+                    Select(panel);
+                    SoundEngine.PlaySound(SoundID.MenuTick);
+                    TypeClicked(t);
                 };
                 VariablesList.Add(panel);
             }
@@ -469,7 +525,18 @@ namespace TerraIntegration.UI
                     MarginLeft = 0,
                     MarginRight = 0,
                     MarginBottom = 0,
+
+                    PaddingLeft = 32,
+                    PaddingRight = 0,
                 };
+
+                panel.Append(new UIDrawing()
+                {
+                    Top = new(-8, 0),
+                    Left = new(-28, 0),
+                    OnDraw = (e, sb, st) => VariableRenderer.DrawVariableOverlay(sb, true, v.VariableReturnType, v.Type, st.Position(), new(32), Color.White, 0f, Vector2.Zero)
+                });
+
                 panel.OnClick += (ev, el) =>
                 {
                     Select(panel);
@@ -483,14 +550,19 @@ namespace TerraIntegration.UI
         {
             PropertiesList.Clear();
 
-            if (CurrentValue is not null)
+            if (CurrentValue is not null || CurrentType is not null)
             {
-                Type valueType = CurrentValue.GetType();
+                Type valueType = CurrentValue?.GetType() ?? CurrentType;
 
-                foreach (var (type, prop) in CurrentValue.GetProperties())
+                IEnumerable<(Type, ValueProperty)> props = CurrentValue?.GetProperties() ??
+                    (ValueProperty.ByValueType.TryGetValue(CurrentType, out var properties) ?
+                    properties.Values.Select(p => (valueType, p)) : Array.Empty<(Type, ValueProperty)>());
+
+
+                foreach (var (type, prop) in props)
                 {
                     if (!prop.TypeDisplay.ToLower().Contains(PropertiesSearch.CurrentString.ToLower())
-                        || !prop.AppliesTo(CurrentValue)) continue;
+                        || CurrentValue is not null && !prop.AppliesTo(CurrentValue)) continue;
 
                     UITextPanel<string> panel = new UITextPanel<string>(prop.TypeDisplay)
                     {
@@ -501,7 +573,17 @@ namespace TerraIntegration.UI
                         MarginLeft = 0,
                         MarginRight = 0,
                         MarginBottom = 0,
+
+                        PaddingLeft = 32,
+                        PaddingRight = 0,
                     };
+                    UIDrawing icon = new UIDrawing()
+                    {
+                        Top = new(-8, 0),
+                        Left = new(-28, 0),
+                        OnDraw = (e, sb, st) => VariableRenderer.DrawVariableOverlay(sb, true, prop.VariableReturnType, prop.Type, st.Position(), new(32), Color.White, 0f, Vector2.Zero)
+                    };
+                    panel.Append(icon);
                     panel.OnClick += (ev, el) =>
                     {
                         Select(panel);
@@ -515,10 +597,12 @@ namespace TerraIntegration.UI
 
                         panel.Height = new(45, 0);
                         panel.PaddingTop = 18;
+                        icon.Top.Pixels -= 2;
 
                         panel.Append(new UIText($"from {typeName}", .7f) 
                         {
-                            Top = new(-13, 0)
+                            Top = new(-13, 0),
+                            Left = new(8, 0)
                         });
                     }
 
@@ -530,15 +614,25 @@ namespace TerraIntegration.UI
         static void ValueClicked(VariableValue value)
         {
             CurrentValue = value;
+            CurrentType = null;
             SetInterface(value as IOwnProgrammerInterface);
+            PopulateProperties();
+        }
+        static void TypeClicked(Type type)
+        {
+            CurrentValue = null;
+            CurrentType = type;
+            SetInterface(null);
             PopulateProperties();
         }
         static void VariableClicked(IOwnProgrammerInterface var)
         {
             CurrentValue = null;
+            CurrentType = null;
             SetInterface(var);
             PopulateProperties();
         }
+
         static void PropertyClicked(IOwnProgrammerInterface prop)
         {
             SetInterface(prop);

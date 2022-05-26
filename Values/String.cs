@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using TerraIntegration.DisplayedValues;
 using TerraIntegration.Interfaces;
+using TerraIntegration.Interfaces.Math;
 using TerraIntegration.Items;
 using TerraIntegration.UI;
 using TerraIntegration.Variables;
