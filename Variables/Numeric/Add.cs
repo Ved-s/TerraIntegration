@@ -11,72 +11,36 @@ using Terraria.ModLoader;
 
 namespace TerraIntegration.Variables.Numeric
 {
-    public class Add : Variable, IOwnProgrammerInterface
+    public class Add : DoubleReferenceVariable
     {
         public override string Type => "add";
         public override string TypeDisplay => "Add";
 
-        public Guid First { get; set; }
-        public Guid Second { get; set; }
-
         public override SpriteSheetPos SpriteSheetPos => new(MathSheet, 0, 0);
 
-        public UIPanel Interface { get; set; }
-        public UIVariableSlot SlotA, SlotB;
-        public Type[] ValidAddTypes;
+        public override Type[] LeftSlotValueTypes => new[] { typeof(IAddable) };
+
+        public override UIDrawing CenterDrawing => new UIDrawing()
+        {
+            OnDraw = (e, sb, style) =>
+            {
+                sb.DrawLine(style.Position() + new Vector2(1, -15), (float)Math.PI * 0.5f, 30, Color.White, 4);
+                sb.DrawLine(style.Position() + new Vector2(-16, -2), 0, 30, Color.White, 4);
+            }
+        };
 
         public Add() { }
-        public Add(Guid first, Guid second)
+        public Add(Guid left, Guid right)
         {
-            First = first;
-            Second = second;
+            LeftId = left;
+            RightId = right;
         }
-
-        protected override void SaveCustomData(BinaryWriter writer)
+        public override Type[] GetValidRightSlotTypes(Type leftSlotType)
         {
-            writer.Write(First.ToByteArray());
-            writer.Write(Second.ToByteArray());
+            if (VariableValue.ByType.TryGetValue(leftSlotType, out VariableValue value) && value is IAddable addable)
+                return addable.ValidAddTypes;
+            return null;
         }
-
-        protected override Variable LoadCustomData(BinaryReader reader)
-        {
-            return new Add(new Guid(reader.ReadBytes(16)), new Guid(reader.ReadBytes(16)));
-        }
-
-        public override VariableValue GetValue(ComponentSystem system, List<Error> errors)
-        {
-            VariableValue first = system.GetVariableValue(First, errors);
-            VariableValue second = system.GetVariableValue(Second, errors);
-
-            if (first is null || second is null) return null;
-
-            if (first is not IAddable addable)
-            {
-                errors.Add(new(ErrorType.ExpectedValueWithId, "Addable", World.Guids.GetShortGuid(Id)));
-                return null;
-            }
-            bool anyMatch = false;
-            Type secondType = second.GetType();
-            foreach (Type t in addable.ValidAddTypes)
-                if (secondType.IsAssignableTo(t))
-                {
-                    anyMatch = true;
-                    break;
-                }
-            if (!anyMatch)
-            {
-                IEnumerable<string> strings = addable.ValidAddTypes.Select(t => VariableValue.TypeToName(t, false));
-                errors.Add(new(ErrorType.ExpectedValuesWithId, string.Join(", ", strings), World.Guids.GetShortGuid(Id)));
-                return null;
-            }
-
-            VariableValue result = addable.Add(second, errors);
-
-            if (result is not null)
-                SetReturnTypeCache(result.GetType());
-            return result;
-        }
-
         public override Variable GetFromCommand(CommandCaller caller, List<string> args)
         {
             if (args.Count < 1)
@@ -108,73 +72,21 @@ namespace TerraIntegration.Variables.Numeric
 
             return new Add(first.Value, second.Value);
         }
-
-        public override void ModifyTooltips(List<TooltipLine> tooltips)
+        public override VariableValue GetValue(ComponentSystem system, VariableValue left, VariableValue right, List<Error> errors)
         {
-            if (First != default && Second != default)
-                tooltips.Add(new(Mod, "TIAddIds", $"[c/aaaa00:Referenced IDs:] {World.Guids.GetShortGuid(First)}, {World.Guids.GetShortGuid(Second)}"));
+            IAddable addable = (IAddable)left;
+
+            VariableValue result = addable.Add(right, errors);
+
+            if (result is not null)
+                SetReturnTypeCache(result.GetType());
+            return result;
         }
-
-        public void SetupInterface()
+        public override DoubleReferenceVariable CreateVariable(Variable left, Variable right)
         {
-            Interface.Append(SlotA = new()
+            return new Add()
             {
-                Top = new(-21, .5f),
-                Left = new(-75, .5f),
-
-                DisplayOnly = true,
-                VariableValidator = (var) => typeof(IAddable).IsAssignableFrom(var.VariableReturnType),
-                HoverText = VariableValue.TypeToName(typeof(IAddable), true),
-
-                VariableChanged = (var) =>
-                {
-                    if (var?.Var.VariableReturnType is not null
-                    && VariableValue.ByType.TryGetValue(var.Var.VariableReturnType, out VariableValue val)
-                    && val is IAddable addable)
-                    {
-                        ValidAddTypes = addable.ValidAddTypes;
-                        SlotB.HoverText = string.Join(", ", ValidAddTypes.Select(t => VariableValue.TypeToName(t, true)));
-                    }
-                    else
-                    {
-                        ValidAddTypes = null;
-                        SlotB.HoverText = null;
-                    }
-                }
-            });
-
-            Interface.Append(new UIDrawing()
-            {
-                Top = new(-15, .5f),
-                Left = new(-15, .5f),
-
-                Width = new(30, 0),
-                Height = new(30, 0),
-
-                OnDraw = (e, sb, style) =>
-                {
-                    sb.DrawLine(style.Position() + new Vector2(16, 0), (float)Math.PI * 0.5f, 30, Color.White, 4);
-                    sb.DrawLine(style.Position() + new Vector2(-1, 13), 0, 30, Color.White, 4);
-                }
-            });
-
-            Interface.Append(SlotB = new()
-            {
-                Top = new(-21, .5f),
-                Left = new(30, .5f),
-
-                DisplayOnly = true,
-                VariableValidator = (var) => ValidAddTypes is not null && ValidAddTypes.Any(t => t.IsAssignableFrom(var.VariableReturnType)),
-            });
-        }
-
-        public Variables.Variable WriteVariable()
-        {
-            if (SlotA?.Var is null || SlotB?.Var is null) return null;
-
-            return new Add(SlotA.Var.Var.Id, SlotB.Var.Var.Id)
-            {
-                VariableReturnType = SlotA.Var.Var.VariableReturnType
+                VariableReturnType = left.VariableReturnType
             };
         }
     }
