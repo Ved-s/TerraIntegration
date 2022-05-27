@@ -26,6 +26,7 @@ namespace TerraIntegration.UI
         public UIComponentVariableDefinition()
         {
             Height = new(58, 0);
+            MinWidth = new(200, 0);
 
             TextName = new("unregistered variable")
             {

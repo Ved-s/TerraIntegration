@@ -92,6 +92,8 @@ namespace TerraIntegration
 			if (text is null)
 				return null;
 
+			if (text.Length == 0) return "";
+
 			uint v = color.PackedValue; // AABBGGRR
 
 			v = (v & 0xff0000) >> 16 | (v & 0x00ff00) | (v & 0x0000ff) << 16; // RRGGBB

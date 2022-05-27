@@ -253,7 +253,7 @@ namespace TerraIntegration.Variables
                 BinaryReader reader = new BinaryReader(ms);
                 newVar = var.LoadCustomData(reader);
             }
-            else newVar = (Variable)Activator.CreateInstance(var.GetType());
+            if (newVar is null) newVar = (Variable)Activator.CreateInstance(var.GetType());
 
             World.Guids.AddToDictionary(id);
 

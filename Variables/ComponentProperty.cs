@@ -21,6 +21,7 @@ namespace TerraIntegration.Variables
 
         public abstract string ComponentType { get; }
         public abstract string PropertyName { get; }
+        public abstract string PropertyDisplay { get; }
 
         public override SpriteSheet DefaultSpriteSheet
         {
@@ -57,7 +58,9 @@ namespace TerraIntegration.Variables
                 string result = "";
                 if (ComponentPos != default)
                 {
-                    result = $"[c/aaaa00:Bound to:] {BoundComponent?.Name ?? "Unregistered component"} at {ComponentPos.X}, {ComponentPos.Y}";
+                    Component c = BoundComponent;
+
+                    result = $"[c/aaaa00:Bound to:] {(c is null ? "Unregistered component" : (c.ComponentDisplayName ?? c.Name))} at {ComponentPos.X}, {ComponentPos.Y}";
                 }
 
                 if (!propd.IsNullEmptyOrWhitespace())
@@ -70,6 +73,7 @@ namespace TerraIntegration.Variables
             }
         }
 
+        public override string TypeDisplay => PropertyDisplay;
         public virtual string PropertyDescription => "";
 
         public abstract VariableValue GetProperty(PositionedComponent c, List<Error> errors);
@@ -115,7 +119,6 @@ namespace TerraIntegration.Variables
         protected override Variable LoadCustomTag(object data)
         {
             ComponentProperty pv = (ComponentProperty)Activator.CreateInstance(GetType());
-
 
             if (data is TagCompound tag)
             {
