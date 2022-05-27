@@ -41,9 +41,9 @@ namespace TerraIntegration.Walls
 
         internal static void DelayedDraw()
         {
-            foreach (var (pos, frame) in DelayedDraws) 
+            foreach (var (pos, frame) in DelayedDraws)
             {
-                Vector2 screenpos = Util.WorldToScreen(pos);
+                Vector2 screenpos = pos.ToVector2() * 16 + new Vector2(Main.offScreenRange) - Main.screenPosition;
 
                 Tile t = Main.tile[pos.X, pos.Y];
 

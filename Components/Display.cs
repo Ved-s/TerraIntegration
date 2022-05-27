@@ -105,7 +105,7 @@ namespace TerraIntegration.Components
 
             Rectangle screenRect = new();
 
-            Vector2 screen = Util.WorldToScreen(data.MasterPos);
+            Vector2 screen = data.MasterPos.ToVector2() * 16 + new Vector2(Main.offScreenRange) - Main.screenPosition;
             screenRect.X = (int)screen.X;
             screenRect.Y = (int)screen.Y;
             screenRect.Width = 16 * data.DisplaySize.X;
@@ -513,7 +513,7 @@ namespace TerraIntegration.Components
            data.Master.DisplayValue.Draw(screenRect, spriteBatch);
         }
 
-        record struct DisplayBoundaryData(Point16 Master, Point16 Size);
+        internal record struct DisplayBoundaryData(Point16 Master, Point16 Size);
         enum MessageType : ushort
         {
             DisplayBoundaries,

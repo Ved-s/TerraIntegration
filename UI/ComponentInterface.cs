@@ -399,13 +399,14 @@ namespace TerraIntegration.UI
 
                 Main.spriteBatch.Begin(SpriteSortMode.Deferred, null, null, null, null, null, Main.UIScaleMatrix);
 
-                Vector2 screen = (InterfaceComponent.Pos.ToVector2() * 16) - Main.screenPosition;
+                Vector2 screen = Util.WorldPixelsToScreen(InterfaceComponent.Pos.ToVector2() * 16 + InterfaceComponent.Component.InterfaceOffset);
 
-                screen += InterfaceComponent.Component.InterfaceOffset;
-                screen += InterfaceOffset;
-
-                screen *= Main.GameZoomTarget;
                 screen /= Main.UIScale;
+                screen += InterfaceOffset;
+                
+
+                //screen *= Main.GameZoomTarget;
+                //screen /= Main.UIScale;
 
                 Interface.CurrentState.Top = new(screen.Y, 0);
                 Interface.CurrentState.Left = new(screen.X, 0);

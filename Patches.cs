@@ -31,6 +31,8 @@ namespace TerraIntegration
             Terraria.IO.WorldFile.OnWorldLoad += WorldFile_OnWorldLoad;
         }
 
+        
+
         public void Unload()
         {
             IL.Terraria.Main.DrawItem -= DrawItemTexturePatch;

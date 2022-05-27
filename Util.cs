@@ -121,7 +121,12 @@ namespace TerraIntegration
 
 		public static Vector2 WorldPixelsToScreen(Vector2 worldPos)
 		{
-			return worldPos + new Vector2(Main.offScreenRange) - Main.screenPosition;
+			Vector2 screenHalf = Main.ScreenSize.ToVector2() / 2;
+			Vector2 v = worldPos - Main.screenPosition - screenHalf;
+
+			v *= Main.GameZoomTarget;
+
+			return v + screenHalf;
 		}
 
 		public static Vector2 WorldToScreen(Point worldPos)
