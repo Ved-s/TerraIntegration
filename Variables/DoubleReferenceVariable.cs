@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Xna.Framework;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -19,7 +20,13 @@ namespace TerraIntegration.Variables
         public UIVariableSlot RightSlot { get; set; }
 
         public abstract Type[] LeftSlotValueTypes { get; }
-        public virtual UIDrawing CenterDrawing { get; }
+        public virtual UIDrawing CenterDrawing => new UIDrawing()
+        {
+            OnDraw = (e, sb, style) =>
+            {
+                VariableRenderer.DrawVariableOverlay(sb, false, null, Type, style.Position() - new Vector2(16), new(32), Color.White, 0f, Vector2.Zero);
+            }
+        };
 
         public Guid LeftId { get; set; }
         public Guid RightId { get; set; }

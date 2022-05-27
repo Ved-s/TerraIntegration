@@ -12,6 +12,8 @@ namespace TerraIntegration.Variables
         public override string Type => "iserror";
         public override string TypeDisplay => "Is Error";
 
+        public override SpriteSheetPos SpriteSheetPos => new(BasicSheet, 1, 1);
+
         public override Type VariableReturnType => typeof(Values.Boolean);
 
         List<Error> ErrorTest = new();

@@ -21,14 +21,6 @@ namespace TerraIntegration.Variables.Numeric
 
         public override Type[] LeftSlotValueTypes => new[] { typeof(IMultipliable) };
 
-        public override UIDrawing CenterDrawing => new UIDrawing()
-        {
-            OnDraw = (e, sb, style) =>
-            {
-                VariableRenderer.DrawVariableOverlay(sb, false, null, Type, style.Position() - new Vector2(16), new(32), Color.White, 0f, Vector2.Zero);
-            }
-        };
-
         public Multiply() { }
         public Multiply(Guid left, Guid right)
         {

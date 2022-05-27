@@ -98,21 +98,31 @@ namespace TerraIntegration
             List<string> values = new();
             List<string> variables = new();
 
+            int allValues = 0, allVariables = 0;
+
             foreach (VariableValue val in VariableValue.ByTypeName.Values)
-                if (val.Type != "any" && val.Type != "unloaded" && val.Texture is null && (val.SpriteSheetPos.SpriteSheet ?? val.DefaultSpriteSheet) is null)
-                    values.Add(val.Type);
+                if (val.Type != "any" && val.Type != "unloaded")
+                {
+                    allValues++;
+                    if (val.Texture is null && (val.SpriteSheetPos.SpriteSheet ?? val.DefaultSpriteSheet) is null)
+                        values.Add(val.Type);
+                }
 
             foreach (Variable var in Variable.ByTypeName.Values)
-                if (var.Type != "any" && var.Type != "unloaded" && var.Texture is null && (var.SpriteSheetPos.SpriteSheet ?? var.DefaultSpriteSheet) is null)
-                    variables.Add(var.Type);
+                if (var.Type != "any" && var.Type != "unloaded")
+                {
+                    allVariables++;
+                    if (var.Texture is null && (var.SpriteSheetPos.SpriteSheet ?? var.DefaultSpriteSheet) is null)
+                        variables.Add(var.Type);
+                }
 
             string valstr = values.Count == 0 ?
-                    "All values are textured" :
-                    $"Not textured values:\n    {string.Join(", ", values)}";
+                    $"All values are textured ({allValues})" :
+                    $"Not textured values: ({values.Count} os {allVariables})\n    {string.Join(", ", values)}";
 
             string varstr = variables.Count == 0 ?
-                    "All variables are textured" :
-                    $"Not textured variables:\n    {string.Join(", ", variables)}";
+                    $"All variables are textured ({allVariables})" :
+                    $"Not textured variables: ({variables.Count} of {allVariables})\n    {string.Join(", ", variables)}";
 
             caller.Reply($"{valstr}\n{varstr}");
             

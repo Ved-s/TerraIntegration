@@ -14,6 +14,8 @@ namespace TerraIntegration.ValueProperties.Numeric
         public override Type ConvertFrom => typeof(INumeric);
         public override Type ConvertTo => typeof(Integer);
 
+        public override SpriteSheetPos SpriteSheetPos => new(ConvSheet, 3, 0);
+
         public override bool AppliesTo(VariableValue value) => value is not Integer;
         
         public override VariableValue GetProperty(VariableValue value, List<Error> errors)

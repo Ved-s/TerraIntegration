@@ -10,15 +10,12 @@ using TerraIntegration.Variables;
 
 namespace TerraIntegration.ValueProperties
 {
-    public class ToString : ValueProperty
+    public class ToString : ValueConversion
     {
-        public override Type ValueType => typeof(IToString);
-        public override string PropertyName => "toStr";
-        public override string PropertyDisplay => "To String";
+        public override Type ConvertFrom => typeof(IToString);
+        public override Type ConvertTo => typeof(Values.String);
 
-        public override Type VariableReturnType => typeof(Values.String);
-
-        public override SpriteSheetPos SpriteSheetPos => new(StringSheet, 0, 0);
+        public override SpriteSheetPos SpriteSheetPos => new(ConvSheet, 0, 0);
 
         public override bool AppliesTo(VariableValue value) => value is not Values.String;
 

@@ -15,6 +15,8 @@ namespace TerraIntegration.ValueProperties.Collection
         public override string PropertyName => "first";
         public override string PropertyDisplay => "First";
 
+        public override SpriteSheetPos SpriteSheetPos => new(CollectionSheet, 0, 0);
+
         public override ReferenceVariable CreateVariable(Variable var)
         {
             First result = new();

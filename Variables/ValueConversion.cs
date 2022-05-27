@@ -9,6 +9,8 @@ namespace TerraIntegration.Variables
 {
     public abstract class ValueConversion : ValueProperty
     {
+        internal static SpriteSheet ConvSheet = new("TerraIntegration/Assets/Types/conv", new(32, 32));
+
         public abstract Type ConvertFrom { get; }
         public abstract Type ConvertTo { get; }
 

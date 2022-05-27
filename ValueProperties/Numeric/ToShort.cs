@@ -14,6 +14,8 @@ namespace TerraIntegration.ValueProperties.Numeric
         public override Type ConvertFrom => typeof(INumeric);
         public override Type ConvertTo => typeof(Short);
 
+        public override SpriteSheetPos SpriteSheetPos => new(ConvSheet, 2, 0);
+
         public override bool AppliesTo(VariableValue value) => value is not Short;
         
         public override VariableValue GetProperty(VariableValue value, List<Error> errors)
