@@ -4,6 +4,7 @@ using ReLogic.Graphics;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using TerraIntegration.DataStructures;
 using TerraIntegration.DisplayedValues;
 using TerraIntegration.UI;
 using TerraIntegration.Values;

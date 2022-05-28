@@ -3,17 +3,18 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TerraIntegration.DataStructures;
 
 namespace TerraIntegration.Interfaces.Math
 {
     public interface IMathOperable : IAddable, ISubtractable, IMultipliable, IDivisible, IModulable
     {
-        Type[] ValidMathValueTypes { get; }
+        ValueMatcher ValidMathValueTypes { get; }
 
-        Type[] IAddable.ValidAddTypes => ValidMathValueTypes;
-        Type[] ISubtractable.ValidSubtractTypes => ValidMathValueTypes;
-        Type[] IMultipliable.ValidMultiplyTypes => ValidMathValueTypes;
-        Type[] IDivisible.ValidDivideTypes => ValidMathValueTypes;
-        Type[] IModulable.ValidModuloTypes => ValidMathValueTypes;
+        ValueMatcher IAddable.ValidAddTypes => ValidMathValueTypes;
+        ValueMatcher ISubtractable.ValidSubtractTypes => ValidMathValueTypes;
+        ValueMatcher IMultipliable.ValidMultiplyTypes => ValidMathValueTypes;
+        ValueMatcher IDivisible.ValidDivideTypes => ValidMathValueTypes;
+        ValueMatcher IModulable.ValidModuloTypes => ValidMathValueTypes;
     }
 }

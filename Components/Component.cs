@@ -4,10 +4,10 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using TerraIntegration.ComponentProperties;
+using TerraIntegration.DataStructures;
 using TerraIntegration.UI;
 using TerraIntegration.Variables;
 using Terraria;
-using Terraria.DataStructures;
 using Terraria.GameContent.UI.Elements;
 using Terraria.ID;
 using Terraria.ModLoader;
@@ -88,7 +88,7 @@ namespace TerraIntegration.Components
             TileObjectData.newTile.CoordinateHeights = new[] { 16 };
             TileObjectData.newTile.CoordinateWidth = 16;
             TileObjectData.newTile.CoordinatePadding = 2;
-            TileObjectData.newTile.HookCheckIfCanPlace = new PlacementHook((_, _, _, _, _, _) => 0, -1, 0, true);
+            TileObjectData.newTile.HookCheckIfCanPlace = new((_, _, _, _, _, _) => 0, -1, 0, true);
             TileObjectData.newTile.UsesCustomCanPlace = true;
             //TileObjectData.newTile.HookPostPlaceEveryone = new PlacementHook((x, y, _, _, _, _) => { OnPlaced(new(x, y)); return 0; }, -1, 0, true);
         }
@@ -533,7 +533,7 @@ namespace TerraIntegration.Components
     public class ComponentVariableInfo
     {
         public string[] AcceptVariableTypes { get; set; }
-        public Type[] AcceptVariableReturnTypes { get; set; }
+        public ValueMatcher AcceptVariableReturnTypes { get; set; }
 
         public string VariableName { get; set; }
         public string VariableSlot { get; set; }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TerraIntegration.DataStructures;
 using TerraIntegration.Interfaces;
 using TerraIntegration.Values;
 
@@ -15,11 +16,11 @@ namespace TerraIntegration.Variables
 
         public override SpriteSheetPos SpriteSheetPos => new(BasicSheet, 2, 1);
 
-        public override Type[] LeftSlotValueTypes => new[] { typeof(IEquatable) };
+        public override ValueMatcher LeftSlotValueTypes => ValueMatcher.OfType<IEquatable>();
 
-        public override Type[] GetValidRightSlotTypes(Type leftSlotType)
+        public override ValueMatcher GetValidRightSlotTypes(ReturnValue? leftSlotReturn)
         {
-            return new[] { leftSlotType };
+            return leftSlotReturn.HasValue ? ValueMatcher.OfType(leftSlotReturn.Value.ValueType) : ValueMatcher.MatchNone;
         }
 
         public override VariableValue GetValue(ComponentSystem system, VariableValue left, VariableValue right, List<Error> errors)

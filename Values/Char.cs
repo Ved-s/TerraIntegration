@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TerraIntegration.DataStructures;
 using TerraIntegration.DisplayedValues;
 using TerraIntegration.Interfaces;
 using TerraIntegration.Items;

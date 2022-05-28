@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TerraIntegration.DataStructures;
 using Terraria;
 using Terraria.GameContent;
 using Terraria.ModLoader;
@@ -37,7 +38,50 @@ namespace TerraIntegration
             return tex;
         }
 
-        public static void DrawVariableOverlay(SpriteBatch spriteBatch, bool drawVariable, Type returnType, string type, Vector2 pos, Vector2 size, Color color, float rotation, Vector2 origin)
+        static List<Type> TypeTmp = new();
+
+        public static void DrawVariable(SpriteBatch spriteBatch, Vector2 pos, Vector2 size, Color? color = null, float rotation = 0f, Vector2? origin = null)
+        {
+            TypeTmp.Clear();
+            DrawVariableOverlay(spriteBatch, true, TypeTmp, null, pos, size, color, rotation, origin);
+        }
+
+        public static void DrawVariableOverlay(SpriteBatch spriteBatch, bool drawVariable, string variableType, Vector2 pos, Vector2 size, Color? color = null, float rotation = 0f, Vector2? origin = null)
+        {
+            TypeTmp.Clear();
+            DrawVariableOverlay(spriteBatch, drawVariable, TypeTmp, variableType, pos, size, color, rotation, origin);
+        }
+
+        public static void DrawVariableOverlay(SpriteBatch spriteBatch, bool drawVariable, Type valueType, Vector2 pos, Vector2 size, Color? color = null, float rotation = 0f, Vector2? origin = null)
+        {
+            TypeTmp.Clear();
+            TypeTmp.Add(valueType);
+            DrawVariableOverlay(spriteBatch, drawVariable, TypeTmp, null, pos, size, color, rotation, origin);
+        }
+
+        public static void DrawVariableOverlay(SpriteBatch spriteBatch, bool drawVariable, Type valueType, string variableType, Vector2 pos, Vector2 size, Color? color = null, float rotation = 0f, Vector2? origin = null)
+        {
+            TypeTmp.Clear();
+            TypeTmp.Add(valueType);
+            DrawVariableOverlay(spriteBatch, drawVariable, TypeTmp, variableType, pos, size, color, rotation, origin);
+        }
+
+        public static void DrawVariableOverlay(SpriteBatch spriteBatch, bool drawVariable, ReturnValue? returnValue, string variableType, Vector2 pos, Vector2 size, Color? color = null, float rotation = 0f, Vector2? origin = null)
+        {
+            if (returnValue is null)
+            {
+                DrawVariableOverlay(spriteBatch, drawVariable, null as Type[], variableType, pos, size, color, rotation, origin);
+                return;
+            }
+
+            TypeTmp.Clear();
+            TypeTmp.Add(returnValue.Value.ValueType);
+            TypeTmp.Add(returnValue.Value.SubTypeA);
+            TypeTmp.Add(returnValue.Value.SubTypeB);
+            DrawVariableOverlay(spriteBatch, drawVariable, TypeTmp, variableType, pos, size, color, rotation, origin);
+        }
+
+        public static void DrawVariableOverlay(SpriteBatch spriteBatch, bool drawVariable, IEnumerable<Type> valueTypes, string variableType, Vector2 pos, Vector2 size, Color? color = null, float rotation = 0f, Vector2? origin = null)
         {
             if (Main.dedServ) return;
 
@@ -50,14 +94,16 @@ namespace TerraIntegration
 
                 Vector2 scale = size / variable.Size();
 
-                spriteBatch.Draw(variable.Value, pos, null, color, rotation, origin, scale, SpriteEffects.None, 0);
+                spriteBatch.Draw(variable.Value, pos, null, color ?? Color.White, rotation, origin ?? Vector2.Zero, scale, SpriteEffects.None, 0);
             }
 
             Rectangle frame = default;
             Texture2D texture = null;
 
             Queue<Type> drawTypes = new();
-            drawTypes.Enqueue(returnType);
+            if (valueTypes is not null)
+                foreach (Type type in valueTypes)
+                    drawTypes.Enqueue(type);
 
             while (drawTypes.Count > 0)
             {
@@ -115,12 +161,12 @@ namespace TerraIntegration
                     {
                         Vector2 scale = size / frame.Size();
 
-                        spriteBatch.Draw(texture, pos, frame, color, rotation, origin, scale, SpriteEffects.None, 0);
+                        spriteBatch.Draw(texture, pos, frame, color ?? Color.White, rotation, origin ?? Vector2.Zero, scale, SpriteEffects.None, 0);
                     }
                 }
             }
 
-            if (type is not null && Variables.Variable.ByTypeName.TryGetValue(type, out var var))
+            if (variableType is not null && Variables.Variable.ByTypeName.TryGetValue(variableType, out var var))
             {
                 SpriteSheet ss = var.SpriteSheetPos.SpriteSheet ?? var.DefaultSpriteSheet;
                 if (ss is not null)
@@ -165,7 +211,7 @@ namespace TerraIntegration
                 {
                     Vector2 scale = size / frame.Size();
 
-                    spriteBatch.Draw(texture, pos, frame, color, rotation, origin, scale, SpriteEffects.None, 0);
+                    spriteBatch.Draw(texture, pos, frame, color ?? Color.White, rotation, origin ?? Vector2.Zero, scale, SpriteEffects.None, 0);
                 }
             }
         }

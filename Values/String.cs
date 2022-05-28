@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TerraIntegration.DataStructures;
 using TerraIntegration.DisplayedValues;
 using TerraIntegration.Interfaces;
 using TerraIntegration.Interfaces.Math;
@@ -26,7 +27,7 @@ namespace TerraIntegration.Values
         public override SpriteSheetPos SpriteSheetPos => new(BasicSheet, 2, 1);
 
         public string Value { get; set; }
-        public Type[] ValidAddTypes => new[] { typeof(IToString) };
+        public ValueMatcher ValidAddTypes => ValueMatcher.OfType<IToString>();
 
         public UIPanel Interface { get; set; }
         public Type CollectionType => typeof(Char);

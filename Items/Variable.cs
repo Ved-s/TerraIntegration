@@ -58,7 +58,7 @@ namespace TerraIntegration.Items
 
             if (Var.IsEmpty) return;
 
-            string returns = VariableValue.TypeToName(Var.VariableReturnType, true);
+            string returns = Var.VariableReturnType?.DisplayName(true);
 
             tooltips.Add(new(Mod, "TIVarType", $"[c/aaaa00:Type:] {Var.TypeDisplay}"));
             if (returns is not null)

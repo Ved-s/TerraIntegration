@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using TerraIntegration.Components;
+using TerraIntegration.DataStructures;
 using TerraIntegration.Values;
 using TerraIntegration.Variables;
 using Terraria.ModLoader;

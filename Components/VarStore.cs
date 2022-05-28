@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TerraIntegration.DataStructures;
 using TerraIntegration.UI;
 using Terraria;
 using Terraria.GameContent.UI.Elements;

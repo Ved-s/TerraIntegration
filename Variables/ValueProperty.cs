@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using TerraIntegration.Components;
+using TerraIntegration.DataStructures;
 using TerraIntegration.Values;
 using TerraIntegration.Variables;
 
@@ -45,7 +46,7 @@ namespace TerraIntegration.Variables
         public sealed override string TypeDescription => PropertyDescription;
         public sealed override string TypeDisplay => PropertyDisplay;
 
-        public override Type ReferenceReturnType => ValueType;
+        public override ReturnValue? ReferenceReturnType => VariableValue.ByType.TryGetValue(ValueType, out var value) ? value.GetReturnValue() : null;
 
         public abstract VariableValue GetProperty(VariableValue value, List<Error> errors);
 

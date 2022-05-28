@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TerraIntegration.DataStructures;
 using TerraIntegration.UI;
 using TerraIntegration.Values;
 using Terraria.GameContent.UI.Elements;
@@ -19,21 +20,21 @@ namespace TerraIntegration.Variables
         public UIVariableSlot LeftSlot { get; set; }
         public UIVariableSlot RightSlot { get; set; }
 
-        public abstract Type[] LeftSlotValueTypes { get; }
+        public abstract ValueMatcher LeftSlotValueTypes { get; }
         public virtual UIDrawing CenterDrawing => new UIDrawing()
         {
             OnDraw = (e, sb, style) =>
             {
-                VariableRenderer.DrawVariableOverlay(sb, false, null, Type, style.Position() - new Vector2(16), new(32), Color.White, 0f, Vector2.Zero);
+                VariableRenderer.DrawVariableOverlay(sb, false, Type, style.Position() - new Vector2(16), new(32), Color.White, 0f, Vector2.Zero);
             }
         };
 
         public Guid LeftId { get; set; }
         public Guid RightId { get; set; }
 
-        private Type[] ValidRightTypes;
-        private Dictionary<Type, Type[]> ValidTypesCache = new();
-        private HashSet<(Type, Type)> ValidTypePairs = new();
+        private ValueMatcher ValidRightTypes;
+        private Dictionary<ReturnValue, ValueMatcher> ValidTypesCache = new();
+        private HashSet<(ReturnValue, ReturnValue)> ValidTypePairs = new();
         
         public void SetupInterface()
         {
@@ -43,31 +44,31 @@ namespace TerraIntegration.Variables
                 Left = new(-75, .5f),
 
                 DisplayOnly = true,
-                VariableValidator = (var) => LeftSlotValueTypes is not null && LeftSlotValueTypes.Any(t => t.IsAssignableFrom(var.VariableReturnType)),
-                HoverText = LeftSlotValueTypes is null ? null : string.Join(", ", LeftSlotValueTypes.Select(t => VariableValue.TypeToName(t, true))),
+                VariableValidator = (var) => LeftSlotValueTypes.Match(var.VariableReturnType),
+                HoverText = LeftSlotValueTypes.MatchTypes is null ? null : string.Join(", ", LeftSlotValueTypes.MatchTypes.Select(t => VariableValue.TypeToName(t, true))),
 
                 VariableChanged = (var) =>
                 {
                     if (var?.Var.VariableReturnType is null)
                     {
-                        ValidRightTypes = null;
+                        ValidRightTypes = ValueMatcher.MatchNone;
                         RightSlot.HoverText = null;
                         return;
                     }
 
                     ValidRightTypes = GetValidRightSlotTypes(var.Var.VariableReturnType);
-                    if (ValidRightTypes is null)
+                    if (ValidRightTypes.MatchesNone)
                     {
-                        ValidRightTypes = null;
                         RightSlot.HoverText = null;
                         RightSlot.Var = null;
                         return;
                     }
 
-                    if (RightSlot.Var is not null && !ValidRightTypes.Any(t => t.IsAssignableFrom(RightSlot.Var.Var.VariableReturnType)))
+                    if (RightSlot.Var is not null && !ValidRightTypes.Match(RightSlot.Var.Var.VariableReturnType))
                         RightSlot.Var = null;
 
-                    RightSlot.HoverText = string.Join(", ", ValidRightTypes.Select(t => VariableValue.TypeToName(t, true)));
+                    RightSlot.HoverText = ValidRightTypes.MatchTypes is null ? null :
+                        string.Join(", ", ValidRightTypes.MatchTypes.Select(t => VariableValue.TypeToName(t, true)));
                 }
             });
 
@@ -86,7 +87,7 @@ namespace TerraIntegration.Variables
                 Left = new(30, .5f),
 
                 DisplayOnly = true,
-                VariableValidator = (var) => ValidRightTypes is not null && ValidRightTypes.Any(t => t.IsAssignableFrom(var.VariableReturnType)),
+                VariableValidator = (var) => ValidRightTypes.Match(var.VariableReturnType),
             });
         }
 
@@ -110,31 +111,31 @@ namespace TerraIntegration.Variables
             VariableValue right = system.GetVariableValue(RightId, errors);
 
             if (left is null || right is null) return null;
-            Type leftType = left.GetType();
-            Type rightType = right.GetType();
+            ReturnValue leftType = left.GetReturnValue();
+            ReturnValue rightType = right.GetReturnValue();
 
             if (!ValidTypePairs.Contains((leftType, rightType)))
             {
-                if (LeftSlotValueTypes is not null && !LeftSlotValueTypes.Any(t => t.IsAssignableFrom(leftType)))
+                if (!LeftSlotValueTypes.Match(leftType))
                 {
                     errors.Add(new(
                         ErrorType.ExpectedValuesWithId,
-                        string.Join(", ", LeftSlotValueTypes.Select(t => VariableValue.TypeToName(t, true))),
+                        string.Join(", ", LeftSlotValueTypes.MatchTypes?.Select(t => VariableValue.TypeToName(t, false)) ?? Array.Empty<string>()),
                         World.Guids.GetShortGuid(Id)));
                     return null;
                 }
 
-                if (!ValidTypesCache.TryGetValue(leftType, out Type[] validRightTypes))
+                if (!ValidTypesCache.TryGetValue(leftType, out ValueMatcher validRightTypes))
                 {
                     validRightTypes = GetValidRightSlotTypes(leftType);
                     ValidTypesCache[leftType] = validRightTypes;
                 }
 
-                if (validRightTypes is not null && !validRightTypes.Any(t => t.IsAssignableFrom(rightType)))
+                if (!validRightTypes.Match(rightType))
                 {
                     errors.Add(new(
                         ErrorType.ExpectedValuesWithId,
-                        string.Join(", ", validRightTypes.Select(t => VariableValue.TypeToName(t, true))),
+                        string.Join(", ", validRightTypes.MatchTypes?.Select(t => VariableValue.TypeToName(t, false)) ?? Array.Empty<string>()),
                         World.Guids.GetShortGuid(Id)));
                     return null;
                 }
@@ -165,7 +166,7 @@ namespace TerraIntegration.Variables
         }
 
         public abstract VariableValue GetValue(ComponentSystem system, VariableValue left, VariableValue right, List<Error> errors);
-        public abstract Type[] GetValidRightSlotTypes(Type leftSlotType);
+        public abstract ValueMatcher GetValidRightSlotTypes(ReturnValue? leftSlotReturn);
 
         public virtual DoubleReferenceVariable CreateVariable(Variable left, Variable right) => (DoubleReferenceVariable)Activator.CreateInstance(GetType());
     }

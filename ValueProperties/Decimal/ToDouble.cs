@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using TerraIntegration.DataStructures;
 using TerraIntegration.Interfaces;
 using TerraIntegration.Values;
 using TerraIntegration.Variables;

@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using TerraIntegration.DataStructures;
 using TerraIntegration.Interfaces;
 using TerraIntegration.Interfaces.Math;
 using TerraIntegration.UI;
@@ -19,7 +20,7 @@ namespace TerraIntegration.Variables.Numeric
 
         public override SpriteSheetPos SpriteSheetPos => new(MathSheet, 3, 0);
 
-        public override Type[] LeftSlotValueTypes => new[] { typeof(ISubtractable) };
+        public override ValueMatcher LeftSlotValueTypes => ValueMatcher.OfType<ISubtractable>();
 
         public Subtract() { }
         public Subtract(Guid left, Guid right)
@@ -27,11 +28,11 @@ namespace TerraIntegration.Variables.Numeric
             LeftId = left;
             RightId = right;
         }
-        public override Type[] GetValidRightSlotTypes(Type leftSlotType)
+        public override ValueMatcher GetValidRightSlotTypes(ReturnValue? leftSlotReturn)
         {
-            if (VariableValue.ByType.TryGetValue(leftSlotType, out VariableValue value) && value is ISubtractable subtractable)
-                return subtractable.ValidSubtractTypes;
-            return null;
+            if (!leftSlotReturn.HasValue)
+                return ValueMatcher.MatchNone;
+            return leftSlotReturn.Value.GetInstanceInterface<ISubtractable>()?.ValidSubtractTypes ?? ValueMatcher.MatchNone;
         }
         public override VariableValue GetValue(ComponentSystem system, VariableValue left, VariableValue right, List<Error> errors)
         {
@@ -40,7 +41,7 @@ namespace TerraIntegration.Variables.Numeric
             VariableValue result = subtractable.Subtract(right, errors);
 
             if (result is not null)
-                SetReturnTypeCache(result.GetType());
+                SetReturnTypeCache(ReturnValue.OfType(result.GetType()));
             return result;
         }
         public override DoubleReferenceVariable CreateVariable(Variable left, Variable right)

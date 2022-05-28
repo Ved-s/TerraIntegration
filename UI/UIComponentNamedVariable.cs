@@ -1,10 +1,9 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
+using TerraIntegration.DataStructures;
 using TerraIntegration.Values;
 using TerraIntegration.Variables;
 using Terraria;
@@ -17,7 +16,7 @@ namespace TerraIntegration.UI
     public class UIComponentNamedVariable : UIPanel
     {
         public string[] VariableTypes { get; set; } = null;
-        public Type[] VariableReturnTypes { get; set; } = null;
+        public ValueMatcher VariableReturnTypes { get; set; } = ValueMatcher.MatchNone;
         public string VariableDescription { get; set; }
 
         public Action<Items.Variable> DefineVariable;
@@ -75,13 +74,10 @@ namespace TerraIntegration.UI
                 if (VariableTypes is not null && !VariableTypes.Contains(var.Type))
                     return false;
 
-                if (VariableReturnTypes is not null)
-                {
-                    if (var.VariableReturnType is null)
-                        return false;
-                    if (!VariableReturnTypes.Any(t => var.VariableReturnType.IsAssignableTo(t)))
-                        return false;
-                }
+                if (var.VariableReturnType is null)
+                    return false;
+                if (!VariableReturnTypes.Match(var.VariableReturnType))
+                    return false;
 
                 return true;
             };
@@ -102,11 +98,14 @@ namespace TerraIntegration.UI
             uint change = world.UpdateCounter / 60;
 
             if (VariableTypes is not null)
-                VariableRenderer.DrawVariableOverlay(spriteBatch, true, null, VariableTypes[change % VariableTypes.Length], pos, new(size), Color.White, 0f, Vector2.Zero);
-            else if (VariableReturnTypes is not null)
-                VariableRenderer.DrawVariableOverlay(spriteBatch, true, VariableReturnTypes[change % VariableReturnTypes.Length], null, pos, new(size), Color.White, 0f, Vector2.Zero);
+                VariableRenderer.DrawVariableOverlay(spriteBatch, true, VariableTypes[change % VariableTypes.Length], pos, new(size), Color.White, 0f, Vector2.Zero);
+            else if (VariableReturnTypes.MatchTypes is not null)
+            {
+                Type[] types = VariableReturnTypes.MatchTypes;
+                VariableRenderer.DrawVariableOverlay(spriteBatch, true, types[change % types.Length], pos, new(size), Color.White, 0f, Vector2.Zero);
+            }
             else
-                VariableRenderer.DrawVariableOverlay(spriteBatch, true, null, null, pos, new(size), Color.White, 0f, Vector2.Zero);
+                VariableRenderer.DrawVariable(spriteBatch, pos, new(size), Color.White, 0f, Vector2.Zero);
 
             Rectangle hitbox = new((int)pos.X, (int)pos.Y, (int)size, (int)size);
             if (hitbox.Contains(Main.MouseScreen.ToPoint()))
@@ -127,14 +126,14 @@ namespace TerraIntegration.UI
                         return $"Unregistered ({t})";
                     })));
                 }
-                if (VariableReturnTypes is not null)
+                if (VariableReturnTypes.MatchTypes is not null)
                 {
                     hover.Append("[c/aaaa00:");
                     hover.Append("Returns");
                     hover.Append(":] ");
-                    hover.AppendLine(string.Join(", ", VariableReturnTypes.Select(t => VariableValue.TypeToName(t, true))));
+                    hover.AppendLine(string.Join(", ", VariableReturnTypes.MatchTypes.Select(t => VariableValue.TypeToName(t, true))));
                 }
-                if (VariableReturnTypes is null && VariableTypes is null) hover.AppendLine("Accepts any variable");
+                if (VariableReturnTypes.MatchesNone && VariableTypes is null) hover.AppendLine("Accepts any variable");
 
                 if (!VariableDescription.IsNullEmptyOrWhitespace())
                 {

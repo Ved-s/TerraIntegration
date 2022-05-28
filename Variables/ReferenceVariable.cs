@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using TerraIntegration.DataStructures;
 using TerraIntegration.UI;
 using TerraIntegration.Values;
 using Terraria.GameContent.UI.Elements;
@@ -13,7 +14,7 @@ namespace TerraIntegration.Variables
     public abstract class ReferenceVariable : Variable, IOwnProgrammerInterface
     {
         public Guid VariableId { get; set; }
-        public virtual Type ReferenceReturnType { get; }
+        public virtual ReturnValue? ReferenceReturnType { get; }
 
         public UIPanel Interface { get; set; }
         public UIVariableSlot InterfaceSlot { get; set; }
@@ -28,8 +29,8 @@ namespace TerraIntegration.Variables
             };
             if (ReferenceReturnType is not null)
             {
-                InterfaceSlot.VariableValidator = (var) => ReferenceReturnType?.IsAssignableFrom(var.VariableReturnType) ?? false;
-                InterfaceSlot.HoverText = VariableValue.TypeToName(ReferenceReturnType, true);
+                InterfaceSlot.VariableValidator = (var) => var.VariableReturnType?.CheckBaseType(ReferenceReturnType.Value.ValueType) ?? false;
+                InterfaceSlot.HoverText = ReferenceReturnType.Value.DisplayName(true);
             }
 
             Interface.Append(InterfaceSlot);

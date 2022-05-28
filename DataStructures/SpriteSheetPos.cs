@@ -1,24 +1,5 @@
-﻿using Microsoft.Xna.Framework;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace TerraIntegration
+﻿namespace TerraIntegration.DataStructures
 {
-    public class SpriteSheet
-    {
-        public string Texture;
-        public Point SpriteSize;
-
-        public SpriteSheet(string texture, Point spriteSize)
-        {
-            Texture = texture;
-            SpriteSize = spriteSize;
-        }
-    }
-
     public struct SpriteSheetPos 
     {
         public SpriteSheet SpriteSheet;

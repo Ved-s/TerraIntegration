@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TerraIntegration.DataStructures;
 using TerraIntegration.Interfaces;
 using TerraIntegration.Values;
 using TerraIntegration.Variables;
@@ -15,7 +16,7 @@ namespace TerraIntegration.ValueProperties.Collection
         public override string PropertyName => "len";
         public override string PropertyDisplay => "Length";
 
-        public override Type VariableReturnType => typeof(Integer);
+        public override ReturnValue? VariableReturnType => ReturnValue.OfType<Integer>();
 
         public override SpriteSheetPos SpriteSheetPos => new(BasicSheet, 3, 1);
 

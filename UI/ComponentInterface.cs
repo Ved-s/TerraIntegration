@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using TerraIntegration.ComponentProperties;
 using TerraIntegration.Components;
+using TerraIntegration.DataStructures;
 using TerraIntegration.Variables;
 using Terraria;
 using Terraria.Audio;

@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using System.Collections.Generic;
+using TerraIntegration.DataStructures;
 using Terraria;
 using Terraria.ObjectData;
 

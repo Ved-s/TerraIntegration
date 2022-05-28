@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using TerraIntegration.Components;
+using TerraIntegration.DataStructures;
 using TerraIntegration.Values;
 using TerraIntegration.Variables;
 
@@ -17,7 +18,7 @@ namespace TerraIntegration.ComponentProperties.Display
 
         public override SpriteSheetPos SpriteSheetPos => new(1, 0);
 
-        public override Type VariableReturnType => typeof(Integer);
+        public override ReturnValue? VariableReturnType => ReturnValue.OfType<Integer>();
 
         public override VariableValue GetProperty(Components.Display component, Point16 pos, List<Error> errors)
         {

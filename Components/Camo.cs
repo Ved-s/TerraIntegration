@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
 using System.Collections.Generic;
 using System.IO;
+using TerraIntegration.DataStructures;
 using TerraIntegration.UI;
 using Terraria;
 using Terraria.GameContent;
@@ -92,7 +93,8 @@ namespace TerraIntegration.Components
                 {
                     return item.createTile >= TileID.Dirt
                     || item.ModItem is Items.Variable var
-                    && var.Var.VariableReturnType == typeof(Values.Tile);
+                    && var.Var.VariableReturnType.HasValue
+                    && var.Var.VariableReturnType.Value.CheckType<Values.Tile>();
                 }
             };
             p.Append(Slot);
@@ -129,7 +131,9 @@ namespace TerraIntegration.Components
 
             CamoData data = GetData(pos);
 
-            if (data.CamoTileItem?.ModItem is Items.Variable var && var.Var.VariableReturnType == typeof(Values.Tile))
+            if (data.CamoTileItem?.ModItem is Items.Variable var 
+                && var.Var.VariableReturnType.HasValue
+                && var.Var.VariableReturnType.Value.CheckType<Values.Tile>())
             {
                 Errors.Clear();
                 Values.Tile tile = var.Var.GetValue(data.System, Errors) as Values.Tile;

@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using TerraIntegration.DataStructures;
 using TerraIntegration.Values;
 using Terraria.ModLoader;
 
@@ -18,7 +19,7 @@ namespace TerraIntegration.Variables
 
         public VariableValue Value { get; set; } = new();
 
-        public override Type VariableReturnType => Value.GetType();
+        public override ReturnValue? VariableReturnType => ReturnValue.OfType(Value.GetType());
 
         public override SpriteSheetPos SpriteSheetPos => new(BasicSheet, 2, 0);
 

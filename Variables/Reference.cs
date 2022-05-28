@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TerraIntegration.DataStructures;
 using TerraIntegration.Values;
 using Terraria.ModLoader;
 
@@ -27,7 +28,7 @@ namespace TerraIntegration.Variables
         {
             VariableValue val = system.GetVariableValue(VariableId, errors);
             if (val is not null && errors.Count == 0)
-                SetReturnTypeCache(val.GetType());
+                SetReturnTypeCache(ReturnValue.OfType(val.GetType()));
             return val;
         }
 

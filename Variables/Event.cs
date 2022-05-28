@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using TerraIntegration.Components;
+using TerraIntegration.DataStructures;
 using TerraIntegration.Values;
 
 namespace TerraIntegration.Variables
@@ -14,7 +15,7 @@ namespace TerraIntegration.Variables
         public override string Type => "event";
         public override string TypeDisplay => "Event";
 
-        public override Type VariableReturnType => null;
+        public override ReturnValue? VariableReturnType => null;
 
         public override SpriteSheetPos SpriteSheetPos => new(BasicSheet, 3, 0);
 

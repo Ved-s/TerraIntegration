@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TerraIntegration.DataStructures;
 using TerraIntegration.Values;
 
 namespace TerraIntegration.Variables
@@ -14,7 +15,7 @@ namespace TerraIntegration.Variables
 
         public override SpriteSheetPos SpriteSheetPos => new(BasicSheet, 1, 1);
 
-        public override Type VariableReturnType => typeof(Values.Boolean);
+        public override ReturnValue? VariableReturnType => ReturnValue.OfType<Values.Boolean>();
 
         List<Error> ErrorTest = new();
 

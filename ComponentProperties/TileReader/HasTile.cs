@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TerraIntegration.DataStructures;
 using TerraIntegration.Values;
 using TerraIntegration.Variables;
 using Terraria;
@@ -14,7 +15,7 @@ namespace TerraIntegration.ComponentProperties.TileReader
         public override string PropertyName => "hasTile";
         public override string PropertyDisplay => "Has Tile";
 
-        public override Type VariableReturnType => typeof(Values.Boolean);
+        public override ReturnValue? VariableReturnType => ReturnValue.OfType<Values.Boolean>();
 
         public override VariableValue GetProperty(Components.TileReader component, Point16 pos, List<Error> errors)
         {

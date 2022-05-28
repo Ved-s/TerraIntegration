@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
+using TerraIntegration.DataStructures;
 using TerraIntegration.Interfaces;
 using TerraIntegration.Values;
 using TerraIntegration.Variables;
@@ -17,7 +18,7 @@ namespace TerraIntegration.ComponentProperties.TileReader
 
         public override Type ValueType => typeof(INamed);
 
-        public override Type VariableReturnType => typeof(Values.String);
+        public override ReturnValue? VariableReturnType => ReturnValue.OfType<Values.String>();
 
         public override VariableValue GetProperty(VariableValue value, List<Error> errors)
         {

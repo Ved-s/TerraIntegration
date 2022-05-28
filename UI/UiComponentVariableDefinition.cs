@@ -77,21 +77,7 @@ namespace TerraIntegration.UI
             Rectangle hitbox = new((int)pos.X, (int)pos.Y, (int)size, (int)size);
             if (hitbox.Contains(Main.MouseScreen.ToPoint())) 
             {
-                string returns;
-
-                if (var.VariableReturnType is null) returns = null;
-                else if (Values.VariableValue.ByType.TryGetValue(var.VariableReturnType, out Values.VariableValue val))
-                {
-                    returns = Util.ColorTag(val.TypeColor, val.TypeDisplay);
-                }
-                else if (var.VariableReturnType?.IsInterface ?? false)
-                {
-                    string i = var.VariableReturnType.Name;
-                    if (i.StartsWith('I')) i = i[1..];
-
-                    returns = $"[c/aabb00:{i}]";
-                }
-                else returns = $"[c/ffaaaa:unregistered type ({var.VariableReturnType.Name})]";
+                string returns = var.VariableReturnType?.DisplayName(true);
 
                 ModContent.GetInstance<ComponentWorld>().HoverText =
                     $"[c/aaaa00:Type:] {var.TypeDisplay}" +

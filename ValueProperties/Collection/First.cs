@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TerraIntegration.DataStructures;
 using TerraIntegration.Interfaces;
 using TerraIntegration.Values;
 using TerraIntegration.Variables;
@@ -21,10 +22,10 @@ namespace TerraIntegration.ValueProperties.Collection
         {
             First result = new();
 
-            Type collectionReturn = ICollection.TryGetCollectionType(var);
+            Type collectionReturn = var.VariableReturnType?.SubTypeA;
             if (collectionReturn is not null)
             {
-                result.SetReturnTypeCache(collectionReturn);
+                result.SetReturnTypeCache(ReturnValue.OfType(collectionReturn));
             }
 
             return result;

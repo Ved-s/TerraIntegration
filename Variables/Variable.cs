@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using TerraIntegration.DataStructures;
 using TerraIntegration.Interfaces;
 using TerraIntegration.Values;
 using Terraria.ModLoader;
@@ -36,17 +37,17 @@ namespace TerraIntegration.Variables
 
         public virtual string TypeDescription => null;
 
-        public virtual Type VariableReturnType
+        public virtual ReturnValue? VariableReturnType
         {
             get
             {
-                return GetReturnTypeCache() ?? typeof(VariableValue);
+                return GetReturnTypeCache();
             }
             set => SetReturnTypeCache(value);
         }
 
         public string ReturnTypeCacheName;
-        public Type ReturnTypeCacheType;
+        public ReturnValue? ReturnTypeCacheType;
 
         public Variable()
         {
@@ -284,20 +285,20 @@ namespace TerraIntegration.Variables
         }
         public virtual Variable CloneCustom() => (Variable)MemberwiseClone();
 
-        public void SetReturnTypeCache(Type t)
+        public void SetReturnTypeCache(ReturnValue? ret)
         {
-            if (t is null)
+            if (ret is null)
             {
                 ReturnTypeCacheType = null;
                 ReturnTypeCacheName = null;
             }
             else
             {
-                ReturnTypeCacheType = t;
-                ReturnTypeCacheName = VariableValue.TypeToString(t);
+                ReturnTypeCacheType = ret;
+                ReturnTypeCacheName = ret.ToString();
             }
         }
-        public Type GetReturnTypeCache()
+        public ReturnValue? GetReturnTypeCache()
         {
             if (ReturnTypeCacheName is null && ReturnTypeCacheType is null)
                 return null;
@@ -305,7 +306,7 @@ namespace TerraIntegration.Variables
             if (ReturnTypeCacheType is not null)
                 return ReturnTypeCacheType;
 
-            ReturnTypeCacheType = VariableValue.StringToType(ReturnTypeCacheName);
+            ReturnTypeCacheType = ReturnValue.Parse(ReturnTypeCacheName);
             return ReturnTypeCacheType;
         }
 
@@ -345,8 +346,8 @@ namespace TerraIntegration.Variables
         public TValueInterface TryGetReturnTypeInterface<TValueInterface>() where TValueInterface : class, IValueInterface
         {
             if (VariableReturnType is not null
-                && VariableReturnType.IsAssignableTo(typeof(TValueInterface))
-                && VariableValue.ByType.TryGetValue(VariableReturnType, out VariableValue value))
+                && VariableReturnType.Value.CheckInterface<TValueInterface>()
+                && VariableValue.ByType.TryGetValue(VariableReturnType.Value.ValueType, out VariableValue value))
                 return value as TValueInterface;
 
             return null;
@@ -354,7 +355,7 @@ namespace TerraIntegration.Variables
         public TValue TryGetReturnType<TValue>() where TValue : VariableValue
         {
             if (VariableReturnType is not null
-                && VariableReturnType == typeof(TValue)
+                && VariableReturnType.Value.CheckType<TValue>()
                 && VariableValue.ByType.TryGetValue(typeof(TValue), out VariableValue value))
                 return (TValue)value;
 
@@ -369,7 +370,7 @@ namespace TerraIntegration.Variables
 
         public override SpriteSheetPos SpriteSheetPos => new(BasicSheet, 0, 0);
 
-        public override Type VariableReturnType => typeof(UnloadedVariableValue);
+        public override ReturnValue? VariableReturnType => ReturnValue.OfType<UnloadedVariableValue>();
 
         public string UnloadedTypeName { get; private set; }
         public byte[] UnloadedData { get; private set; }

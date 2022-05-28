@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TerraIntegration.DataStructures;
 using TerraIntegration.Values;
 using Terraria.ModLoader;
 
@@ -15,7 +16,7 @@ namespace TerraIntegration.Variables
         public override string Type => "eventsub";
         public override string TypeDisplay => "Event Subscriber";
 
-        public override Type VariableReturnType => typeof(Values.Boolean);
+        public override ReturnValue? VariableReturnType => ReturnValue.OfType<Values.Boolean>();
 
         public override SpriteSheetPos SpriteSheetPos => new(BasicSheet, 0, 1);
 

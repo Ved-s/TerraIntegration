@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TerraIntegration.DataStructures;
 using TerraIntegration.Interfaces.Math;
 using TerraIntegration.Values;
 using Terraria.ModLoader;
@@ -15,7 +16,7 @@ namespace TerraIntegration.Interfaces
         public long NumericMax { get; }
         public long NumericMin { get; }
 
-        Type[] IMathOperable.ValidMathValueTypes => new[] { typeof(INumeric), typeof(IDecimal) };
+        ValueMatcher IMathOperable.ValidMathValueTypes => ValueMatcher.OfTypes<INumeric, IDecimal>();
 
         public VariableValue GetFromNumeric(long value, List<Error> errors) 
         {

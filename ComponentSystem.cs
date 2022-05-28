@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using TerraIntegration.Components;
+using TerraIntegration.DataStructures;
 using TerraIntegration.Values;
 using TerraIntegration.Variables;
 using Terraria;

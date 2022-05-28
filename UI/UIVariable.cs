@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using TerraIntegration.DataStructures;
 using TerraIntegration.Variables;
 using Terraria;
 using Terraria.ModLoader;

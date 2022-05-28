@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using TerraIntegration.DataStructures;
 using TerraIntegration.Interfaces.Math;
 using TerraIntegration.Values;
 using Terraria.ModLoader;
@@ -12,7 +13,7 @@ namespace TerraIntegration.Interfaces
         public double DecimalMax { get; }
         public double DecimalMin { get; }
 
-        Type[] IMathOperable.ValidMathValueTypes => new[] { typeof(INumeric), typeof(IDecimal) };
+        ValueMatcher IMathOperable.ValidMathValueTypes => ValueMatcher.OfTypes<INumeric, IDecimal>();
 
         public VariableValue GetFromDecimal(double value, List<Error> errors)
         {

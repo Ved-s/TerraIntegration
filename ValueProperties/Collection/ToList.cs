@@ -1,39 +1,39 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using TerraIntegration.Interfaces;
-using TerraIntegration.Values;
-using TerraIntegration.Variables;
-using Terraria.ModLoader;
+﻿//using System;
+//using System.Collections.Generic;
+//using System.Linq;
+//using System.Text;
+//using System.Threading.Tasks;
+//using TerraIntegration.Interfaces;
+//using TerraIntegration.Values;
+//using TerraIntegration.Variables;
+//using Terraria.ModLoader;
 
-namespace TerraIntegration.ValueProperties.Collection
-{
-    [Autoload(false)]
-    public class ToCollection : ValueProperty
-    {
-        public override Type ValueType => typeof(ICollection);
-        public override string PropertyName => "toCollection";
-        public override string PropertyDisplay => "To Collection";
+//namespace TerraIntegration.ValueProperties.Collection
+//{
+//    [Autoload(false)]
+//    public class ToCollection : ValueProperty
+//    {
+//        public override Type ValueType => typeof(ICollection);
+//        public override string PropertyName => "toCollection";
+//        public override string PropertyDisplay => "To Collection";
 
-        public override ReferenceVariable CreateVariable(Variable var)
-        {
-            ToCollection result = new ToCollection();
+//        public override ReferenceVariable CreateVariable(Variable var)
+//        {
+//            ToCollection result = new ToCollection();
 
-            Type collectionType = ICollection.TryGetCollectionType(var);
+//            Type collectionType = ICollection.TryGetCollectionType(var);
 
-            if (collectionType is not null)
-            {
-                result.SetReturnTypeCache(typeof(Interfaces.ICollection<>).MakeGenericType(collectionType));
-            }
+//            if (collectionType is not null)
+//            {
+//                result.SetReturnTypeCache(typeof(Interfaces.ICollection<>).MakeGenericType(collectionType));
+//            }
 
-            return result;
-        }
+//            return result;
+//        }
 
-        public override VariableValue GetProperty(VariableValue value, List<Error> errors)
-        {
-            return value;
-        }
-    }
-}
+//        public override VariableValue GetProperty(VariableValue value, List<Error> errors)
+//        {
+//            return value;
+//        }
+//    }
+//}
