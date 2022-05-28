@@ -432,7 +432,7 @@ namespace TerraIntegration.Components
                     if (dy < size.Y - 1) frameY += 36;
                     if (dx < size.X - 1) frameX += 36;
 
-                    Tile t = Main.tile[p.X, p.Y];
+                    Terraria.Tile t = Main.tile[p.X, p.Y];
                     t.TileFrameX = frameX;
                     t.TileFrameY = frameY;
 

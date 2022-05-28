@@ -6,7 +6,7 @@ using Terraria.ModLoader;
 
 namespace TerraIntegration.Interfaces
 {
-    public interface IDecimal : IMathOperable, IValueInterface
+    public interface IDecimal : IMathOperable, IEquatable, IValueInterface
     {
         public double DecimalValue { get; }
         public double DecimalMax { get; }
@@ -111,6 +111,12 @@ namespace TerraIntegration.Interfaces
 
             double num = DecimalValue % val;
             return GetFromDecimal(num, errors);
+        }
+
+        [NoJIT]
+        bool IEquatable.Equals(VariableValue value)
+        {
+            return (value as IDecimal).DecimalValue == DecimalValue;
         }
 
     }

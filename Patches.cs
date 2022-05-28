@@ -31,8 +31,6 @@ namespace TerraIntegration
             Terraria.IO.WorldFile.OnWorldLoad += WorldFile_OnWorldLoad;
         }
 
-        
-
         public void Unload()
         {
             IL.Terraria.Main.DrawItem -= DrawItemTexturePatch;
@@ -57,13 +55,15 @@ namespace TerraIntegration
         }
         private void WorldGen_KillTile(On.Terraria.WorldGen.orig_KillTile orig, int i, int j, bool fail, bool effectOnly, bool noItem)
         {
+            if (TileMimicking.PreventKillTile(i, j))
+                return;
+
             int type = Main.tile[i, j].TileType;
             orig(i, j, fail, effectOnly, noItem);
             if (!Main.tile[i, j].HasTile && Components.Component.TileTypes.Contains(type))
                 Components.Component.ByTileType[type].OnKilled(new(i, j));
             if (!Main.tile[i, j].HasTile && ComponentSystem.CableTiles.Contains(type))
                 ComponentSystem.UpdateSystem(new((short)i, (short)j, false), out _);
-
         }
         private bool TileObject_Place(On.Terraria.TileObject.orig_Place orig, TileObject toBePlaced)
         {

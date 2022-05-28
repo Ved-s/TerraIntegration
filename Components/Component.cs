@@ -243,7 +243,7 @@ namespace TerraIntegration.Components
                 data.SetVariable(kvp.Key, kvp.Value);
 
             data.UpdateFrequency = freq;
-
+            data.Loaded();
             return data;
         }
 
@@ -323,6 +323,8 @@ namespace TerraIntegration.Components
                 foreach (var kvp in vars)
                     data.SetVariable(kvp.Key, kvp.Value);
 
+            data.Loaded();
+
             return data;
         }
 
@@ -384,6 +386,7 @@ namespace TerraIntegration.Components
         }
 
         public virtual void CustomInit(Component c) { }
+        public virtual void Loaded() { }
 
         internal void Destroy(Point16 pos)
         {

@@ -16,7 +16,7 @@ using Terraria.ModLoader;
 
 namespace TerraIntegration.Values
 {
-    public class String : VariableValue, IToString, IAddable, Interfaces.ICollection<Char>, IOwnProgrammerInterface
+    public class String : VariableValue, IToString, IAddable, Interfaces.ICollection<Char>, IEquatable, IOwnProgrammerInterface
     {
         public override string Type => "str";
         public override string TypeDisplay => "String";
@@ -109,6 +109,11 @@ namespace TerraIntegration.Values
         {
             foreach (char c in Value)
                 yield return new Char(c);
+        }
+
+        public bool Equals(VariableValue value)
+        {
+            return (value as String).Value == Value;
         }
     }
 }

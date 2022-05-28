@@ -15,7 +15,7 @@ using Terraria.ID;
 
 namespace TerraIntegration.Values
 {
-    public class List : VariableValue, ICollection, IOwnProgrammerInterface
+    public class List : VariableValue, ICollection, IEquatable, IOwnProgrammerInterface
     {
         public override string Type => "list";
         public override string TypeDisplay => "List";
@@ -233,6 +233,24 @@ namespace TerraIntegration.Values
             {
                 TextAlign = new(0, .5f)
             };
+        }
+
+        public bool Equals(VariableValue value)
+        {
+            foreach (var (First, Second) in (value as List).Values.Zip(Values)) 
+            {
+                if (First is null || Second is null)
+                    return false;
+
+                if (First.GetType() != Second.GetType()) 
+                    return false;
+
+                if (First is IEquatable equatable)
+                    return equatable.Equals(Second);
+
+                return false;
+            }
+            return true;
         }
 
         class ListEntry

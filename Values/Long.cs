@@ -14,33 +14,33 @@ using Terraria.ModLoader;
 
 namespace TerraIntegration.Values
 {
-    public class Integer : VariableValue, INumeric, IToString, IOwnProgrammerInterface
+    public class Long : VariableValue, INumeric, IToString, IOwnProgrammerInterface
     {
-        public override string Type => "int";
-        public override string TypeDisplay => "Integer";
+        public override string Type => "long";
+        public override string TypeDisplay => "Long";
 
-        public override Color TypeColor => Color.Orange;
+        public override Color TypeColor => Color.Red;
 
         public override SpriteSheetPos SpriteSheetPos => new(BasicSheet, 0, 0);
 
-        public int Value { get; set; }
+        public long Value { get; set; }
 
         public long NumericValue => Value;
-        public long NumericMax => int.MaxValue;
-        public long NumericMin => int.MinValue;
+        public long NumericMax => long.MaxValue;
+        public long NumericMin => long.MinValue;
 
         public UIPanel Interface { get; set; }
         public UIFocusInputTextField InterfaceValue;
         static Regex NotDigit = new(@"\D+", RegexOptions.Compiled);
 
-        public Integer() { }
-        public Integer(int value) { Value = value; }
+        public Long() { }
+        public Long(long value) { Value = value; }
 
         public override DisplayedValue Display() => new ColorTextDisplay(Value.ToString(), TypeColor);
 
         protected override VariableValue LoadCustomData(BinaryReader reader)
         {
-            return new Integer(reader.ReadInt32());
+            return new Long(reader.ReadInt64());
         }
 
         protected override void SaveCustomData(BinaryWriter writer)
@@ -48,34 +48,9 @@ namespace TerraIntegration.Values
             writer.Write(Value);
         }
 
-        public override VariableValue GetFromCommand(CommandCaller caller, List<string> args)
-        {
-            if (args.Count < 1)
-            {
-                caller.Reply("Argument required: int value");
-                return null;
-            }
-
-            if (!int.TryParse(args[0], out int val))
-            {
-                caller.Reply($"Value is not an integer: {args[0]}");
-                return null;
-            }
-            args.RemoveAt(0);
-
-            return new Integer(val);
-        }
-
         public override string ToString()
         {
             return Value.ToString();
-        }
-
-        public override bool Equals(object obj)
-        {
-            return obj is Integer integer &&
-                   Type == integer.Type &&
-                   Value == integer.Value;
         }
 
         public override int GetHashCode()
@@ -85,7 +60,7 @@ namespace TerraIntegration.Values
 
         public VariableValue FromNumericChecked(long value, List<Error> errors)
         {
-            return new Integer((int)value);
+            return new Long(value);
         }
 
         public void SetupInterface()
@@ -105,7 +80,7 @@ namespace TerraIntegration.Values
 
                     if (neg) @new = '-' + @new;
 
-                    if (int.TryParse(@new, out _)) return @new;
+                    if (long.TryParse(@new, out _)) return @new;
                     return old;
                 }
             };
@@ -114,9 +89,16 @@ namespace TerraIntegration.Values
 
         public Variables.Variable WriteVariable()
         {
-            if (int.TryParse(InterfaceValue.CurrentString, out int value))
-                return new Constant(new Integer(value));
+            if (long.TryParse(InterfaceValue.CurrentString, out long value))
+                return new Constant(new Long(value));
             return null;
+        }
+
+        public override bool Equals(object obj)
+        {
+            return obj is Long @long &&
+                   Type == @long.Type &&
+                   Value == @long.Value;
         }
     }
 }

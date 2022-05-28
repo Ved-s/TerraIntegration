@@ -61,9 +61,9 @@ namespace TerraIntegration.Components
             return false;
         }
 
-        public Point16 GetTargetTile(Point16 pos) => GetTargetTile(pos.X, pos.Y);
-
-        public Point16 GetTargetTile(int x, int y)
+        public Tile GetTargetTile(Point16 pos) => Framing.GetTileSafely(GetTargetTilePos(pos));
+        public Point16 GetTargetTilePos(Point16 pos) => GetTargetTilePos(pos.X, pos.Y);
+        public Point16 GetTargetTilePos(int x, int y)
         {
             Tile t = Framing.GetTileSafely(x, y);
             int frame = t.TileFrameX / 18;

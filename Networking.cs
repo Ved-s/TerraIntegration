@@ -18,6 +18,10 @@ namespace TerraIntegration
 
         private static string[] MessageTypeNames = Enum.GetNames(typeof(NetMessageType));
 
+        public static bool SinglePlayer => Main.netMode == NetmodeID.SinglePlayer;
+        public static bool Server => Main.netMode == NetmodeID.Server;
+        public static bool Client => Main.netMode == NetmodeID.MultiplayerClient;
+
         public static void HandlePacket(BinaryReader reader, int whoAmI) 
         {
             ushort type = reader.ReadUInt16();

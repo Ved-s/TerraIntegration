@@ -17,7 +17,7 @@ using Terraria.ModLoader;
 
 namespace TerraIntegration.Values
 {
-    public class Boolean : VariableValue, IToString, IOwnProgrammerInterface
+    public class Boolean : VariableValue, IToString, IEquatable, IOwnProgrammerInterface
     {
         public override string Type => "bool";
         public override string TypeDisplay => "Boolean";
@@ -113,6 +113,11 @@ namespace TerraIntegration.Values
         public Variables.Variable WriteVariable()
         {
             return new Constant(new Boolean(InterfaceValue));
+        }
+
+        public bool Equals(VariableValue value)
+        {
+            return (value as Boolean).Value == Value;
         }
     }
 }

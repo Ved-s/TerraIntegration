@@ -107,7 +107,7 @@ namespace TerraIntegration
                 if (found.Contains(p)) continue;
                 found.Add(p);
 
-                Tile t = Framing.GetTileSafely(p.ToPoint());
+                Terraria.Tile t = Framing.GetTileSafely(p.ToPoint());
 
                 if (!IsConnector(p)) continue;
 
@@ -127,7 +127,7 @@ namespace TerraIntegration
         }
         public static bool IsConnector(WorldPoint p)
         {
-            Tile t = Framing.GetTileSafely(p.ToPoint());
+            Terraria.Tile t = Framing.GetTileSafely(p.ToPoint());
 
             if (p.Wall)
                 return CableWalls.Contains(t.WallType);
@@ -138,7 +138,7 @@ namespace TerraIntegration
         public void Add(WorldPoint point)
         {
             AllPoints.Add(point);
-            Tile t = Framing.GetTileSafely(point.ToPoint());
+            Terraria.Tile t = Framing.GetTileSafely(point.ToPoint());
             if (!point.Wall && Component.ByTileType.TryGetValue(t.TileType, out Component component))
             {
                 PositionedComponent positioned = new(point.ToPoint16(), component);

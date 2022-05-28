@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using System.Collections.Generic;
 using Terraria;
+using Terraria.ObjectData;
 
 namespace TerraIntegration
 {
@@ -61,7 +62,25 @@ namespace TerraIntegration
 
         public static void PrepareTileMimicking(Point16 pos)
         {
-            if (TileMimicsInProgress.ContainsKey(pos) || !MimicType.TryGetValue(pos, out ushort mimicType)) return;
+            if (TileMimicsInProgress.ContainsKey(pos) 
+                || !MimicType.TryGetValue(pos, out ushort mimicType)) return;
+
+            if (!NeedsMimicking(mimicType))
+            {
+                TileObjectData tileObject = TileObjectData.GetTileData(mimicType, 0);
+                if (tileObject is not null)
+                {
+                    var orig = tileObject.Origin;
+
+                    MimicResult[pos] = new()
+                    {
+                        Type = mimicType,
+                        FrameX = (short)(orig.X * 16),
+                        FrameY = (short)(orig.Y * 16),
+                    };
+                }
+                return;
+            }
 
             TileMimic mimicTile;
             if (MimicResult.TryGetValue(pos, out mimicTile))
@@ -102,6 +121,16 @@ namespace TerraIntegration
             tile.TileFrameY = realTile.FrameY;
 
             TileMimicsInProgress.Remove(pos);
+        }
+
+        public static bool PreventKillTile(int x, int y)
+        {
+            return TileMimicsInProgress.ContainsKey(new(x, y));
+        }
+
+        public static bool NeedsMimicking(int type)
+        {
+            return !Main.tileFrameImportant[type];
         }
     }
 }
