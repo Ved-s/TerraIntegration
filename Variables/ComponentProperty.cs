@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using TerraIntegration.Components;
 using TerraIntegration.Values;
 using TerraIntegration.Variables;
+using Terraria.ModLoader;
 using Terraria.ModLoader.IO;
 
 namespace TerraIntegration.Variables
@@ -22,6 +23,7 @@ namespace TerraIntegration.Variables
         public abstract string ComponentType { get; }
         public abstract string PropertyName { get; }
         public abstract string PropertyDisplay { get; }
+        public virtual string PropertyDescription => "";
 
         public override SpriteSheet DefaultSpriteSheet
         {
@@ -49,33 +51,9 @@ namespace TerraIntegration.Variables
             set => BoundComponentCache = value;
         }
 
-        public override string TypeDescription
-        {
-            get
-            {
-                string propd = PropertyDescription;
-
-                string result = "";
-                if (ComponentPos != default)
-                {
-                    Component c = BoundComponent;
-
-                    result = $"[c/aaaa00:Bound to:] {(c is null ? "Unregistered component" : (c.ComponentDisplayName ?? c.Name))} at {ComponentPos.X}, {ComponentPos.Y}";
-                }
-
-                if (!propd.IsNullEmptyOrWhitespace())
-                {
-                    if (result.IsNullEmptyOrWhitespace()) result = propd;
-                    else result += "\n" + propd;
-                }
-
-                return result;
-            }
-        }
-
+        public override string TypeDescription => PropertyDescription;
         public override string TypeDisplay => PropertyDisplay;
-        public virtual string PropertyDescription => "";
-
+        
         public abstract VariableValue GetProperty(PositionedComponent c, List<Error> errors);
 
         public virtual ComponentProperty CreateVariable(PositionedComponent c)
@@ -93,6 +71,15 @@ namespace TerraIntegration.Variables
             if (c is null) return null;
 
             return GetProperty(new(ComponentPos, c), errors);
+        }
+        public override void ModifyTooltips(List<TooltipLine> tooltips)
+        {
+            if (ComponentPos != default)
+            {
+                Component c = BoundComponent;
+                string line = $"[c/aaaa00:Bound to:] {(c is null ? "Unregistered component" : (c.ComponentDisplayName ?? c.Name))} at {ComponentPos.X}, {ComponentPos.Y}";
+                tooltips.Add(new(Mod, "TIPropBoundTo", line));
+            }
         }
 
         protected override void SaveCustomData(BinaryWriter writer)

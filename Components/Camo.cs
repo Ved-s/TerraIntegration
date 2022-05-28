@@ -41,7 +41,6 @@ namespace TerraIntegration.Components
 
         public override Vector2 InterfaceOffset => new(24, 0);
 
-        
         List<Error> Errors = new();
 
         public override void SetStaticDefaults()
