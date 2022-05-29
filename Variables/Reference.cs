@@ -31,24 +31,12 @@ namespace TerraIntegration.Variables
             return val;
         }
 
-        public override Variable GetFromCommand(CommandCaller caller, List<string> args)
+        public override ReferenceVariable CreateVariable(Variable var)
         {
-            if (args.Count < 1)
+            return new Reference()
             {
-                caller.Reply("Argument required: variable id");
-                return null;
-            }
-
-            Guid? id = World.Guids.GetGuid(args[0]);
-
-            if (id is null)
-            {
-                caller.Reply($"Id not found: {args[0]}");
-                return null;
-            }
-            args.RemoveAt(0);
-
-            return new Reference(id.Value);
+                VariableReturnType = var.VariableReturnType
+            };
         }
     }
 }

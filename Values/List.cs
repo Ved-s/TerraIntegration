@@ -292,9 +292,11 @@ namespace TerraIntegration.Values
                 if (v.IsRef)
                 {
                     if (system is null)
+                    {
                         Strings.Add($"Ref {ModContent.GetInstance<ComponentWorld>().Guids.GetShortGuid(v.Id)}");
-                    
-                    value = system.GetVariableValue(v.Id, Errors);
+                        continue;
+                    }
+                    else value = system.GetVariableValue(v.Id, Errors);
                 }
                 Strings.Add(value?.Display(system).HoverText);
             }
