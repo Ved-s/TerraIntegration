@@ -36,7 +36,7 @@ namespace TerraIntegration.Values
         public Long() { }
         public Long(long value) { Value = value; }
 
-        public override DisplayedValue Display() => new ColorTextDisplay(Value.ToString(), TypeColor);
+        public override DisplayedValue Display(ComponentSystem system) => new ColorTextDisplay(Value.ToString(), TypeColor);
 
         protected override VariableValue LoadCustomData(BinaryReader reader)
         {

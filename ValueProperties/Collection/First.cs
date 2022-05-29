@@ -30,10 +30,10 @@ namespace TerraIntegration.ValueProperties.Collection
             return result;
         }
 
-        public override VariableValue GetProperty(VariableValue value, List<Error> errors)
+        public override VariableValue GetProperty(ComponentSystem system, VariableValue value, List<Error> errors)
         {
             ICollection collection = (ICollection)value;
-            return collection.Enumerate().FirstOrDefault(new VariableValue());
+            return collection.Enumerate(system, errors).FirstOrDefault(new VariableValue());
         }
     }
 }

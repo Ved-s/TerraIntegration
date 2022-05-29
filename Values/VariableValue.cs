@@ -27,7 +27,7 @@ namespace TerraIntegration.Values
 
         public virtual Color TypeColor => Color.White;
 
-        public virtual DisplayedValue Display() { return new ColorTextDisplay("null", Color.White); }
+        public virtual DisplayedValue Display(ComponentSystem system) { return new ColorTextDisplay("null", Color.White); }
 
         public void SaveData(BinaryWriter writer)
         {
@@ -68,8 +68,10 @@ namespace TerraIntegration.Values
             long diff = (reader.BaseStream.Position - pos) - length;
             if (diff != 0)
             {
-                if (diff > 0) value.Mod.Logger.WarnFormat("Variable {0} data overread: {1} bytes", type, diff);
-                else value.Mod.Logger.WarnFormat("Variable {0} data underread: {1} bytes", type, -diff);
+                Mod m = value?.Mod ?? ModContent.GetInstance<TerraIntegration>();
+
+                if (diff > 0) m.Logger.WarnFormat("Variable {0} data overread: {1} bytes", type, diff);
+                else m.Logger.WarnFormat("Variable {0} data underread: {1} bytes", type, -diff);
 
                 reader.BaseStream.Seek(pos + length, SeekOrigin.Begin);
             }
@@ -201,7 +203,7 @@ namespace TerraIntegration.Values
         public override string TypeDisplay => "Unloaded value";
 
         public override Color TypeColor => Color.Red;
-        public override DisplayedValue Display() => new ColorTextDisplay("Unloaded", TypeColor);
+        public override DisplayedValue Display(ComponentSystem system) => new ColorTextDisplay("Unloaded", TypeColor);
 
         public string ValueType { get; private set; }
         public byte[] Data { get; private set; }

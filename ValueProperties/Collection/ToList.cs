@@ -31,7 +31,7 @@ namespace TerraIntegration.ValueProperties.Collection
             return result;
         }
 
-        public override VariableValue GetProperty(VariableValue value, List<Error> errors)
+        public override VariableValue GetProperty(ComponentSystem system, VariableValue value, List<Error> errors)
         {
             return value;
         }

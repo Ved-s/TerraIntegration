@@ -31,7 +31,7 @@ namespace TerraIntegration.Values
         public Char() { }
         public Char(char value) { Value = value; }
 
-        public override DisplayedValue Display() => new ColorTextDisplay(Value.ToString(), TypeColor);
+        public override DisplayedValue Display(ComponentSystem system) => new ColorTextDisplay(Value.ToString(), TypeColor);
 
         protected override VariableValue LoadCustomData(BinaryReader reader)
         {

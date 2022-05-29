@@ -47,7 +47,7 @@ namespace TerraIntegration.Variables
 
         public override Type ReferenceReturnType => ValueType;
 
-        public abstract VariableValue GetProperty(VariableValue value, List<Error> errors);
+        public abstract VariableValue GetProperty(ComponentSystem system, VariableValue value, List<Error> errors);
 
         public override VariableValue GetValue(ComponentSystem system, List<Error> errors)
         {
@@ -60,7 +60,7 @@ namespace TerraIntegration.Variables
                 return null;
             }
 
-            return GetProperty(val, errors);
+            return GetProperty(system, val, errors);
         }
 
         public static void ValueRegistered()
@@ -112,7 +112,7 @@ namespace TerraIntegration.Variables
 
         public abstract VariableValue GetProperty(TValue value, List<Error> errors);
 
-        public override VariableValue GetProperty(VariableValue value, List<Error> errors)
+        public override VariableValue GetProperty(ComponentSystem system, VariableValue value, List<Error> errors)
         {
             return GetProperty(value as TValue, errors);
         }

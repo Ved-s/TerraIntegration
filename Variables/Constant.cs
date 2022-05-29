@@ -74,7 +74,7 @@ namespace TerraIntegration.Variables
         {
             if (Value is not null)
             {
-                string text = Value.Display().HoverText;
+                string text = Value.Display(null).HoverText;
                 text = LineBreaksWithPadding.Replace(text, " ");
                 if (text is not null)
                     tooltips.Add(new(Mod, "TIConstantValue", $"[c/aaaa00:Value:] {text}"));

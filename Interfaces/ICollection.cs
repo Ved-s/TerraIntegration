@@ -10,7 +10,7 @@ namespace TerraIntegration.Interfaces
 {
     public interface ICollection : IValueInterface
     {
-        public IEnumerable<VariableValue> Enumerate();
+        public IEnumerable<VariableValue> Enumerate(ComponentSystem system, List<Error> errors);
 
         public Type CollectionType { get; }
 

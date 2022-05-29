@@ -36,7 +36,7 @@ namespace TerraIntegration.Values
         public String() { }
         public String(string value) { Value = value; }
 
-        public override DisplayedValue Display() => new ColorTextDisplay(Value, TypeColor);
+        public override DisplayedValue Display(ComponentSystem system) => new ColorTextDisplay(Value, TypeColor);
 
         protected override VariableValue LoadCustomData(BinaryReader reader)
         {
@@ -105,7 +105,7 @@ namespace TerraIntegration.Values
             return new Constant(new String(InterfaceValue.CurrentString));
         }
 
-        public IEnumerable<VariableValue> Enumerate()
+        public IEnumerable<VariableValue> Enumerate(ComponentSystem system, List<Error> errors)
         {
             foreach (char c in Value)
                 yield return new Char(c);

@@ -163,7 +163,7 @@ namespace TerraIntegration.Components
                     SyncNull(pos, data.Master);
                     return;
                 }
-                data.Master.DisplayValue = value.Display();
+                data.Master.DisplayValue = value.Display(data.System);
                 SyncValue(pos, data.Master);
             }
         }

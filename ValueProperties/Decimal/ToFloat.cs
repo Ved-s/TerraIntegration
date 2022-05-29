@@ -18,7 +18,7 @@ namespace TerraIntegration.ValueProperties.Decimal
 
         public override bool AppliesTo(VariableValue value) => value is not Float;
 
-        public override VariableValue GetProperty(VariableValue value, List<Error> errors)
+        public override VariableValue GetProperty(ComponentSystem system, VariableValue value, List<Error> errors)
         {
             double v = ((IDecimal)value).DecimalValue;
             return (VariableValue.GetInstance<Float>() as IDecimal).GetFromDecimal(v, errors);

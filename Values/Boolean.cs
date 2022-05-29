@@ -37,7 +37,7 @@ namespace TerraIntegration.Values
         private static HashSet<string> TrueValues = new() { "true", "1", "yes", "t" };
         private static HashSet<string> FalseValues = new() { "false", "0", "no", "f" };
 
-        public override DisplayedValue Display() => new ColorTextDisplay(Value.ToString(), TypeColor);
+        public override DisplayedValue Display(ComponentSystem system) => new ColorTextDisplay(Value.ToString(), TypeColor);
 
         protected override VariableValue LoadCustomData(BinaryReader reader)
         {

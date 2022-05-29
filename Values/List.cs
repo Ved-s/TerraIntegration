@@ -12,6 +12,7 @@ using Terraria.Audio;
 using Terraria.GameContent;
 using Terraria.GameContent.UI.Elements;
 using Terraria.ID;
+using Terraria.ModLoader;
 
 namespace TerraIntegration.Values
 {
@@ -32,15 +33,31 @@ namespace TerraIntegration.Values
         UIVariableSwitch NewValueSwitch;
         UITextPanel<string> NewValueAdd;
 
-        public IEnumerable<VariableValue> Values;
+        public ListValueEntry[] Values;
+        List<Error> Errors = new();
+        List<string> Strings = new();
 
         public List() { }
-        public List(IEnumerable<VariableValue> values)
+        public List(ListValueEntry[] values)
         {
             Values = values;
         }
 
-        public IEnumerable<VariableValue> Enumerate() => Values;
+        public IEnumerable<VariableValue> Enumerate(ComponentSystem system, List<Error> errors) 
+        {
+            if (Values is null) yield break;
+
+            foreach (ListValueEntry value in Values)
+            {
+                if (!value.IsRef)
+                {
+                    yield return value.Value;
+                    continue;
+                }
+
+                yield return system.GetVariableValue(value.Id, errors);
+            }
+        }
 
         public void SetupInterface()
         {
@@ -55,7 +72,7 @@ namespace TerraIntegration.Values
             {
                 Left = new(-96, 1),
 
-                SwitchVariableTypes = new[] { "const" },
+                SwitchVariableTypes = new[] { "const", "ref" },
                 SwitchValueTypes = ByType.Where(kvp => kvp.Value is not List and IOwnProgrammerInterface).Select(kvp => kvp.Key).ToArray()
             });
             Interface.Append(NewValueAdd = new("Add")
@@ -82,7 +99,7 @@ namespace TerraIntegration.Values
         }
         public Variables.Variable WriteVariable()
         {
-            VariableValue[] array = new VariableValue[Entries.Count];
+            ListValueEntry[] array = new ListValueEntry[Entries.Count];
 
             Type type = null;
             bool commonType = true;
@@ -90,8 +107,19 @@ namespace TerraIntegration.Values
             for (int i = 0; i < Entries.Count; i++)
             {
                 Variables.Variable entry = Entries[i].Owner.WriteVariable();
+
+                if (entry is Reference @ref)
+                {
+                    array[i] = new(true, null, @ref.VariableId);
+                    Type refType = @ref.VariableReturnType;
+
+                    if (type is null) type = refType;
+                    else if (type != refType) commonType = false;
+                    continue;
+                }
+
                 if (entry is not Constant @const) return null;
-                array[i] = @const.Value;
+                array[i] = new(false, @const.Value, default);
 
                 if (type is null) type = Entries[i].Type;
                 else if (type != Entries[i].Type) commonType = false;
@@ -105,11 +133,24 @@ namespace TerraIntegration.Values
 
         private void AddEntry(Terraria.UI.UIMouseEvent evt, Terraria.UI.UIElement listeningElement)
         {
-            Type type = NewValueSwitch.CurrentValueType;
-            if (type is null || !ByType.TryGetValue(type, out VariableValue val)) return;
-            if (val is not IOwnProgrammerInterface) return;
+            Type valueType = NewValueSwitch.CurrentValueType;
+            string variableType = NewValueSwitch.CurrentVariableType;
 
-            IOwnProgrammerInterface owner = (IOwnProgrammerInterface)val.Clone();
+            IOwnProgrammerInterface owner;
+            if (variableType == "ref")
+            {
+                if (!Variables.Variable.ByTypeName.TryGetValue(variableType, out var var)
+                    || var is not IOwnProgrammerInterface) return;
+                owner = (IOwnProgrammerInterface)var.Clone();
+                valueType = null;
+            }
+            else
+            {
+                if (valueType is null || !ByType.TryGetValue(valueType, out VariableValue val)) return;
+                if (val is not IOwnProgrammerInterface) return;
+                owner = (IOwnProgrammerInterface)val.Clone();
+            }
+
             owner.Interface = null;
             owner.SetupInterfaceIfNeeded();
 
@@ -125,7 +166,7 @@ namespace TerraIntegration.Values
             };
             ListEntry entry = new()
             {
-                Type = type,
+                Type = valueType,
                 Owner = owner,
                 Panel = p,
             };
@@ -210,8 +251,14 @@ namespace TerraIntegration.Values
         {
             writer.Write(TypeToString(CollectionType) ?? "");
             writer.Write((ushort)Values.Count());
-            foreach (VariableValue value in Values)
-                value.SaveData(writer);
+            foreach (ListValueEntry value in Values)
+            {
+                writer.Write(value.IsRef);
+                if (value.IsRef)
+                    writer.Write(value.Id.ToByteArray());
+                else
+                    value.Value.SaveData(writer);
+            }
         }
         protected override VariableValue LoadCustomData(BinaryReader reader)
         {
@@ -220,16 +267,42 @@ namespace TerraIntegration.Values
             if (!type.IsNullEmptyOrWhitespace())
                 collectionType = StringToType(type);
 
-            VariableValue[] values = new VariableValue[reader.ReadInt16()];
+            ListValueEntry[] values = new ListValueEntry[reader.ReadInt16()];
             for (int i = 0; i < values.Length; i++)
-                values[i] = LoadData(reader);
+            {
+                bool isRef = reader.ReadBoolean();
+                if (isRef)
+                    values[i] = new(isRef, null, new(reader.ReadBytes(16)));
+                else 
+                    values[i] = new(isRef, LoadData(reader), default);
+            }
 
             return new List(values) { CollectionType = collectionType ?? typeof(VariableValue) };
         }
 
-        public override DisplayedValue Display()
+        public override DisplayedValue Display(ComponentSystem system)
         {
-            return new ColorTextDisplay($"[\n {string.Join(",\n ", Values.Select(v => v.Display().HoverText))}\n]", Color.White)
+            Strings.Clear();
+            Errors.Clear();
+
+            foreach (var v in Values)
+            {
+                VariableValue value = v.Value;
+
+                if (v.IsRef)
+                {
+                    if (system is null)
+                        Strings.Add($"Ref {ModContent.GetInstance<ComponentWorld>().Guids.GetShortGuid(v.Id)}");
+                    
+                    value = system.GetVariableValue(v.Id, Errors);
+                }
+                Strings.Add(value?.Display(system).HoverText);
+            }
+
+            if (Errors.Count > 0)
+                return new ErrorDisplay(Errors.ToArray());
+
+            return new ColorTextDisplay($"[\n {string.Join(",\n ", Strings)}\n]", Color.White)
             {
                 TextAlign = new(0, .5f)
             };
@@ -239,13 +312,13 @@ namespace TerraIntegration.Values
         {
             foreach (var (First, Second) in (value as List).Values.Zip(Values)) 
             {
-                if (First is null || Second is null)
+                if (First != Second)
                     return false;
 
                 if (First.GetType() != Second.GetType()) 
                     return false;
 
-                if (First is IEquatable equatable)
+                if (First.Value is IEquatable equatable)
                     return equatable.Equals(Second);
 
                 return false;
@@ -260,5 +333,6 @@ namespace TerraIntegration.Values
             public UIPanel Panel;
             public UITextPanel<string> Index;
         }
+        public record struct ListValueEntry(bool IsRef, VariableValue Value, Guid Id);
     }
 }

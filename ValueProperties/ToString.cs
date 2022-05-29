@@ -19,7 +19,7 @@ namespace TerraIntegration.ValueProperties
 
         public override bool AppliesTo(VariableValue value) => value is not Values.String;
 
-        public override VariableValue GetProperty(VariableValue value, List<Error> errors)
+        public override VariableValue GetProperty(ComponentSystem system, VariableValue value, List<Error> errors)
         {
             return new Values.String(((IToString) value).ToString());
         }

@@ -21,9 +21,9 @@ namespace TerraIntegration.ValueProperties.Collection
 
         public override bool AppliesTo(VariableValue value) => value is not Values.String;
 
-        public override VariableValue GetProperty(VariableValue value, List<Error> errors)
+        public override VariableValue GetProperty(ComponentSystem system, VariableValue value, List<Error> errors)
         {
-            return new Integer(((ICollection)value).Enumerate().Count());
+            return new Integer(((ICollection)value).Enumerate(system, errors).Count());
         }
     }
 }

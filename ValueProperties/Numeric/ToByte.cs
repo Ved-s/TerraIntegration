@@ -18,7 +18,7 @@ namespace TerraIntegration.ValueProperties.Numeric
 
         public override bool AppliesTo(VariableValue value) => value is not Values.Byte;
         
-        public override VariableValue GetProperty(VariableValue value, List<Error> errors)
+        public override VariableValue GetProperty(ComponentSystem system, VariableValue value, List<Error> errors)
         {
             long v = ((INumeric)value).NumericValue;
             return (VariableValue.GetInstance<Values.Byte>() as INumeric).GetFromNumeric(v, errors);
