@@ -100,6 +100,8 @@ namespace TerraIntegration
         {
             if (Main.netMode == NetmodeID.SinglePlayer) return;
 
+            Statistics.LogMessage($"[Net] Sending {positions?.Count.ToString() ?? "all"} component data");
+
             ComponentWorld world = ModContent.GetInstance<ComponentWorld>();
 
             List<(Point16, ComponentData)> send = new();
@@ -137,6 +139,7 @@ namespace TerraIntegration
             ComponentWorld world = ModContent.GetInstance<ComponentWorld>();
 
             ushort count = reader.ReadUInt16();
+            Statistics.LogMessage($"[Net] Receiving {count} component data");
             for (int i = 0; i < count; i++)
             {
                 Point16 pos = new(reader.ReadInt16(), reader.ReadInt16());
@@ -155,6 +158,8 @@ namespace TerraIntegration
         public static void SendComponentDataRequest(List<Point16> positions = null) 
         {
             if (Main.netMode != NetmodeID.MultiplayerClient) return;
+
+            Statistics.LogMessage($"[Net] Sending {positions?.Count.ToString() ?? "all"} component data request");
 
             ModPacket pack = CreatePacket(NetMessageType.ComponentDataRequest);
             if (positions is null)
@@ -175,6 +180,7 @@ namespace TerraIntegration
         private static void ReceiveComponentDataRequest(BinaryReader reader, int whoAmI)
         {
             ushort count = reader.ReadUInt16();
+            Statistics.LogMessage($"[Net] Receiving {(count == ushort.MaxValue ? "all" : count.ToString())} component data request");
             List<Point16> positions = null;
             if (count < ushort.MaxValue)
                 for (int i = 0; i < count; i++)
@@ -188,6 +194,8 @@ namespace TerraIntegration
             if (component is null)
                 throw new ArgumentNullException(nameof(component));
 
+            Statistics.LogMessage($"[Net] Sending {component} component packet at {pos}, type {messageType}");
+
             ModPacket pack = CreatePacket(NetMessageType.ComponentPacket);
             pack.Write(component);
             pack.Write(messageType);
@@ -200,6 +208,9 @@ namespace TerraIntegration
             string component = reader.ReadString();
             ushort type = reader.ReadUInt16();
             Point16 pos = new(reader.ReadInt16(), reader.ReadInt16());
+
+            Statistics.LogMessage($"[Net] Receiving {component} component packet at {pos}, type {type}");
+
             if (!Component.ByTypeName.TryGetValue(component, out Component c))
             {
                 LogWarn("Message for unregistered component {0}", component);
@@ -219,13 +230,15 @@ namespace TerraIntegration
             }
         }
 
-        public static ModPacket CreateVariablePacket(string message, Point16 pos, ushort messageType)
+        public static ModPacket CreateVariablePacket(string variable, Point16 pos, ushort messageType)
         {
-            if (message is null)
-                throw new ArgumentNullException(nameof(message));
+            if (variable is null)
+                throw new ArgumentNullException(nameof(variable));
+
+            Statistics.LogMessage($"[Net] Sending {variable} variable packet at {pos}, type {messageType}");
 
             ModPacket pack = CreatePacket(NetMessageType.VariablePacket);
-            pack.Write(message);
+            pack.Write(variable);
             pack.Write(messageType);
             pack.Write(pos.X);
             pack.Write(pos.Y);
@@ -233,12 +246,15 @@ namespace TerraIntegration
         }
         private static void ReceiveVariablePacket(BinaryReader reader, int whoAmI, ref bool broadcast)
         {
-            string component = reader.ReadString();
+            string variable = reader.ReadString();
             ushort type = reader.ReadUInt16();
             Point16 pos = new(reader.ReadInt16(), reader.ReadInt16());
-            if (!Variable.ByTypeName.TryGetValue(component, out Variable v))
+
+            Statistics.LogMessage($"[Net] Receivnig {variable} variable packet at {pos}, type {type}");
+
+            if (!Variable.ByTypeName.TryGetValue(variable, out Variable v))
             {
-                LogWarn("Message for unregistered variable {0}", component);
+                LogWarn("Message for unregistered variable {0}", variable);
                 return;
             }
             v.HandlePacket(pos, type, reader, whoAmI, ref broadcast);
@@ -248,22 +264,21 @@ namespace TerraIntegration
         {
             if (Main.netMode == NetmodeID.SinglePlayer) return;
 
+            Statistics.LogMessage($"[Net] Sending variable at {pos}, slot {slot}");
+
             ComponentWorld world = ModContent.GetInstance<ComponentWorld>();
             ComponentData data = world.GetDataOrNull(pos);
             if (!data.Variables.TryGetValue(slot, out Items.Variable var))
                 return;
 
-            Variable v = var.Var;
+            Variable v = var?.Var;
 
             ModPacket pack = CreatePacket(NetMessageType.ComponentVariable);
             pack.Write(pos.X);
             pack.Write(pos.Y);
             pack.Write(slot);
 
-            if (v is null)
-                pack.Write("");
-            else
-                Variable.SaveData(v, pack);
+            Variable.SaveData(v, pack);
             pack.Send();
         }
         private static void ReceiveComponentVariable(BinaryReader reader) 
@@ -272,6 +287,9 @@ namespace TerraIntegration
 
             Point16 pos = new(reader.ReadInt16(), reader.ReadInt16());
             string slot = reader.ReadString();
+
+            Statistics.LogMessage($"[Net] Receiving variable at {pos}, slot {slot}");
+
             Variable v = Variable.LoadData(reader);
 
             ComponentData data = world.GetDataOrNull(pos);
@@ -281,6 +299,8 @@ namespace TerraIntegration
         public static void SendComponentFrequency(Point16 pos)
         {
             if (Main.netMode == NetmodeID.SinglePlayer) return;
+
+            Statistics.LogMessage($"[Net] Sending component frequency at {pos}");
 
             ComponentWorld world = ModContent.GetInstance<ComponentWorld>();
             ComponentData data = world.GetDataOrNull(pos);
@@ -299,6 +319,8 @@ namespace TerraIntegration
             Point16 pos = new(reader.ReadInt16(), reader.ReadInt16());
             ushort freq = reader.ReadUInt16();
 
+            Statistics.LogMessage($"[Net] Receiving component frequency at {pos}");
+
             ComponentData data = world.GetDataOrNull(pos);
             if (data is null) return;
             data.Component?.SetUpdates(pos, freq > 0);
@@ -313,7 +335,11 @@ namespace TerraIntegration
                 Console.WriteLine(format, args);
                 return;
             }
-            Mod.Logger.WarnFormat(format, args);
+            else
+            {
+                Statistics.LogMessage("[Net] " + string.Format(format, args));
+                Mod.Logger.WarnFormat(format, args);
+            }
         }
     }
 

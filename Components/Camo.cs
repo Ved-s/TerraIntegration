@@ -211,9 +211,8 @@ namespace TerraIntegration.Components
                     OnVariableChanged(pos, "camoTile");
                 }
                 CamoChanged(-1, pos, true);
-                return;
             }
-            CamoChanged(camo.createTile, pos, true);
+            else CamoChanged(camo.createTile, pos, true);
 
             if (!noSync && Main.netMode != NetmodeID.SinglePlayer)
             {

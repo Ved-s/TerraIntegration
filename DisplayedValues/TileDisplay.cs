@@ -82,5 +82,21 @@ namespace TerraIntegration.DisplayedValues
             writer.Write(HoverText);
             writer.Write(MaxZoom);
         }
+
+        public override bool Equals(object obj)
+        {
+            return obj is TileDisplay display &&
+                   Type == display.Type &&
+                   HoverText == display.HoverText &&
+                   TileType == display.TileType &&
+                   TileFrame == display.TileFrame &&
+                   TileColor == display.TileColor &&
+                   MaxZoom == display.MaxZoom;
+        }
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(Type, HoverText, TileType, TileFrame, TileColor, MaxZoom);
+        }
     }
 }

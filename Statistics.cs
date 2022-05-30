@@ -1,6 +1,9 @@
 ﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 using ReLogic.Graphics;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -12,10 +15,12 @@ using Terraria.ModLoader;
 
 namespace TerraIntegration
 {
-    public class Statistics : ILoadable
+    public static class Statistics
     {
         public static Stopwatch[] Updates = new Stopwatch[4];
         public static TimeSpan[] MaxUpdates = new TimeSpan[4];
+        public static bool Visible;
+        public static RingArray<string> Log = new(15);
 
         public static int
             UpdatedComponents = 0,
@@ -44,6 +49,12 @@ namespace TerraIntegration
                 for (int i = 0; i < MaxUpdates.Length; i++)
                     MaxUpdates[i] = default;
             }
+        }
+
+        public static void LogMessage(string message)
+        {
+            if (Networking.Server) return;
+            Log.Push($"[{DateTime.Now:HH:mm:ss}] {message}");
         }
 
         public static string Get(UpdateTime time)
@@ -85,22 +96,18 @@ namespace TerraIntegration
             Updates[(int)time].Stop();
         }
 
-
-        public void Load(Mod mod)
+        public static void Draw()
         {
-            On.Terraria.Main.DrawInterface_18_DiagnoseVideo += OnDrawVideoDiag;
-        }
+            if (Main.keyState.IsKeyDown(Keys.Escape))
+                Visible = false;
 
-        public void Unload()
-        {
-            On.Terraria.Main.DrawInterface_18_DiagnoseVideo -= OnDrawVideoDiag;
-        }
+            if (!Visible) return;
 
-        private void OnDrawVideoDiag(On.Terraria.Main.orig_DrawInterface_18_DiagnoseVideo orig)
-        {
-            orig();
+            int width = 800;
+            int height = 600;
 
-            if (!Main.drawDiag) return;
+            Rectangle rect = new((Main.screenWidth - width) / 2, (Main.screenHeight - height) / 2, width, height);
+            Main.spriteBatch.Draw(TextureAssets.MagicPixel.Value, rect, Color.DarkSlateBlue * .7f);
 
             string text = $"TerraIntegration stats:\n" +
                 $"Full update: {Get(UpdateTime.FullUpdate)}\n" +
@@ -108,13 +115,9 @@ namespace TerraIntegration
                 $"Component requests: {ComponentRequests} in {Get(UpdateTime.ComponentRequests)}\n" +
                 $"Variable requests: {VariableRequests} in {Get(UpdateTime.VariableRequests)}";
 
-            Vector2 size = FontAssets.MouseText.Value.MeasureString(text);
+            Main.spriteBatch.DrawString(FontAssets.MouseText.Value, text, new Vector2(rect.X + 20, rect.Y + 20), Color.White);
 
-            Vector2 pos = new Vector2(20, Main.screenHeight - size.Y);
-
-            if (Main.showFrameRate) pos.Y -= 25;
-
-            Main.spriteBatch.DrawString(FontAssets.MouseText.Value, text, pos, Color.White);
+            Main.spriteBatch.DrawString(FontAssets.MouseText.Value, $"Log:\n{string.Join("\n", Log.EnumerateBackwards())}", new Vector2(rect.X + 20, rect.Y + 180), Color.White, 0f, Vector2.Zero, .8f, SpriteEffects.None, 0f);
         }
 
         public enum UpdateTime 
@@ -123,6 +126,64 @@ namespace TerraIntegration
             Components,
             ComponentRequests,
             VariableRequests
+        }
+
+        public class RingArray<T>
+        {
+            public T[] Values;
+            int Index, Count;
+
+            public int Length => Count;
+
+            public RingArray(int capacity) 
+            {
+                Values = new T[capacity];
+            }
+
+            int ConvertIndex(int index)
+            {
+                index += Index;
+                index %= Values.Length;
+                if (index < 0)
+                    index += Values.Length;
+                return index;
+            }
+
+            public T this[int i] 
+            {
+                get => Values[ConvertIndex(i)];
+                set => Values[ConvertIndex(i)] = value;
+            }
+
+            public void Push(T value)
+            {
+                Values[Index] = value;
+                Index = (Index + 1) % Values.Length;
+                if (Count < Values.Length) 
+                    Count++;
+            }
+
+            public T Pop()
+            {
+                if (Count <= 0) 
+                    return default;
+
+                Index = ConvertIndex(-1);
+                Count--;
+                return Values[Index];
+            }
+
+            public IEnumerable<T> Enumerate()
+            {
+                for (int i = -(Count - 1); i < 0; i++)
+                    yield return Values[ConvertIndex(i)];
+            }
+
+            public IEnumerable<T> EnumerateBackwards()
+            {
+                for (int i = 1; i <= Count; i++)
+                    yield return Values[ConvertIndex(-i)];
+            }
         }
     }
 }

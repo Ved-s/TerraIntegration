@@ -59,9 +59,8 @@ namespace TerraIntegration.DisplayedValues
         public override bool Equals(object obj)
         {
             return obj is ErrorDisplay display &&
-                   base.Equals(obj) &&
                    Type == display.Type &&
-                   EqualityComparer<Error[]>.Default.Equals(Errors, display.Errors);
+                   Errors.SequenceEqual(display.Errors);
         }
     }
 }

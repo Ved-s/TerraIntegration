@@ -33,6 +33,11 @@ namespace TerraIntegration
         public static implicit operator Point(Point16 p) => new(p.X, p.Y);
 
         public Vector2 ToVector2() => new Vector2(X, Y);
+
+        public override string ToString()
+        {
+            return $"({X}, {Y})";
+        }
     }
 
     public struct WorldPoint

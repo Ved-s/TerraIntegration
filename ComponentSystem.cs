@@ -208,7 +208,7 @@ namespace TerraIntegration
                     ComponentData d = c.GetData();
                     foreach (Items.Variable var in d.Variables.Values)
                         if (var is not null)
-                            if (var.Var.Id == varId)
+                            if (var.Var?.Id == varId)
                             {
                                 if (var.Var is UnloadedVariable)
                                 {

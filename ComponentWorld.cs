@@ -195,25 +195,27 @@ namespace TerraIntegration
         public bool DrawUI()
         {
             ProgrammerInterface.Draw();
+            Statistics.Draw();
 
             if (HoverText is null && TerraIntegration.DebugMode) 
             {
                 Point mouse = (Main.MouseWorld / 16).ToPoint();
             
-                Tile t = Main.tile[mouse.X, mouse.Y];
-            
-                if (t.HasTile && TileID.Sets.IsATreeTrunk[t.TileType])
-                {
-                    TreeStats stats = TreeGrowing.GetTreeStats(mouse.X, mouse.Y);
-                    bool haveSettings = CustomTree.TryGetTreeSettingsByType(t.TileType, out TreeSettings settings);
-
-                    HoverText = $"- TerraIntegration tree info -\ntX: {t.TileFrameX} tY: {t.TileFrameY}\n"
-                        + TreeTileInfo.GetInfo(mouse.X, mouse.Y) + "\n"
-                        + stats.ToString()
-                        + (haveSettings? 
-                            $"\nGV:{(settings.GroundTypeCheck(stats.GroundType)? "T" : "F")} " +
-                            $"GM:{(settings.CanGrowMoreCheck(stats.Top, settings, stats) ? "T" : "F")}" : "");
-                }
+                //Tile t = Main.tile[mouse.X, mouse.Y];
+                //
+                //if (t.HasTile && TileID.Sets.IsATreeTrunk[t.TileType])
+                //{
+                //    TreeStats stats = TreeGrowing.GetTreeStats(mouse.X, mouse.Y);
+                //    bool haveSettings = CustomTree.TryGetTreeSettingsByType(t.TileType, out TreeSettings settings);
+                //
+                //    HoverText = $"- TerraIntegration tree info -\ntX: {t.TileFrameX} tY: {t.TileFrameY}\n"
+                //        + TreeTileInfo.GetInfo(mouse.X, mouse.Y) + "\n"
+                //        + stats.ToString()
+                //        + (haveSettings? 
+                //            $"\nGV:{(settings.GroundTypeCheck(stats.GroundType)? "T" : "F")} " +
+                //            $"GM:{(settings.CanGrowMoreCheck(stats.Top, settings, stats) ? "T" : "F")}" : "");
+                //}
+                HoverText = mouse.ToString();
             }
 
             if (HoverItem is not null)

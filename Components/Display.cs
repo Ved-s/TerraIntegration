@@ -151,7 +151,7 @@ namespace TerraIntegration.Components
 
             if (Main.netMode != NetmodeID.MultiplayerClient)
             {
-                VariableValue value = data.GetVariable(DisplayVariableSlot).GetValue(data.System, Errors);
+                VariableValue value = data.GetVariable(DisplayVariableSlot)?.GetValue(data.System, Errors);
                 if (Errors.Count > 0)
                 {
                     data.Master.DisplayValue = new ErrorDisplay(Errors.ToArray());

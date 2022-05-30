@@ -23,25 +23,25 @@ namespace TerraIntegration
 
             if (arg.Count == 0)
             {
-                caller.Reply("Expected subcommand: var, gen, notex");
+                caller.Reply("Expected subcommand: var, gen, notex, stats");
                 return;
             }
             string sub = arg[0];
             arg.RemoveAt(0);
-            if (sub == "var")
+            switch (sub)
             {
-                VarCommand(caller, arg);
-                return;
-            }
-            if (sub == "gen")
-            {
-                ModContent.GetInstance<ComponentWorld>().PostWorldGen();
-                return;
-            }
-            if (sub == "notex")
-            {
-                MissingTexCommand(caller);
-                return;
+                case "var":
+                    VarCommand(caller, arg);
+                    return;
+                case "gen":
+                    ModContent.GetInstance<ComponentWorld>().PostWorldGen();
+                    return;
+                case "notex":
+                    MissingTexCommand(caller);
+                    return;
+                case "stats":
+                    Statistics.Visible = !Statistics.Visible;
+                    return;
             }
 
             caller.Reply("Unknown subcommand");

@@ -23,7 +23,7 @@ namespace TerraIntegration
         {
             return obj is Error error &&
                    Type == error.Type &&
-                   EqualityComparer<string[]>.Default.Equals(Args, error.Args);
+                   Args.SequenceEqual(error.Args);
         }
 
         public override int GetHashCode()
