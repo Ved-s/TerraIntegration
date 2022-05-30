@@ -221,7 +221,7 @@ namespace TerraIntegration.Components
                 else
                 {
                     ModPacket p = CreatePacket(pos, 1);
-                    ItemIO.Send(data.CamoTileItem, p, true);
+                    ItemIO.Send(data.CamoTileItem, p);
                     p.Send();
                 }
             }

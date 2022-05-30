@@ -33,55 +33,60 @@ namespace TerraIntegration
             }
             NetMessageType msgType = (NetMessageType)type;
 
-            bool broadcast = false;
-
-            long startPos = reader.BaseStream.Position;
-
-            switch (msgType)
+            try
             {
-                case NetMessageType.ComponentDataSync:
-                    ReceiveComponentDataSync(reader);
-                    break;
+                bool broadcast = false;
+                long startPos = reader.BaseStream.Position;
+                switch (msgType)
+                {
+                    case NetMessageType.ComponentDataSync:
+                        ReceiveComponentDataSync(reader);
+                        break;
 
-                case NetMessageType.ComponentDataRequest:
-                    ReceiveComponentDataRequest(reader, whoAmI);
-                    break;
+                    case NetMessageType.ComponentDataRequest:
+                        ReceiveComponentDataRequest(reader, whoAmI);
+                        break;
 
-                case NetMessageType.ComponentPacket:
-                    ReceiveComponentPacket(reader, whoAmI, ref broadcast);
-                    break;
+                    case NetMessageType.ComponentPacket:
+                        ReceiveComponentPacket(reader, whoAmI, ref broadcast);
+                        break;
 
-                case NetMessageType.VariablePacket:
-                    ReceiveVariablePacket(reader, whoAmI, ref broadcast);
-                    break;
+                    case NetMessageType.VariablePacket:
+                        ReceiveVariablePacket(reader, whoAmI, ref broadcast);
+                        break;
 
-                case NetMessageType.ComponentVariable:
-                    ReceiveComponentVariable(reader);
-                    broadcast = true;
-                    return;
+                    case NetMessageType.ComponentVariable:
+                        ReceiveComponentVariable(reader);
+                        broadcast = true;
+                        return;
 
-                case NetMessageType.ComponentFrequency:
-                    ReceiveComponentFrequency(reader);
-                    broadcast = true;
-                    break;
+                    case NetMessageType.ComponentFrequency:
+                        ReceiveComponentFrequency(reader);
+                        broadcast = true;
+                        break;
 
-                default:
-                    LogWarn("Unhandled netmessage: {0}", msgType);
-                    break;
+                    default:
+                        LogWarn("Unhandled netmessage: {0}", msgType);
+                        break;
+                }
+
+                if (broadcast && Main.netMode == NetmodeID.Server)
+                {
+                    long size = reader.BaseStream.Position - startPos;
+                    reader.BaseStream.Seek(startPos, SeekOrigin.Begin);
+
+                    byte[] data = reader.ReadBytes((int)size);
+
+                    ModPacket packet = CreatePacket(msgType);
+                    packet.Write(data);
+                    packet.Send(-1, whoAmI);
+                }
             }
-
-            if (broadcast && Main.netMode == NetmodeID.Server)
+            catch (NetworkException) { throw; }
+            catch (Exception e)
             {
-                long size = reader.BaseStream.Position - startPos;
-                reader.BaseStream.Seek(startPos, SeekOrigin.Begin);
-
-                byte[] data = reader.ReadBytes((int)size);
-
-                ModPacket packet = CreatePacket(msgType);
-                packet.Write(data);
-                packet.Send(-1, whoAmI);
+                throw new NetworkException($"Exception in receiving {msgType} packet", e);
             }
-            
         }
 
         public static ModPacket CreatePacket(NetMessageType type) 
@@ -178,19 +183,6 @@ namespace TerraIntegration
             SendComponentDataSync(positions, whoAmI);
         }
 
-        //public static void SendComponentCustomData<TDataType>(Point16 pos, Component<TDataType> component, int clientId = -1) where TDataType : ComponentData, new()
-        //{
-        //    ModPacket pack = CreatePacket(NetMessageType.ComponentCustomDataSync);
-        //    pack.Write(pos.X);
-        //    pack.Write(pos.Y);
-        //    component.SendCustomData(component.GetData(pos), pack);
-        //    pack.Send(clientId);
-        //}
-        //private static void ReceiveComponentCustomData(BinaryReader reader, int whoAmI) 
-        //{
-        //
-        //}
-
         public static ModPacket CreateComponentPacket(string component, Point16 pos, ushort messageType)
         {
             if (component is null)
@@ -213,10 +205,17 @@ namespace TerraIntegration
                 LogWarn("Message for unregistered component {0}", component);
                 return;
             }
-            if (!c.HandlePacket(pos, type, reader, whoAmI, ref broadcast))
+            try
             {
-                LogWarn("Unhandled message {0} for component {1}", type, component);
-                return;
+                if (!c.HandlePacket(pos, type, reader, whoAmI, ref broadcast))
+                {
+                    LogWarn("Unhandled message {0} for component {1}", type, component);
+                    return;
+                }
+            }
+            catch (Exception e)
+            {
+                throw new NetworkException($"Exception while receiving message {type} for component {component} at {pos}", e);
             }
         }
 
@@ -322,11 +321,14 @@ namespace TerraIntegration
     {
         ComponentDataSync,
         ComponentDataRequest,
-        //ComponentCustomDataSync,
-        //ComponentCustomDataRequest,
         ComponentPacket,
         VariablePacket,
         ComponentVariable,
         ComponentFrequency
+    }
+
+    public class NetworkException : Exception
+    {
+        public NetworkException(string message, Exception inner) : base(message, inner) { }
     }
 }
