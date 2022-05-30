@@ -10,7 +10,7 @@ using Terraria.ModLoader;
 
 namespace TerraIntegration.Interfaces
 {
-    public interface INumeric : IMathOperable, IEquatable, IValueInterface
+    public interface INumeric : IMathOperable, IComparable, IValueInterface
     {
         public long NumericValue { get; }
         public long NumericMax { get; }
@@ -121,6 +121,18 @@ namespace TerraIntegration.Interfaces
         bool IEquatable.Equals(VariableValue value)
         {
             return (value as INumeric).NumericValue == NumericValue;
+        }
+
+        [NoJIT]
+        bool IComparable.GreaterThan(VariableValue value)
+        {
+            return NumericValue > (value as INumeric).NumericValue;
+        }
+
+        [NoJIT]
+        bool IComparable.LessThan(VariableValue value)
+        {
+            return NumericValue < (value as INumeric).NumericValue;
         }
     }
 }

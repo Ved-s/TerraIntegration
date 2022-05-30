@@ -9,14 +9,12 @@ using TerraIntegration.Values;
 
 namespace TerraIntegration.Variables.Comparing
 {
-    public class Equals : DoubleReferenceVariable
+    public class GreaterEquals : DoubleReferenceVariable
     {
-        public override string Type => "equals";
-        public override string TypeDisplay => "==";
+        public override string Type => "greaterEquals";
+        public override string TypeDisplay => ">=";
 
-        public override SpriteSheetPos SpriteSheetPos => new(BasicSheet, 2, 1);
-
-        public override Type[] LeftSlotValueTypes => new[] { typeof(IEquatable) };
+        public override Type[] LeftSlotValueTypes => new[] { typeof(Interfaces.IComparable) };
 
         public override Type[] GetValidRightSlotTypes(Type leftSlotType)
         {
@@ -25,8 +23,8 @@ namespace TerraIntegration.Variables.Comparing
 
         public override VariableValue GetValue(ComponentSystem system, VariableValue left, VariableValue right, List<Error> errors)
         {
-            bool result = (left as IEquatable).Equals(right);
-            return new Values.Boolean(result);
+            Interfaces.IComparable comparable = left as Interfaces.IComparable;
+            return new Values.Boolean(comparable.GreaterThan(right) || comparable.Equals(right));
         }
     }
 }

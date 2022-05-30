@@ -9,12 +9,10 @@ using TerraIntegration.Values;
 
 namespace TerraIntegration.Variables.Comparing
 {
-    public class Equals : DoubleReferenceVariable
+    public class NotEquals : DoubleReferenceVariable
     {
-        public override string Type => "equals";
-        public override string TypeDisplay => "==";
-
-        public override SpriteSheetPos SpriteSheetPos => new(BasicSheet, 2, 1);
+        public override string Type => "notEquals";
+        public override string TypeDisplay => "!=";
 
         public override Type[] LeftSlotValueTypes => new[] { typeof(IEquatable) };
 
@@ -25,7 +23,7 @@ namespace TerraIntegration.Variables.Comparing
 
         public override VariableValue GetValue(ComponentSystem system, VariableValue left, VariableValue right, List<Error> errors)
         {
-            bool result = (left as IEquatable).Equals(right);
+            bool result = !(left as IEquatable).Equals(right);
             return new Values.Boolean(result);
         }
     }
