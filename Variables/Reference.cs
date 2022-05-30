@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using TerraIntegration.Basic;
+using TerraIntegration.DataStructures;
 using TerraIntegration.Values;
 using Terraria.ModLoader;
 
@@ -24,12 +25,10 @@ namespace TerraIntegration.Variables
             VariableId = varId;
         }
 
-        public override VariableValue GetValue(ComponentSystem system, List<Error> errors)
+        public override VariableValue GetValue(VariableValue value, ComponentSystem system, List<Error> errors)
         {
-            VariableValue val = system.GetVariableValue(VariableId, errors);
-            if (val is not null && errors.Count == 0)
-                SetReturnTypeCache(val.GetType());
-            return val;
+            SetReturnTypeCache(value.GetType());
+            return value;
         }
 
         public override ReferenceVariable CreateVariable(Variable var)

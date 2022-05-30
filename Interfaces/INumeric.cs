@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using TerraIntegration.Basic;
+using TerraIntegration.DataStructures;
 using TerraIntegration.Interfaces.Math;
 using TerraIntegration.Values;
 using Terraria.ModLoader;
@@ -15,6 +16,7 @@ namespace TerraIntegration.Interfaces
         public long NumericValue { get; }
         public long NumericMax { get; }
         public long NumericMin { get; }
+        public byte BitWidth { get; }
 
         Type[] IMathOperable.ValidMathValueTypes => new[] { typeof(INumeric), typeof(IDecimal) };
 

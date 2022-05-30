@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using TerraIntegration.Components;
+using TerraIntegration.DataStructures;
 using TerraIntegration.Values;
 using TerraIntegration.Variables;
 
@@ -15,7 +16,7 @@ namespace TerraIntegration.Basic
         public static readonly List<ValueProperty> AllProperties = new();
         public static readonly List<ValueProperty> WaitingValue = new();
 
-        public override string Type => $"{ValueTypeName}.{PropertyName}";
+        public sealed override string Type => $"{ValueTypeName}.{PropertyName}";
 
         public abstract Type ValueType { get; }
         public string ValueTypeName
@@ -45,22 +46,19 @@ namespace TerraIntegration.Basic
         public sealed override string TypeDescription => PropertyDescription;
         public sealed override string TypeDisplay => PropertyDisplay;
 
-        public override Type ReferenceReturnType => ValueType;
+        public override Type[] ReferenceReturnTypes => new[] { ValueType };
 
         public abstract VariableValue GetProperty(ComponentSystem system, VariableValue value, List<Error> errors);
 
-        public override VariableValue GetValue(ComponentSystem system, List<Error> errors)
+        public override VariableValue GetValue(VariableValue value, ComponentSystem system, List<Error> errors)
         {
-            VariableValue val = system.GetVariableValue(VariableId, errors);
-            if (val is null) return null;
-
-            if (!ValueType.IsAssignableFrom(val.GetType()))
+            if (!ValueType.IsAssignableFrom(value.GetType()))
             {
                 errors.Add(new(ErrorType.ExpectedValue, VariableValue.TypeToName(ValueType, false)));
                 return null;
             }
 
-            return GetProperty(system, val, errors);
+            return GetProperty(system, value, errors);
         }
 
         public static void ValueRegistered()

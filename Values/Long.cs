@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using TerraIntegration.Basic;
+using TerraIntegration.DataStructures;
 using TerraIntegration.DisplayedValues;
 using TerraIntegration.Interfaces;
 using TerraIntegration.Interfaces.Math;
@@ -29,6 +30,8 @@ namespace TerraIntegration.Values
         public long NumericMin => long.MinValue;
 
         public UIPanel Interface { get; set; }
+        public byte BitWidth => 64;
+
         public UIFocusInputTextField InterfaceValue;
         static Regex NotDigit = new(@"\D+", RegexOptions.Compiled);
 

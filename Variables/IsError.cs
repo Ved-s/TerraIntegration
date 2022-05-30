@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using TerraIntegration.Basic;
+using TerraIntegration.DataStructures;
 using TerraIntegration.Values;
 
 namespace TerraIntegration.Variables
@@ -24,6 +25,10 @@ namespace TerraIntegration.Variables
             ErrorTest.Clear();
             system.GetVariableValue(VariableId, ErrorTest);
             return new Values.Boolean(ErrorTest.Count > 0);
+        }
+        public override VariableValue GetValue(VariableValue value, ComponentSystem system, List<Error> errors)
+        {
+            throw new InvalidOperationException();
         }
     }
 }

@@ -4,6 +4,7 @@ using Mono.Cecil.Cil;
 using MonoMod.Cil;
 using System.Collections.Generic;
 using System.Linq;
+using TerraIntegration.DataStructures;
 using Terraria;
 using Terraria.GameContent.Drawing;
 using Terraria.ID;

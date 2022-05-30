@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Reflection;
 using TerraIntegration.Basic;
+using TerraIntegration.DataStructures;
 using TerraIntegration.Interfaces;
 using TerraIntegration.Values;
 using TerraIntegration.Variables;

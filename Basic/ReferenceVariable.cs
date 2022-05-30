@@ -2,6 +2,8 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using TerraIntegration.DataStructures;
 using TerraIntegration.UI;
 using TerraIntegration.Values;
 using Terraria.GameContent.UI.Elements;
@@ -13,7 +15,7 @@ namespace TerraIntegration.Basic
     public abstract class ReferenceVariable : Variable, IOwnProgrammerInterface
     {
         public Guid VariableId { get; set; }
-        public virtual Type ReferenceReturnType { get; }
+        public virtual Type[] ReferenceReturnTypes { get; }
 
         public UIPanel Interface { get; set; }
         public UIVariableSlot InterfaceSlot { get; set; }
@@ -26,10 +28,10 @@ namespace TerraIntegration.Basic
                 Top = new(-21, .5f),
                 Left = new(-21, .5f),
             };
-            if (ReferenceReturnType is not null)
+            if (ReferenceReturnTypes is not null)
             {
-                InterfaceSlot.VariableValidator = (var) => ReferenceReturnType?.IsAssignableFrom(var.VariableReturnType) ?? false;
-                InterfaceSlot.HoverText = VariableValue.TypeToName(ReferenceReturnType, true);
+                InterfaceSlot.VariableValidator = (var) => ReferenceReturnTypes.Any(t => t.IsAssignableFrom(var.VariableReturnType));
+                InterfaceSlot.HoverText = string.Join(", ", ReferenceReturnTypes.Select(t => VariableValue.TypeToName(t, true)));
             }
 
             Interface.Append(InterfaceSlot);
@@ -50,6 +52,14 @@ namespace TerraIntegration.Basic
 
         public virtual ReferenceVariable CreateVariable(Variable var) => (ReferenceVariable)Activator.CreateInstance(GetType());
 
+        public abstract VariableValue GetValue(VariableValue value, ComponentSystem system, List<Error> errors);
+
+        public override VariableValue GetValue(ComponentSystem system, List<Error> errors)
+        {
+            VariableValue val = system.GetVariableValue(VariableId, errors);
+            if (val is null) return null;
+            return GetValue(val, system, errors);
+        }
         protected override void SaveCustomData(BinaryWriter writer)
         {
             writer.Write(VariableId.ToByteArray());

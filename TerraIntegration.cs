@@ -4,6 +4,7 @@ using System.IO;
 using System.Reflection;
 using TerraIntegration.Basic;
 using TerraIntegration.Components;
+using TerraIntegration.DataStructures;
 using TerraIntegration.DisplayedValues;
 using TerraIntegration.Values;
 using TerraIntegration.Variables;
