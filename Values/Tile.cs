@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using System.Collections.Generic;
 using System.Reflection;
+using TerraIntegration.Basic;
 using TerraIntegration.DisplayedValues;
 using TerraIntegration.Interfaces;
 using Terraria.ID;
@@ -82,7 +83,7 @@ namespace TerraIntegration.Values
 
         public override DisplayedValue Display(ComponentSystem system)
         {
-            if (TileType < 0) return base.Display(system);
+            if (TileType < 0) return null;
             return new TileDisplay((ushort)TileType, new(TileFrameX, TileFrameY), Color, Name);
         }
     }

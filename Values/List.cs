@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using TerraIntegration.Basic;
 using TerraIntegration.DisplayedValues;
 using TerraIntegration.Interfaces;
 using TerraIntegration.Items;
@@ -97,7 +98,7 @@ namespace TerraIntegration.Values
             SubInterfaces.SetScrollbar(Scroll);
             NewValueAdd.OnClick += AddEntry;
         }
-        public Variables.Variable WriteVariable()
+        public Basic.Variable WriteVariable()
         {
             ListValueEntry[] array = new ListValueEntry[Entries.Count];
 
@@ -106,7 +107,7 @@ namespace TerraIntegration.Values
 
             for (int i = 0; i < Entries.Count; i++)
             {
-                Variables.Variable entry = Entries[i].Owner.WriteVariable();
+                Basic.Variable entry = Entries[i].Owner.WriteVariable();
 
                 if (entry is Reference @ref)
                 {
@@ -139,7 +140,7 @@ namespace TerraIntegration.Values
             IOwnProgrammerInterface owner;
             if (variableType == "ref")
             {
-                if (!Variables.Variable.ByTypeName.TryGetValue(variableType, out var var)
+                if (!Basic.Variable.ByTypeName.TryGetValue(variableType, out var var)
                     || var is not IOwnProgrammerInterface) return;
                 owner = (IOwnProgrammerInterface)var.Clone();
                 valueType = null;
@@ -257,7 +258,7 @@ namespace TerraIntegration.Values
                 if (value.IsRef)
                     writer.Write(value.Id.ToByteArray());
                 else
-                    value.Value.SaveData(writer);
+                    SaveData(value.Value, writer);
             }
         }
         protected override VariableValue LoadCustomData(BinaryReader reader)

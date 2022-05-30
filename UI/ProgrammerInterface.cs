@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using TerraIntegration.Basic;
 using TerraIntegration.Values;
 using TerraIntegration.Variables;
 using Terraria;
@@ -241,6 +242,8 @@ namespace TerraIntegration.UI
             {
                 Top = new(-18, .5f),
                 Left = new(-56, 1),
+
+                AcceptEmpty = true
             });
             ProgrammerOutput.Append(ResultText = new("Result:")
             {
@@ -337,7 +340,7 @@ namespace TerraIntegration.UI
             if (ResultSlot?.Var is null) return;
             if (CurrentOwner is not null)
             {
-                Guid id = ResultSlot.Var.Var.IsEmpty ? default : ResultSlot.Var.Var.Id;
+                Guid id = ResultSlot.Var.Var is null ? default : ResultSlot.Var.Var.Id;
                 Variable result = CurrentOwner.WriteVariable();
                 if (result is not null)
                 {

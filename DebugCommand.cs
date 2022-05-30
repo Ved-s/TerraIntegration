@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TerraIntegration.Basic;
 using TerraIntegration.Values;
 using TerraIntegration.Variables;
 using Terraria;
@@ -118,7 +119,7 @@ namespace TerraIntegration
 
             string valstr = values.Count == 0 ?
                     $"All values are textured ({allValues})" :
-                    $"Not textured values: ({values.Count} os {allVariables})\n    {string.Join(", ", values)}";
+                    $"Not textured values: ({values.Count} of {allVariables})\n    {string.Join(", ", values)}";
 
             string varstr = variables.Count == 0 ?
                     $"All variables are textured ({allVariables})" :

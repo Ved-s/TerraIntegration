@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using TerraIntegration.Basic;
 using TerraIntegration.Interfaces;
 using TerraIntegration.Interfaces.Math;
 using TerraIntegration.UI;

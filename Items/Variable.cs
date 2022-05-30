@@ -8,6 +8,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TerraIntegration.Basic;
 using TerraIntegration.Values;
 using Terraria;
 using Terraria.GameContent;
@@ -22,7 +23,7 @@ namespace TerraIntegration.Items
         public override string Texture => $"{nameof(TerraIntegration)}/Assets/Items/{Name}";
 
         private const string VarTagKey = "var";
-        public Variables.Variable Var = new();
+        public Basic.Variable Var = null;
         public byte Highlight;
 
         public override bool IsCloneable => true;
@@ -37,7 +38,7 @@ namespace TerraIntegration.Items
         public override ModItem Clone(Item item)
         {
             Variable var = (Variable)base.Clone(item);
-            var.Var = Var.Clone();
+            var.Var = Var?.Clone();
             return var;
         }
 
@@ -56,7 +57,7 @@ namespace TerraIntegration.Items
                 }
             }
 
-            if (Var.IsEmpty) return;
+            if (Var is null) return;
 
             string returns = VariableValue.TypeToName(Var.VariableReturnType, true);
 
@@ -75,12 +76,12 @@ namespace TerraIntegration.Items
 
         public override bool CanStack(Item item2)
         {
-            if (!Var.IsEmpty || Var.Name is not null) return false;
+            if (Var is not null) return false;
 
             Variable var = item2.ModItem as Variable;
-            if (var is null || var.Var?.Name != var.Var.Name) return false;
+            if (var is null) return false;
 
-            return var.Var.IsEmpty;
+            return var.Var is null;
         }
 
         public override void SaveData(TagCompound tag)
@@ -88,7 +89,7 @@ namespace TerraIntegration.Items
             MemoryStream stream = new();
             BinaryWriter writer = new(stream);
 
-            tag[VarTagKey] = Var.SaveTag();
+            tag[VarTagKey] = Basic.Variable.SaveTag(Var);
 
             writer.Dispose();
         }
@@ -97,17 +98,17 @@ namespace TerraIntegration.Items
         {
             tag = GetUnloadedItemData(tag);
             if (tag.ContainsKey(VarTagKey))
-                Var = Variables.Variable.LoadTag(tag.GetCompound(VarTagKey)) ?? new();
+                Var = Basic.Variable.LoadTag(tag.GetCompound(VarTagKey));
         }
 
         public override void NetSend(BinaryWriter writer)
         {
-            Var.SaveData(writer);
+            Basic.Variable.SaveData(Var, writer);
         }
 
         public override void NetReceive(BinaryReader reader)
         {
-            Var = Variables.Variable.LoadData(reader);
+            Var = Basic.Variable.LoadData(reader);
         }
 
         public override void AddRecipes()
@@ -120,7 +121,7 @@ namespace TerraIntegration.Items
                 .Register();
         }
 
-        public static Item CreateVarItem(Variables.Variable var) 
+        public static Item CreateVarItem(Basic.Variable var) 
         {
             Item i = new();
             i.SetDefaults(ModContent.ItemType<Variable>());
@@ -138,6 +139,8 @@ namespace TerraIntegration.Items
 
         public void PostDrawAll(SpriteBatch spriteBatch, Vector2 position, Rectangle sourceRectangle, Color color, float rotation, Vector2 origin, float scale) 
         {
+            if (Var is null) return;
+
             Vector2 overlaySize = sourceRectangle.Size() * scale;
             VariableRenderer.DrawVariableOverlay(spriteBatch, false, Var.VariableReturnType, Var.Type, position, overlaySize, color, rotation, origin);
         }

@@ -6,9 +6,9 @@ using TerraIntegration.Values;
 using Terraria.ModLoader;
 using Terraria.ModLoader.IO;
 
-namespace TerraIntegration.Variables
+namespace TerraIntegration.Basic
 {
-    public class Variable
+    public abstract class Variable
     {
         internal readonly static SpriteSheet BasicSheet = new("TerraIntegration/Assets/Types/basic", new(32, 32));
         internal readonly static SpriteSheet MathSheet = new("TerraIntegration/Assets/Types/math", new(32, 32));
@@ -25,14 +25,12 @@ namespace TerraIntegration.Variables
         public virtual SpriteSheetPos SpriteSheetPos => default;
 
         public string Name { get; set; }
-        public Guid Id { get; set; }
+        public Guid Id { get; set; } = Guid.NewGuid();
 
         public string ShortId => ModContent.GetInstance<ComponentWorld>().Guids.GetShortGuid(Id);
 
-        public bool IsEmpty => GetType() == typeof(Variable);
-
-        public virtual string Type => "any";
-        public virtual string TypeDisplay => "Any";
+        public abstract string Type { get; }
+        public abstract string TypeDisplay { get; }
 
         public virtual string TypeDescription => null;
 
@@ -48,47 +46,39 @@ namespace TerraIntegration.Variables
         public string ReturnTypeCacheName;
         public Type ReturnTypeCacheType;
 
-        public Variable()
-        {
-            if (!IsEmpty)
-                Id = Guid.NewGuid();
-        }
-
-        public virtual VariableValue GetValue(ComponentSystem system, List<Error> errors)
-        {
-            return new();
-        }
+        public abstract VariableValue GetValue(ComponentSystem system, List<Error> errors);
         public virtual Variable GetFromCommand(CommandCaller caller, List<string> args) => (Variable)Activator.CreateInstance(GetType());
 
-        public void SaveData(BinaryWriter writer)
+        public static void SaveData(Variable var, BinaryWriter writer)
         {
-            if (this is UnloadedVariable unloaded)
+            if (var is UnloadedVariable unloaded)
             {
                 writer.Write(unloaded.UnloadedTypeName);
-                writer.Write(Name ?? "");
+                writer.Write(var.Name ?? "");
                 writer.Write((ushort)unloaded.UnloadedData.Length);
-                writer.Write(Id.ToByteArray());
+                writer.Write(var.Id.ToByteArray());
                 writer.Write(unloaded.ReturnTypeCacheName ?? "");
                 writer.Write(unloaded.UnloadedData);
                 return;
             }
 
-            writer.Write(Type);
-            writer.Write(Name ?? "");
-            if (IsEmpty)
+            if (var is null)
             {
-                writer.Write((ushort)0);
+                writer.Write("");
                 return;
             }
+
+            writer.Write(var.Type);
+            writer.Write(var.Name ?? "");
 
             long lenPos = writer.BaseStream.Position;
             writer.Write((ushort)0);
 
-            writer.Write(Id.ToByteArray());
-            writer.Write(ReturnTypeCacheName ?? "");
+            writer.Write(var.Id.ToByteArray());
+            writer.Write(var.ReturnTypeCacheName ?? "");
 
             long startPos = writer.BaseStream.Position;
-            SaveCustomData(writer);
+            var.SaveCustomData(writer);
             long endPos = writer.BaseStream.Position;
             long length = endPos - startPos;
 
@@ -123,8 +113,6 @@ namespace TerraIntegration.Variables
                 };
             }
 
-            if (var.IsEmpty) return var;
-
             id = new Guid(reader.ReadBytes(16));
             @return = reader.ReadString().NullIfEmpty();
 
@@ -155,14 +143,16 @@ namespace TerraIntegration.Variables
             return var;
         }
 
-        public TagCompound SaveTag()
+        public static TagCompound SaveTag(Variable var)
         {
             TagCompound tag = new();
 
-            if (this is UnloadedVariable unloaded)
+            if (var is null) return tag;
+
+            if (var is UnloadedVariable unloaded)
             {
                 tag["type"] = unloaded.UnloadedTypeName;
-                tag["id"] = Id.ToByteArray();
+                tag["id"] = var.Id.ToByteArray();
 
                 if (unloaded.UnloadedTag is not null)
                     tag["data"] = unloaded.UnloadedTag;
@@ -179,26 +169,24 @@ namespace TerraIntegration.Variables
                 return tag;
             }
 
-            tag["type"] = Type;
+            tag["type"] = var.Type;
 
-            if (Name is not null)
-                tag["name"] = Name;
+            if (var.Name is not null)
+                tag["name"] = var.Name;
 
-            if (IsEmpty) return tag;
+            tag["id"] = var.Id.ToByteArray();
 
-            tag["id"] = Id.ToByteArray();
+            if (var.ReturnTypeCacheName is not null)
+                tag["return"] = var.ReturnTypeCacheName;
 
-            if (ReturnTypeCacheName is not null)
-                tag["return"] = ReturnTypeCacheName;
-
-            object custom = SaveCustomTag();
+            object custom = var.SaveCustomTag();
             if (custom is not null)
                 tag["data"] = custom;
 
             MemoryStream stream = new MemoryStream();
             BinaryWriter bw = new BinaryWriter(stream);
 
-            SaveCustomData(bw);
+            var.SaveCustomData(bw);
 
             if (stream.Length > 0)
                 tag["bytes"] = stream.ToArray();
@@ -277,7 +265,7 @@ namespace TerraIntegration.Variables
 
         public Variable Clone()
         {
-            Variable var = IsEmpty ? new() : CloneCustom();
+            Variable var = CloneCustom();
             var.Name = Name;
             var.Id = Id;
             return var;

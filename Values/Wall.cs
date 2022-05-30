@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using System.Collections.Generic;
 using System.Reflection;
+using TerraIntegration.Basic;
 using TerraIntegration.Interfaces;
 using Terraria.ID;
 using Terraria.ModLoader;

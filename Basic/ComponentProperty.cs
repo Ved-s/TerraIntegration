@@ -10,7 +10,7 @@ using TerraIntegration.Variables;
 using Terraria.ModLoader;
 using Terraria.ModLoader.IO;
 
-namespace TerraIntegration.Variables
+namespace TerraIntegration.Basic
 {
     public abstract class ComponentProperty : Variable
     {

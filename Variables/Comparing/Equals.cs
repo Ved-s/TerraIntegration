@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TerraIntegration.Basic;
 using TerraIntegration.Interfaces;
 using TerraIntegration.Values;
 
-namespace TerraIntegration.Variables
+namespace TerraIntegration.Variables.Comparing
 {
     public class Equals : DoubleReferenceVariable
     {

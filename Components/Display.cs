@@ -4,6 +4,7 @@ using ReLogic.Graphics;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using TerraIntegration.Basic;
 using TerraIntegration.DisplayedValues;
 using TerraIntegration.UI;
 using TerraIntegration.Values;
@@ -150,7 +151,7 @@ namespace TerraIntegration.Components
 
             if (Main.netMode != NetmodeID.MultiplayerClient)
             {
-                Values.VariableValue value = data.GetVariable(DisplayVariableSlot).GetValue(data.System, Errors);
+                VariableValue value = data.GetVariable(DisplayVariableSlot).GetValue(data.System, Errors);
                 if (Errors.Count > 0)
                 {
                     data.Master.DisplayValue = new ErrorDisplay(Errors.ToArray());

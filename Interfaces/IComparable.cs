@@ -8,8 +8,9 @@ using TerraIntegration.Values;
 
 namespace TerraIntegration.Interfaces
 {
-    public interface IEquatable : IValueInterface
+    public interface IComparable : IEquatable
     {
-        public bool Equals(VariableValue value);
+        public bool GreaterThan(VariableValue value);
+        public bool LessThan(VariableValue value);
     }
 }

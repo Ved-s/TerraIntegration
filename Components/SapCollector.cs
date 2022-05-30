@@ -227,7 +227,7 @@ namespace TerraIntegration.Components
         {
             writer.Write(data.Item is null ? 0 : data.Item.Item.stack);
         }
-        public override SapCollectorData ReceiveCustomData(BinaryReader reader)
+        public override SapCollectorData ReceiveCustomData(BinaryReader reader, Point16 pos)
         {
             SapCollectorData data = new();
 
@@ -252,7 +252,7 @@ namespace TerraIntegration.Components
 
             return tag;
         }
-        public override SapCollectorData LoadCustomDataTag(object data)
+        public override SapCollectorData LoadCustomDataTag(object data, Point16 pos)
         {
             SapCollectorData sdata = new();
 

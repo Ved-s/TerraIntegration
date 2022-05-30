@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
+using TerraIntegration.Basic;
 using TerraIntegration.DisplayedValues;
 using TerraIntegration.Interfaces;
 using TerraIntegration.Interfaces.Math;
@@ -112,7 +113,7 @@ namespace TerraIntegration.Values
             Interface.Append(InterfaceValue);
         }
 
-        public Variables.Variable WriteVariable()
+        public Basic.Variable WriteVariable()
         {
             if (int.TryParse(InterfaceValue.CurrentString, out int value))
                 return new Constant(new Integer(value));

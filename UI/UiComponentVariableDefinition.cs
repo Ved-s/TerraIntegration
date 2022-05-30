@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TerraIntegration.Basic;
 using TerraIntegration.Values;
 using TerraIntegration.Variables;
 using Terraria;
@@ -80,7 +81,7 @@ namespace TerraIntegration.UI
                 string returns;
 
                 if (var.VariableReturnType is null) returns = null;
-                else if (Values.VariableValue.ByType.TryGetValue(var.VariableReturnType, out Values.VariableValue val))
+                else if (VariableValue.ByType.TryGetValue(var.VariableReturnType, out VariableValue val))
                 {
                     returns = Util.ColorTag(val.TypeColor, val.TypeDisplay);
                 }

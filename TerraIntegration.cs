@@ -2,6 +2,7 @@ using System;
 using System.Diagnostics;
 using System.IO;
 using System.Reflection;
+using TerraIntegration.Basic;
 using TerraIntegration.Components;
 using TerraIntegration.DisplayedValues;
 using TerraIntegration.Values;
@@ -18,8 +19,6 @@ namespace TerraIntegration
         {
             Unregister();
 
-            Variable.Register(new Variable());
-            VariableValue.Register(new VariableValue());
             ComponentSystem.RegisterCable(ModContent.TileType<Tiles.Cable>(), false);
             ComponentSystem.RegisterCable(ModContent.WallType<Walls.Cable>(), true);
 

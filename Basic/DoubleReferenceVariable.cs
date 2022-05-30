@@ -10,7 +10,7 @@ using TerraIntegration.Values;
 using Terraria.GameContent.UI.Elements;
 using Terraria.ModLoader;
 
-namespace TerraIntegration.Variables
+namespace TerraIntegration.Basic
 {
     public abstract class DoubleReferenceVariable : Variable, IOwnProgrammerInterface
     {

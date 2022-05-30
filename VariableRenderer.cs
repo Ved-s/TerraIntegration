@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TerraIntegration.Basic;
 using Terraria;
 using Terraria.GameContent;
 using Terraria.ModLoader;
@@ -83,7 +84,7 @@ namespace TerraIntegration
                     hasPos = true;
                 }
 
-                else if (drawType is not null && Values.VariableValue.ByType.TryGetValue(drawType, out var val))
+                else if (drawType is not null && VariableValue.ByType.TryGetValue(drawType, out var val))
                 {
                     spriteSheetPos = val.SpriteSheetPos;
                     if (spriteSheetPos.SpriteSheet is null)
@@ -120,7 +121,7 @@ namespace TerraIntegration
                 }
             }
 
-            if (type is not null && Variables.Variable.ByTypeName.TryGetValue(type, out var var))
+            if (type is not null && Basic.Variable.ByTypeName.TryGetValue(type, out var var))
             {
                 SpriteSheet ss = var.SpriteSheetPos.SpriteSheet ?? var.DefaultSpriteSheet;
                 if (ss is not null)
@@ -139,7 +140,7 @@ namespace TerraIntegration
                         frame = new(0, 0, texture.Width, texture.Height);
                 }
 
-                if (texture is null && var is Variables.ComponentProperty prop 
+                if (texture is null && var is ComponentProperty prop 
                     && Components.Component.ByTypeName.TryGetValue(prop.ComponentType, out Components.Component com))
                 {
                     SpriteSheet sheet = com.DefaultPropertySpriteSheet;

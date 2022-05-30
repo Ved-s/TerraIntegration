@@ -17,6 +17,12 @@
       "executablePath": "dotnet",
       "commandLineArgs": "$(tMLPath) -skipselect \"Tester:Testing world\"",
       "workingDirectory": "$(tMLSteamPath)"
+    },
+    "Terraria (Local server)": {
+      "commandName": "Executable",
+      "executablePath": "dotnet",
+      "commandLineArgs": "$(tMLPath) -j 127.0.0.1 -p 7777",
+      "workingDirectory": "$(tMLSteamPath)"
     }
   }
 }

@@ -7,9 +7,9 @@ using TerraIntegration.DisplayedValues;
 using TerraIntegration.Variables;
 using Terraria.ModLoader;
 
-namespace TerraIntegration.Values
+namespace TerraIntegration.Basic
 {
-    public class VariableValue
+    public abstract class VariableValue
     {
         public readonly static SpriteSheet BasicSheet = new("TerraIntegration/Assets/Values/basic", new(32, 32));
 
@@ -22,16 +22,16 @@ namespace TerraIntegration.Values
         public virtual SpriteSheet DefaultSpriteSheet => null;
         public virtual SpriteSheetPos SpriteSheetPos => default;
 
-        public virtual string Type => "any";
-        public virtual string TypeDisplay => "Any";
+        public abstract string Type { get; }
+        public abstract string TypeDisplay { get; }
 
         public virtual Color TypeColor => Color.White;
 
-        public virtual DisplayedValue Display(ComponentSystem system) { return new ColorTextDisplay("", Color.White); }
+        public virtual DisplayedValue Display(ComponentSystem system) => null;
 
-        public void SaveData(BinaryWriter writer)
+        public static void SaveData(VariableValue value, BinaryWriter writer)
         {
-            if (this is UnloadedVariableValue unloaded)
+            if (value is UnloadedVariableValue unloaded)
             {
                 writer.Write(unloaded.ValueType);
                 writer.Write((ushort)unloaded.Data.Length);
@@ -39,12 +39,18 @@ namespace TerraIntegration.Values
                 return;
             }
 
-            writer.Write(Type);
+            if (value is null)
+            {
+                writer.Write("");
+                return;
+            }
+
+            writer.Write(value.Type);
 
             long lenPos = writer.BaseStream.Position;
             writer.Write((ushort)0);
             long startPos = writer.BaseStream.Position;
-            SaveCustomData(writer);
+            value.SaveCustomData(writer);
             long endPos = writer.BaseStream.Position;
             long length = endPos - startPos;
 
@@ -56,6 +62,8 @@ namespace TerraIntegration.Values
         public static VariableValue LoadData(BinaryReader reader)
         {
             string type = reader.ReadString();
+            if (type == "") return null;
+
             ushort length = reader.ReadUInt16();
 
             if (!ByTypeName.TryGetValue(type, out VariableValue value))
@@ -88,8 +96,11 @@ namespace TerraIntegration.Values
         {
             if (type is null)
                 return null;
-            
-            if (ByType.TryGetValue(type, out Values.VariableValue val))
+
+            if (type == typeof(VariableValue))
+                return "Any";
+
+            if (ByType.TryGetValue(type, out VariableValue val))
             {
                 if (colored)
                     return Util.ColorTag(val.TypeColor, val.TypeDisplay);

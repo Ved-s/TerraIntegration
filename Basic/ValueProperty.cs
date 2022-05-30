@@ -7,7 +7,7 @@ using TerraIntegration.Components;
 using TerraIntegration.Values;
 using TerraIntegration.Variables;
 
-namespace TerraIntegration.Variables
+namespace TerraIntegration.Basic
 {
     public abstract class ValueProperty : ReferenceVariable
     {

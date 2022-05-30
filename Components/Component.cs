@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using TerraIntegration.Basic;
 using TerraIntegration.ComponentProperties;
 using TerraIntegration.UI;
 using TerraIntegration.Variables;
@@ -79,6 +80,7 @@ namespace TerraIntegration.Components
             }
             return false;
         }
+        public override bool Slope(int i, int j) => false;
 
         public void SetupNewTile()
         {
@@ -205,12 +207,12 @@ namespace TerraIntegration.Components
             {
                 if (kvp.Value is null) continue;
                 writer.Write(kvp.Key);
-                kvp.Value.Var.SaveData(writer);
+                Variable.SaveData(kvp.Value.Var, writer);
             }
             writer.Write(data.UpdateFrequency);
             SendDataInternal(writer, data);
         }
-        internal static ComponentData NetReceiveData(BinaryReader reader)
+        internal static ComponentData NetReceiveData(BinaryReader reader, Point16 pos)
         {
             string component = reader.ReadString();
             Dictionary<string, Variable> vars = new();
@@ -219,7 +221,7 @@ namespace TerraIntegration.Components
             for (int i = 0; i < count; i++)
             {
                 string index = reader.ReadString();
-                Variables.Variable var = Variable.LoadData(reader);
+                Basic.Variable var = Variable.LoadData(reader);
 
                 if (var is null) continue;
 
@@ -236,8 +238,8 @@ namespace TerraIntegration.Components
                 return null;
             }
 
-            data = c.ReceiveDataInternal(reader, dataLength, component);
-            data.Init(c);
+            data = c.ReceiveDataInternal(reader, dataLength, component, pos);
+            data.Init(c, pos);
 
             foreach (var kvp in vars)
                 data.SetVariable(kvp.Key, kvp.Value);
@@ -259,7 +261,7 @@ namespace TerraIntegration.Components
             {
                 if (kvp.Value is null) continue;
                 
-                TagCompound vartag = kvp.Value.Var.SaveTag();
+                TagCompound vartag = Variable.SaveTag(kvp.Value.Var);
                 vartag["slot"] = kvp.Key;
                 variables.Add(vartag);
             }
@@ -273,7 +275,7 @@ namespace TerraIntegration.Components
             }
             return tag;
         }
-        internal static ComponentData LoadTag(TagCompound tag)
+        internal static ComponentData LoadTag(TagCompound tag, Point16 pos)
         {
             if (!tag.ContainsKey("type")) return null;
             string component = tag.GetString("type");
@@ -310,8 +312,8 @@ namespace TerraIntegration.Components
                 data = new UnloadedComponentData(component, @internal);
             else
             {
-                data = c.LoadTagInternal(@internal);
-                data.Init(c);
+                data = c.LoadTagInternal(@internal, pos);
+                data.Init(c, pos);
             }
 
             if (tag.ContainsKey("freq"))
@@ -328,14 +330,14 @@ namespace TerraIntegration.Components
             return data;
         }
 
-        internal virtual ComponentData ReceiveDataInternal(BinaryReader reader, ushort dataLength, string type) { return new(); }
+        internal virtual ComponentData ReceiveDataInternal(BinaryReader reader, ushort dataLength, string type, Point16 pos) { return new(); }
         internal virtual void SendDataInternal(BinaryWriter writer, ComponentData data)
         {
             writer.Write((ushort)0);
         }
 
         internal virtual object SaveTagInternal(ComponentData data) => null;
-        internal virtual ComponentData LoadTagInternal(object tag) => new();
+        internal virtual ComponentData LoadTagInternal(object tag, Point16 pos) => new();
 
         internal virtual void InitData(Point16 pos) 
         {
@@ -366,6 +368,7 @@ namespace TerraIntegration.Components
     {
         public Component Component { get; internal set; }
         public ComponentSystem System { get; internal set; }
+        public Point16 Position { get; internal set; }
 
         public ushort UpdateFrequency { get; set; } = 1;
         public Dictionary<string, Items.Variable> Variables { get; internal set; }
@@ -375,11 +378,13 @@ namespace TerraIntegration.Components
             data.System = System;
             data.Variables = Variables;
             data.UpdateFrequency = UpdateFrequency;
+            data.Position = Position;
         }
 
-        internal void Init(Component c)
+        internal void Init(Component c, Point16 pos)
         {
             Component = c;
+            Position = pos;
             Variables = new();
             UpdateFrequency = c.DefaultUpdateFrequency;
             CustomInit(c);
@@ -441,10 +446,10 @@ namespace TerraIntegration.Components
         public new TDataType GetDataOrNull(Point16 pos) => ModContent.GetInstance<ComponentWorld>().GetDataOrNull<TDataType>(pos);
 
         public virtual object SaveCustomDataTag(TDataType data) => null;
-        public virtual TDataType LoadCustomDataTag(object data) => new();
+        public virtual TDataType LoadCustomDataTag(object data, Point16 pos) => new();
 
         public virtual void SendCustomData(TDataType data, BinaryWriter writer) { }
-        public virtual TDataType ReceiveCustomData(BinaryReader reader) => new();
+        public virtual TDataType ReceiveCustomData(BinaryReader reader, Point16 pos) => new();
 
         internal override object SaveTagInternal(ComponentData data)
         {
@@ -454,9 +459,9 @@ namespace TerraIntegration.Components
             }
             return SaveCustomDataTag(tdata);
         }
-        internal override ComponentData LoadTagInternal(object tag)
+        internal override ComponentData LoadTagInternal(object tag, Point16 pos)
         {
-            return LoadCustomDataTag(tag);
+            return LoadCustomDataTag(tag, pos);
         }
 
         internal override void SendDataInternal(BinaryWriter writer, ComponentData data)
@@ -479,17 +484,17 @@ namespace TerraIntegration.Components
             writer.Write((ushort)length);
             writer.BaseStream.Seek(endPos, SeekOrigin.Begin);
         }
-        internal override ComponentData ReceiveDataInternal(BinaryReader reader, ushort length, string type)
+        internal override ComponentData ReceiveDataInternal(BinaryReader reader, ushort length, string type, Point16 pos)
         {
-            long pos = reader.BaseStream.Position;
-            ComponentData data = ReceiveCustomData(reader);
-            long diff = (reader.BaseStream.Position - pos) - length;
+            long startPos = reader.BaseStream.Position;
+            ComponentData data = ReceiveCustomData(reader, pos);
+            long diff = (reader.BaseStream.Position - startPos) - length;
             if (diff != 0)
             {
                 if (diff > 0) Mod.Logger.WarnFormat("Component {0} data overread: {1} bytes", type, diff);
                 else Mod.Logger.WarnFormat("Component {0} data underread: {1} bytes", type, -diff);
 
-                reader.BaseStream.Seek(pos + length, SeekOrigin.Begin);
+                reader.BaseStream.Seek(startPos + length, SeekOrigin.Begin);
             }
             return data;
         }

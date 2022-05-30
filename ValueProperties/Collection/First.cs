@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TerraIntegration.Basic;
 using TerraIntegration.Interfaces;
 using TerraIntegration.Values;
 using TerraIntegration.Variables;
@@ -33,7 +34,7 @@ namespace TerraIntegration.ValueProperties.Collection
         public override VariableValue GetProperty(ComponentSystem system, VariableValue value, List<Error> errors)
         {
             ICollection collection = (ICollection)value;
-            return collection.Enumerate(system, errors).FirstOrDefault(new VariableValue());
+            return collection.Enumerate(system, errors).FirstOrDefault();
         }
     }
 }

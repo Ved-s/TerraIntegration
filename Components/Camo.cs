@@ -151,7 +151,7 @@ namespace TerraIntegration.Components
             return tag;
 
         }
-        public override CamoData LoadCustomDataTag(object data)
+        public override CamoData LoadCustomDataTag(object data, Point16 pos)
         {
             CamoData cd = new();
 
@@ -169,13 +169,25 @@ namespace TerraIntegration.Components
 
             writer.Write(item);
             if (item)
+            {
                 ItemIO.Send(data.CamoTileItem, writer, true);
+                if (data.LastTileType >= 0 && data.CamoTileItem.createTile < 0)
+                    writer.Write(data.LastTileType);
+                else 
+                    writer.Write(-1);
+            }
         }
-        public override CamoData ReceiveCustomData(BinaryReader reader)
+        public override CamoData ReceiveCustomData(BinaryReader reader, Point16 pos)
         {
             CamoData cd = new();
             if (reader.ReadBoolean())
+            {
                 cd.CamoTileItem = ItemIO.Receive(reader, true);
+                CamoChanged(cd.CamoTileItem, pos, true);
+                int tileType = reader.ReadInt32();
+                if (tileType >= 0)
+                    CamoChanged(tileType, pos, true);
+            }
 
             return cd;
         }
@@ -214,7 +226,6 @@ namespace TerraIntegration.Components
                 }
             }
         }
-
         public void CamoChanged(int tileType, Point16 pos, bool noSync)
         {
             CamoData data = GetData(pos);
@@ -252,7 +263,6 @@ namespace TerraIntegration.Components
                     CamoChanged(item, pos, true);
                     broadcast = true;
                     return true;
-
                 case 2:
                     int tileType = reader.ReadInt32();
                     CamoChanged(tileType, pos, true);

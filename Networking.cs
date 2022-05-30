@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TerraIntegration.Basic;
 using TerraIntegration.Components;
 using TerraIntegration.Variables;
 using Terraria;
@@ -134,7 +135,7 @@ namespace TerraIntegration
             for (int i = 0; i < count; i++)
             {
                 Point16 pos = new(reader.ReadInt16(), reader.ReadInt16());
-                ComponentData data = Component.NetReceiveData(reader);
+                ComponentData data = Component.NetReceiveData(reader, pos);
                 
                 if (data is null)
                 {
@@ -263,7 +264,7 @@ namespace TerraIntegration
             if (v is null)
                 pack.Write("");
             else
-                v.SaveData(pack);
+                Variable.SaveData(v, pack);
             pack.Send();
         }
         private static void ReceiveComponentVariable(BinaryReader reader) 

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
+using TerraIntegration.Basic;
 using TerraIntegration.DisplayedValues;
 using TerraIntegration.Interfaces;
 using TerraIntegration.Interfaces.Math;
@@ -20,8 +21,6 @@ namespace TerraIntegration.Values
         public override string TypeDisplay => "Long";
 
         public override Color TypeColor => Color.Red;
-
-        public override SpriteSheetPos SpriteSheetPos => new(BasicSheet, 0, 0);
 
         public long Value { get; set; }
 
@@ -87,7 +86,7 @@ namespace TerraIntegration.Values
             Interface.Append(InterfaceValue);
         }
 
-        public Variables.Variable WriteVariable()
+        public Basic.Variable WriteVariable()
         {
             if (long.TryParse(InterfaceValue.CurrentString, out long value))
                 return new Constant(new Long(value));

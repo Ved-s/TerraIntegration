@@ -58,7 +58,7 @@ namespace TerraIntegration
             }
 
             T newData = new();
-            newData.Init(c);
+            newData.Init(c, pos);
             if (data is not null)
                 data.CopyTo(newData);
 
@@ -80,7 +80,7 @@ namespace TerraIntegration
             }
 
             ComponentData newData = new();
-            newData.Init(c);
+            newData.Init(c, pos);
             ComponentData[pos] = newData;
             return newData;
         }
@@ -104,13 +104,13 @@ namespace TerraIntegration
         public void InitData(Point16 pos, Component c) 
         {
             ComponentData newData = new();
-            newData.Init(c);
+            newData.Init(c, pos);
             ComponentData[pos] = newData;
         }
         public void InitData<T>(Point16 pos, Component<T> c) where T : ComponentData, new()
         {
             T newData = new();
-            newData.Init(c);
+            newData.Init(c, pos);
             ComponentData[pos] = newData;
         }
 
@@ -191,7 +191,6 @@ namespace TerraIntegration
         {
             ModContent.GetInstance<ComponentInterface>().Draw();
         }
-
 
         public bool DrawUI()
         {
@@ -278,7 +277,7 @@ namespace TerraIntegration
                     if (component.ContainsKey("y"))
                         pos.Y = component.GetShort("y");
 
-                    ComponentData data = Component.LoadTag(component);
+                    ComponentData data = Component.LoadTag(component, pos);
                     if (data is null) continue;
 
                     ComponentData[pos] = data;
@@ -290,6 +289,8 @@ namespace TerraIntegration
         {
             if (item.type != ModContent.ItemType<Items.Variable>()) return;
             Items.Variable var = item.ModItem as Items.Variable;
+
+            if (var?.Var is null) return;
 
             bool needsHighlight = VariableHighlights.Any(h => h(var.Var));
             if (!needsHighlight && var.Highlight == 0) return;

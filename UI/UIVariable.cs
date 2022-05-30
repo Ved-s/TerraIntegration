@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using TerraIntegration.Basic;
 using TerraIntegration.Variables;
 using Terraria;
 using Terraria.ModLoader;
@@ -13,9 +14,16 @@ namespace TerraIntegration.UI
         public virtual VariableMatchDelegate VariableValidator { get; set; }
 
         public override int MaxSlotCapacity => 1;
+        public virtual bool AcceptEmpty { get; set; } = false;
 
         public override ItemMatchDelegate ItemValidator => (item) =>
-            item.type == ModContent.ItemType<Items.Variable>() && (VariableValidator?.Invoke((item.ModItem as Items.Variable)?.Var) ?? true);
+        {
+            if (item.type != ModContent.ItemType<Items.Variable>()) return false;
+            Variable var = (item.ModItem as Items.Variable)?.Var;
+            if (var is null && !AcceptEmpty) return false;
+
+            return VariableValidator?.Invoke(var) ?? true;
+        };
 
         public override Item Item
         {

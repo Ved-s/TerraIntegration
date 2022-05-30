@@ -8,7 +8,7 @@ using Terraria.GameContent.UI.Elements;
 using Terraria.ModLoader;
 using Terraria.ModLoader.IO;
 
-namespace TerraIntegration.Variables
+namespace TerraIntegration.Basic
 {
     public abstract class ReferenceVariable : Variable, IOwnProgrammerInterface
     {
@@ -34,7 +34,7 @@ namespace TerraIntegration.Variables
 
             Interface.Append(InterfaceSlot);
         }
-        public Variables.Variable WriteVariable()
+        public Basic.Variable WriteVariable()
         {
             if (InterfaceSlot.Var is not null)
             {

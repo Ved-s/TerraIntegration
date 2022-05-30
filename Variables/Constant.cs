@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using TerraIntegration.Basic;
 using TerraIntegration.Values;
 using Terraria.ModLoader;
 
@@ -16,7 +17,7 @@ namespace TerraIntegration.Variables
         public override string Type => "const";
         public override string TypeDisplay => "Constant";
 
-        public VariableValue Value { get; set; } = new();
+        public VariableValue Value { get; set; }
 
         public override Type VariableReturnType => Value.GetType();
 
@@ -38,7 +39,7 @@ namespace TerraIntegration.Variables
 
         protected override void SaveCustomData(BinaryWriter writer)
         {
-            Value.SaveData(writer);
+            VariableValue.SaveData(Value, writer);
         }
 
         protected override Variable LoadCustomData(BinaryReader reader)
