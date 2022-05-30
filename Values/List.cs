@@ -70,12 +70,14 @@ namespace TerraIntegration.Values
             
             Entries.Clear();
 
+            List<ValueVariablePair> switches = new() { new(null, "ref") };
+            switches.AddRange(ByType.Where(kvp => kvp.Value is not List and IOwnProgrammerInterface).Select(kvp => new ValueVariablePair(kvp.Key, "const")));
+
             Interface.Append(NewValueSwitch = new()
             {
                 Left = new(-96, 1),
 
-                SwitchVariableTypes = new[] { "const", "ref" },
-                SwitchValueTypes = ByType.Where(kvp => kvp.Value is not List and IOwnProgrammerInterface).Select(kvp => kvp.Key).ToArray()
+                SwitchValues = switches.ToArray()
             });
             Interface.Append(NewValueAdd = new("Add")
             {
@@ -135,20 +137,20 @@ namespace TerraIntegration.Values
 
         private void AddEntry(Terraria.UI.UIMouseEvent evt, Terraria.UI.UIElement listeningElement)
         {
-            Type valueType = NewValueSwitch.CurrentValueType;
-            string variableType = NewValueSwitch.CurrentVariableType;
+            ValueVariablePair current = NewValueSwitch.Current.Value;
+            Type entryType = current.ValueType;
 
             IOwnProgrammerInterface owner;
-            if (variableType == "ref")
+            if (current.VariableType == "ref")
             {
-                if (!Basic.Variable.ByTypeName.TryGetValue(variableType, out var var)
+                if (!Basic.Variable.ByTypeName.TryGetValue(current.VariableType, out var var)
                     || var is not IOwnProgrammerInterface) return;
                 owner = (IOwnProgrammerInterface)var.Clone();
-                valueType = null;
+                entryType = null;
             }
             else
             {
-                if (valueType is null || !ByType.TryGetValue(valueType, out VariableValue val)) return;
+                if (entryType is null || !ByType.TryGetValue(entryType, out VariableValue val)) return;
                 if (val is not IOwnProgrammerInterface) return;
                 owner = (IOwnProgrammerInterface)val.Clone();
             }
@@ -168,7 +170,7 @@ namespace TerraIntegration.Values
             };
             ListEntry entry = new()
             {
-                Type = valueType,
+                Type = entryType,
                 Owner = owner,
                 Panel = p,
             };

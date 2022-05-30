@@ -24,6 +24,7 @@ namespace TerraIntegration
     public class ComponentWorld : ModSystem
     {
         public new static TerraIntegration Mod => ModContent.GetInstance<TerraIntegration>();
+        public static ComponentWorld Instance => ModContent.GetInstance<ComponentWorld>();
 
         public ShortGuids Guids { get; } = new(2);
 

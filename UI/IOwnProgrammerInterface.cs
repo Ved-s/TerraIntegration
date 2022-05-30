@@ -27,7 +27,6 @@ namespace TerraIntegration.UI
                 };
                 SetupInterface();
             }
-                
         }
 
         void SetupInterface();

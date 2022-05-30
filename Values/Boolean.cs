@@ -97,7 +97,7 @@ namespace TerraIntegration.Values
             {
                 Width = new(80, 0),
 
-                Top = new(-16, .5f),
+                Top = new(-15, .5f),
                 Left = new(-40, .5f),
                 TextColor = TypeColor,
                 PaddingTop = 8,
