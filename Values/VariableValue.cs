@@ -27,7 +27,7 @@ namespace TerraIntegration.Values
 
         public virtual Color TypeColor => Color.White;
 
-        public virtual DisplayedValue Display(ComponentSystem system) { return new ColorTextDisplay("null", Color.White); }
+        public virtual DisplayedValue Display(ComponentSystem system) { return new ColorTextDisplay("", Color.White); }
 
         public void SaveData(BinaryWriter writer)
         {
