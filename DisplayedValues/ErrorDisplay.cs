@@ -53,13 +53,12 @@ namespace TerraIntegration.DisplayedValues
 
         public override int GetHashCode()
         {
-            return HashCode.Combine(base.GetHashCode(), Type, Errors);
+            return HashCode.Combine(Type, Errors);
         }
 
-        public override bool Equals(object obj)
+        public override bool Equals(DisplayedValue value)
         {
-            return obj is ErrorDisplay display &&
-                   Type == display.Type &&
+            return value is ErrorDisplay display &&
                    Errors.SequenceEqual(display.Errors);
         }
     }

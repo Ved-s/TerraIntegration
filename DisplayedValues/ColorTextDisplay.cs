@@ -66,12 +66,11 @@ namespace TerraIntegration.DisplayedValues
             return new ColorTextDisplay(reader.ReadString(), new Color() { PackedValue = reader.ReadUInt32() });
         }
 
-        public override bool Equals(object obj)
+        public override bool Equals(DisplayedValue value)
         {
-            return obj is ColorTextDisplay display &&
-                   Type == display.Type &&
-                   Text == display.Text &&
-                   Color.Equals(display.Color);
+            return value is ColorTextDisplay display
+                   && Text == display.Text
+                   && Color == display.Color;
         }
 
         public override int GetHashCode()

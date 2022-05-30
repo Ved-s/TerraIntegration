@@ -14,7 +14,7 @@ namespace TerraIntegration.DisplayedValues
 {
     public class TileDisplay : DisplayedValue
     {
-        public override string Type => "texture";
+        public override string Type => "tile";
         public override string HoverText { get; }
 
         public ushort TileType;
@@ -83,20 +83,14 @@ namespace TerraIntegration.DisplayedValues
             writer.Write(MaxZoom);
         }
 
-        public override bool Equals(object obj)
+        public override bool Equals(DisplayedValue value)
         {
-            return obj is TileDisplay display &&
-                   Type == display.Type &&
+            return value is TileDisplay display &&
                    HoverText == display.HoverText &&
                    TileType == display.TileType &&
                    TileFrame == display.TileFrame &&
                    TileColor == display.TileColor &&
                    MaxZoom == display.MaxZoom;
-        }
-
-        public override int GetHashCode()
-        {
-            return HashCode.Combine(Type, HoverText, TileType, TileFrame, TileColor, MaxZoom);
         }
     }
 }

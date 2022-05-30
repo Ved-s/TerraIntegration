@@ -62,5 +62,12 @@ namespace TerraIntegration.DisplayedValues
         {
             ByType.Clear();
         }
+
+        public override bool Equals(object obj)
+            => obj is DisplayedValue value
+            && Type == value.Type
+            && Equals(value);
+
+        public abstract bool Equals(DisplayedValue value);
     }
 }
