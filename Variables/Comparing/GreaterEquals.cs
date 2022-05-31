@@ -13,7 +13,7 @@ namespace TerraIntegration.Variables.Comparing
     public class GreaterEquals : DoubleReferenceVariable
     {
         public override string Type => "greaterEquals";
-        public override string TypeDisplay => ">=";
+        public override string TypeDisplay => "Greater or equals";
 
         public override Type[] LeftSlotValueTypes => new[] { typeof(Interfaces.IComparable) };
 

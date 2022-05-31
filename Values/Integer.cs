@@ -32,6 +32,8 @@ namespace TerraIntegration.Values
         public long NumericMin => int.MinValue;
 
         public UIPanel Interface { get; set; }
+        public bool HasComplexInterface => false;
+
         public byte BitWidth => 32;
 
         public UIFocusInputTextField InterfaceValue;

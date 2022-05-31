@@ -29,6 +29,8 @@ namespace TerraIntegration.Values
         public Type CollectionType { get; set; } = typeof(VariableValue);
 
         public UIPanel Interface { get; set; }
+        public bool HasComplexInterface => true;
+
         List<ListEntry> Entries = new();
         UIList SubInterfaces;
         UIScrollbar Scroll;
@@ -71,7 +73,9 @@ namespace TerraIntegration.Values
             Entries.Clear();
 
             List<ValueVariablePair> switches = new() { new(null, "ref") };
-            switches.AddRange(ByType.Where(kvp => kvp.Value is not List and IOwnProgrammerInterface).Select(kvp => new ValueVariablePair(kvp.Key, "const")));
+            switches.AddRange(from kvp in ByType
+                              where kvp.Value is IOwnProgrammerInterface owner && !owner.HasComplexInterface
+                              select new ValueVariablePair(kvp.Key, "const"));
 
             Interface.Append(NewValueSwitch = new()
             {

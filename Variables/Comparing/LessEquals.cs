@@ -13,7 +13,7 @@ namespace TerraIntegration.Variables.Comparing
     public class LessEquals : DoubleReferenceVariable
     {
         public override string Type => "lessEquals";
-        public override string TypeDisplay => "<=";
+        public override string TypeDisplay => "Less or equals";
 
         public override Type[] LeftSlotValueTypes => new[] { typeof(Interfaces.IComparable) };
 

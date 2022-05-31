@@ -449,68 +449,14 @@ namespace TerraIntegration.UI
                 if (!v.TypeDisplay.ToLower().Contains(VariablesSearch.CurrentString.ToLower())
                     || (!v.HasProperties() && v is not IOwnProgrammerInterface)) continue;
 
-                UITextPanel<string> panel = new UITextPanel<string>(v.TypeDisplay)
-                {
-                    Width = new(0, 1),
-                    Height = new(30, 0),
-
-                    MarginTop = 0,
-                    MarginLeft = 0,
-                    MarginRight = 0,
-                    MarginBottom = 0,
-
-                    PaddingLeft = 32,
-                    PaddingRight = 0,
-
-                    TextColor = v.TypeColor,
-                };
-                panel.Append(new UIDrawing()
-                {
-                    Top = new(-8, 0),
-                    Left = new(-28, 0),
-                    OnDraw = (e, sb, st) => VariableRenderer.DrawVariableOverlay(sb, true, kvp.Key, "const", st.Position(), new(32), Color.White, 0f, Vector2.Zero)
-                });
-
-                panel.OnClick += (ev, el) =>
-                {
-                    Select(panel);
-                    SoundEngine.PlaySound(SoundID.MenuTick);
-                    ValueClicked(v);
-                };
-                VariablesList.Add(panel);
+                VariablesList.Add(CreateVariableButton(v.TypeDisplay, v.TypeColor, kvp.Key, "const", () => ValueClicked(v)));
             }
 
             foreach (Type t in ValueProperty.ByValueType.Keys)
             {
                 if (!t.IsInterface || !t.Name.ToLower().Contains(VariablesSearch.CurrentString.ToLower())) continue;
 
-                UITextPanel<string> panel = new UITextPanel<string>(VariableValue.TypeToName(t, true))
-                {
-                    Width = new(0, 1),
-                    Height = new(30, 0),
-
-                    MarginTop = 0,
-                    MarginLeft = 0,
-                    MarginRight = 0,
-                    MarginBottom = 0,
-
-                    PaddingLeft = 32,
-                    PaddingRight = 0,
-                };
-                panel.Append(new UIDrawing()
-                {
-                    Top = new(-8, 0),
-                    Left = new(-28, 0),
-                    OnDraw = (e, sb, st) => VariableRenderer.DrawVariableOverlay(sb, true, t, null, st.Position(), new(32), Color.White, 0f, Vector2.Zero)
-                });
-
-                panel.OnClick += (ev, el) =>
-                {
-                    Select(panel);
-                    SoundEngine.PlaySound(SoundID.MenuTick);
-                    TypeClicked(t);
-                };
-                VariablesList.Add(panel);
+                VariablesList.Add(CreateVariableButton(VariableValue.TypeToName(t, true), Color.White, t, null, () => TypeClicked(t)));
             }
 
             foreach (Variable v in Variable.ByTypeName.Values)
@@ -519,34 +465,7 @@ namespace TerraIntegration.UI
                     || !v.TypeDisplay.ToLower().Contains(VariablesSearch.CurrentString.ToLower())
                     || v is ValueProperty) continue;
 
-                UITextPanel<string> panel = new UITextPanel<string>(v.TypeDisplay)
-                {
-                    Width = new(0, 1),
-                    Height = new(30, 0),
-
-                    MarginTop = 0,
-                    MarginLeft = 0,
-                    MarginRight = 0,
-                    MarginBottom = 0,
-
-                    PaddingLeft = 32,
-                    PaddingRight = 0,
-                };
-
-                panel.Append(new UIDrawing()
-                {
-                    Top = new(-8, 0),
-                    Left = new(-28, 0),
-                    OnDraw = (e, sb, st) => VariableRenderer.DrawVariableOverlay(sb, true, v.VariableReturnType, v.Type, st.Position(), new(32), Color.White, 0f, Vector2.Zero)
-                });
-
-                panel.OnClick += (ev, el) =>
-                {
-                    Select(panel);
-                    SoundEngine.PlaySound(SoundID.MenuTick);
-                    VariableClicked(interfaceOwner);
-                };
-                VariablesList.Add(panel);
+                VariablesList.Add(CreateVariableButton(v.TypeDisplay, Color.White, v.VariableReturnType, v.Type, () => VariableClicked(interfaceOwner)));
             }
         }
         static void PopulateProperties()
@@ -561,53 +480,17 @@ namespace TerraIntegration.UI
                     (ValueProperty.ByValueType.TryGetValue(CurrentType, out var properties) ?
                     properties.Values.Select(p => (valueType, p)) : Array.Empty<(Type, ValueProperty)>());
 
-
                 foreach (var (type, prop) in props)
                 {
                     if (!prop.TypeDisplay.ToLower().Contains(PropertiesSearch.CurrentString.ToLower())
                         || CurrentValue is not null && !prop.AppliesTo(CurrentValue)) continue;
 
-                    UITextPanel<string> panel = new UITextPanel<string>(prop.TypeDisplay)
-                    {
-                        Width = new(0, 1),
-                        Height = new(30, 0),
-
-                        MarginTop = 0,
-                        MarginLeft = 0,
-                        MarginRight = 0,
-                        MarginBottom = 0,
-
-                        PaddingLeft = 32,
-                        PaddingRight = 0,
-                    };
-                    UIDrawing icon = new UIDrawing()
-                    {
-                        Top = new(-8, 0),
-                        Left = new(-28, 0),
-                        OnDraw = (e, sb, st) => VariableRenderer.DrawVariableOverlay(sb, true, prop.VariableReturnType, prop.Type, st.Position(), new(32), Color.White, 0f, Vector2.Zero)
-                    };
-                    panel.Append(icon);
-                    panel.OnClick += (ev, el) =>
-                    {
-                        Select(panel);
-                        SoundEngine.PlaySound(SoundID.MenuTick);
-                        PropertyClicked(prop);
-                    };
+                    string headText = null;
 
                     if (type != valueType)
-                    {
-                        string typeName = VariableValue.TypeToName(type, true);
+                        headText = $"from {VariableValue.TypeToName(type, true)}";
 
-                        panel.Height = new(45, 0);
-                        panel.PaddingTop = 18;
-                        icon.Top.Pixels -= 2;
-
-                        panel.Append(new UIText($"from {typeName}", .7f) 
-                        {
-                            Top = new(-13, 0),
-                            Left = new(8, 0)
-                        });
-                    }
+                    UITextPanel panel = CreateVariableButton(prop.TypeDisplay, Color.White, prop.VariableReturnType, prop.Type, () => PropertyClicked(prop), headText);
 
                     PropertiesList.Add(panel);
                 }
@@ -677,6 +560,54 @@ namespace TerraIntegration.UI
             PreviousSelectedColor = panel.BackgroundColor;
 
             panel.BackgroundColor = new Color(100, 160, 180);
+        }
+
+        static UITextPanel CreateVariableButton(string text, Color color, Type returnValue, string variableType, Action click, string headText = null) 
+        {
+            UITextPanel panel = new UITextPanel(text, color)
+            {
+                Width = new(0, 1),
+                Height = new(40, 0),
+
+                MarginTop = 0,
+                MarginLeft = 0,
+                MarginRight = 0,
+                MarginBottom = 0,
+
+                PaddingLeft = 38,
+                PaddingRight = 8,
+                PaddingTop = 0,
+                PaddingBottom = 0,
+            };
+            UIDrawing icon = new UIDrawing()
+            {
+                Top = new(4, 0),
+                Left = new(-34, 0),
+                OnDraw = (e, sb, st) => VariableRenderer.DrawVariableOverlay(sb, true, returnValue, variableType, st.Position(), new(32), Color.White, 0f, Vector2.Zero)
+            };
+            panel.Append(icon);
+
+            panel.OnClick += (ev, el) =>
+            {
+                Select(panel);
+                SoundEngine.PlaySound(SoundID.MenuTick);
+                click?.Invoke();
+            };
+
+            if (headText is not null)
+            {
+                panel.Height = new(46, 0);
+                panel.PaddingTop = 6;
+                icon.Top.Pixels -= 3;
+
+                panel.Append(new UIText(headText, .7f)
+                {
+                    Top = new(-3, 0),
+                    Left = new(3, 0)
+                });
+            }
+
+            return panel;
         }
     }
 }

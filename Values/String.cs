@@ -31,6 +31,8 @@ namespace TerraIntegration.Values
         public Type[] ValidAddTypes => new[] { typeof(IToString) };
 
         public UIPanel Interface { get; set; }
+        public bool HasComplexInterface => false;
+
         public Type CollectionType => typeof(Char);
 
         UIFocusInputTextField InterfaceValue;

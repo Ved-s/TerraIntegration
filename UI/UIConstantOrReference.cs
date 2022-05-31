@@ -21,10 +21,11 @@ namespace TerraIntegration.UI
                 validTypes = value;
 
                 SetType(null);
+                Switch.Index = 0;
                 if (value is not null)
                 {
                     List<ValueVariablePair> switches = new() { new(null, "ref") };
-                    switches.AddRange(value.Select(t => new ValueVariablePair(t, null)));
+                    switches.AddRange(value.Select(t => new ValueVariablePair(t, null, "Constant")));
                     Switch.SwitchValues = switches.ToArray();
                 }
                 else
@@ -92,7 +93,9 @@ namespace TerraIntegration.UI
                 return;
             }
 
-            if (!VariableValue.ByType.TryGetValue(valueType, out var value) || value is not IOwnProgrammerInterface)
+            if (!VariableValue.ByType.TryGetValue(valueType, out var value) 
+                || value is not IOwnProgrammerInterface owner
+                || owner.HasComplexInterface)
                 return;
 
             Owner = (IOwnProgrammerInterface)value.Clone();

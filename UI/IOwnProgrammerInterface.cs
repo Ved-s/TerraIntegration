@@ -13,6 +13,7 @@ namespace TerraIntegration.UI
     public interface IOwnProgrammerInterface
     {
         UIPanel Interface { get; set; }
+        bool HasComplexInterface { get; }
 
         public void SetupInterfaceIfNeeded() 
         {

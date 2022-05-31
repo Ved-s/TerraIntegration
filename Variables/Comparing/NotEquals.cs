@@ -13,7 +13,7 @@ namespace TerraIntegration.Variables.Comparing
     public class NotEquals : DoubleReferenceVariable
     {
         public override string Type => "notEquals";
-        public override string TypeDisplay => "!=";
+        public override string TypeDisplay => "Not equals";
 
         public override Type[] LeftSlotValueTypes => new[] { typeof(IEquatable) };
 

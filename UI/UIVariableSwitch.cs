@@ -19,7 +19,7 @@ namespace TerraIntegration.UI
     {
         public ValueVariablePair[] SwitchValues { get; set; }
 
-        int Index
+        public int Index
         {
             get => index;
             set

@@ -28,6 +28,8 @@ namespace TerraIntegration.Values
 
         public char Value { get; set; }
         public UIPanel Interface { get; set; }
+        public bool HasComplexInterface => false;
+
         UIFocusInputTextField InterfaceValue;
 
         public Char() { }

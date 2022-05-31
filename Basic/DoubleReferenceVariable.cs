@@ -31,6 +31,7 @@ namespace TerraIntegration.Basic
 
         public Guid LeftId { get; set; }
         public Guid RightId { get; set; }
+        public bool HasComplexInterface => false;
 
         private Type[] ValidRightTypes;
         private Dictionary<Type, Type[]> ValidTypesCache = new();

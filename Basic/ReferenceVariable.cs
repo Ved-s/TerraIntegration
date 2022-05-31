@@ -19,6 +19,7 @@ namespace TerraIntegration.Basic
 
         public UIPanel Interface { get; set; }
         public UIVariableSlot InterfaceSlot { get; set; }
+        public bool HasComplexInterface => false;
 
         public void SetupInterface()
         {

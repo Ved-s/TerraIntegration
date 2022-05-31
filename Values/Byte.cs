@@ -36,6 +36,8 @@ namespace TerraIntegration.Values
         public UIPanel Interface { get; set; }
         public byte BitWidth => 8;
 
+        public bool HasComplexInterface => false;
+
         public UIFocusInputTextField InterfaceValue;
         static Regex NotDigit = new(@"\D+", RegexOptions.Compiled);
 

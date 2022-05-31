@@ -31,6 +31,7 @@ namespace TerraIntegration.Basic
 
         public Guid Left { get; set; }
         public ValueOrRef Right { get; set; }
+        public bool HasComplexInterface => true;
 
         private Type[] ValidRightTypes;
         private Dictionary<Type, Type[]> ValidTypesCache = new();
@@ -149,17 +150,17 @@ namespace TerraIntegration.Basic
         }
         protected override Variable LoadCustomData(BinaryReader reader)
         {
-            DoubleReferenceVariable doubleRef = (DoubleReferenceVariable)Activator.CreateInstance(GetType());
+            var doubleRef = (DoubleReferenceVariableWithConst)Activator.CreateInstance(GetType());
 
-            doubleRef.LeftId = new(reader.ReadBytes(16));
-            doubleRef.RightId = new(reader.ReadBytes(16));
+            doubleRef.Left = new(reader.ReadBytes(16));
+            doubleRef.Right = ValueOrRef.LoadData(reader);
 
             return doubleRef;
         }
         public override void ModifyTooltips(List<TooltipLine> tooltips)
         {
             if (Left != default && Right is not null)
-                tooltips.Add(new(Mod, "TIDVars", $"[c/aaaa00:Values IDs:] Ref {World.Guids.GetShortGuid(Left)}, {Right}"));
+                tooltips.Add(new(Mod, "TIDVars", $"[c/aaaa00:Values:] Ref {World.Guids.GetShortGuid(Left)}, {Right}"));
         }
 
         public abstract VariableValue GetValue(ComponentSystem system, VariableValue left, VariableValue right, List<Error> errors);

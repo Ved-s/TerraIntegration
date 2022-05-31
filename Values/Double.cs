@@ -34,6 +34,8 @@ namespace TerraIntegration.Values
         public double DecimalMax => double.MaxValue;
         public double DecimalMin => double.MinValue;
 
+        public bool HasComplexInterface => false;
+
         public UIFocusInputTextField InterfaceValue;
         static Regex NotDigitOrDot = new(@"[^\d\.]+", RegexOptions.Compiled);
 

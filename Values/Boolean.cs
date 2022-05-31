@@ -30,6 +30,8 @@ namespace TerraIntegration.Values
 
         public bool Value { get; set; }
         public UIPanel Interface { get; set; }
+        public bool HasComplexInterface => false;
+
         public UITextPanel<string> InterfaceInput;
         public bool InterfaceValue;
 
