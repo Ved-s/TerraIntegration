@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using TerraIntegration.Basic;
 using TerraIntegration.DataStructures;
 using TerraIntegration.Interfaces;
+using TerraIntegration.UI;
 using TerraIntegration.Values;
 
 namespace TerraIntegration.Variables
@@ -17,6 +18,12 @@ namespace TerraIntegration.Variables
 
         public override Type[] LeftSlotValueTypes => new[] { typeof(Values.String) };
         List<string> Strings = new();
+
+        public override SpriteSheetPos SpriteSheetPos => new(BasicSheet, 2, 1);
+
+        public override string LeftSlotDescription => "Delimeter";
+        public override string RightSlotDescription => $"{VariableValue.TypeToName(typeof(IToString), true)}s to join";
+        public override UIDrawing CenterDrawing => null;
 
         public override Type VariableReturnType => typeof(Values.String);
 

@@ -14,6 +14,8 @@ namespace TerraIntegration.ComponentProperties.TileReader
     {
         public override string PropertyName => "walldata";
         public override string PropertyDisplay => "Wall";
+        
+        public override SpriteSheetPos SpriteSheetPos => new(2, 0);
 
         public override Type VariableReturnType => typeof(Wall);
 

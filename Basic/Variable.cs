@@ -14,6 +14,8 @@ namespace TerraIntegration.Basic
         internal readonly static SpriteSheet BasicSheet = new("TerraIntegration/Assets/Types/basic", new(32, 32));
         internal readonly static SpriteSheet MathSheet = new("TerraIntegration/Assets/Types/math", new(32, 32));
         internal readonly static SpriteSheet CollectionSheet = new("TerraIntegration/Assets/Types/collection", new(32, 32));
+        internal readonly static SpriteSheet BooleanSheet = new("TerraIntegration/Assets/Types/boolean", new(32, 32));
+        internal readonly static SpriteSheet ComparingSheet = new("TerraIntegration/Assets/Types/comparing", new(32, 32));
 
         public virtual Mod Mod => ModContent.GetInstance<TerraIntegration>();
         public static ComponentWorld World => ModContent.GetInstance<ComponentWorld>();

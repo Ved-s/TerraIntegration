@@ -15,6 +15,8 @@ namespace TerraIntegration.Variables.Bitwise
         public override string Type => "and";
         public override string TypeDisplay => "And";
 
+        public override SpriteSheetPos SpriteSheetPos => new(BooleanSheet, 0, 0);
+
         public override Type[] GetValidRightSlotTypes(Type leftSlotType)
         {
             return new[] { leftSlotType };

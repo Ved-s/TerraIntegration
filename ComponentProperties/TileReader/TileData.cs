@@ -15,6 +15,8 @@ namespace TerraIntegration.ComponentProperties.TileReader
         public override string PropertyName => "tiledata";
         public override string PropertyDisplay => "Tile";
 
+        public override SpriteSheetPos SpriteSheetPos => new(1, 0);
+
         public override Type VariableReturnType => typeof(Tile);
 
         public override VariableValue GetProperty(Components.TileReader component, Point16 pos, List<Error> errors)

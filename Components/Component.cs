@@ -49,7 +49,7 @@ namespace TerraIntegration.Components
         public virtual bool CanHaveVariables => false;
 
         public virtual string DefaultPropertyTexture => null;
-        public virtual SpriteSheet DefaultPropertySpriteSheet => null;
+        public virtual SpriteSheet DefaultPropertySpriteSheet { get; set; } = null;
         public virtual Point DefaultPropertySpriteSheetPos => default;
 
         public bool HasInterface => HasCustomInterface || VariableInfo?.Length is not null and > 0 || HasProperties();

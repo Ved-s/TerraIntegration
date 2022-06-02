@@ -10,7 +10,7 @@ using Terraria.ModLoader;
 
 namespace TerraIntegration.Values
 {
-    public class Tile : VariableValue, INamed
+    public class Tile : VariableValue, INamed, ITyped
     {
         public override string Type => "tile";
         public override string TypeDisplay => "Tile";
@@ -47,6 +47,7 @@ namespace TerraIntegration.Values
                 return TileLoader.GetTile(TileType)?.Name;
             }
         }
+        int ITyped.Type => TileType;
 
         static Dictionary<int, string> VanillaTileNameCache = new();
 

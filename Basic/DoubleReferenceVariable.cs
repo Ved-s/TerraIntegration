@@ -20,6 +20,9 @@ namespace TerraIntegration.Basic
         public UIVariableSlot LeftSlot { get; set; }
         public UIVariableSlot RightSlot { get; set; }
 
+        public virtual string LeftSlotDescription => null;
+        public virtual string RightSlotDescription => null;
+
         public abstract Type[] LeftSlotValueTypes { get; }
         public virtual UIDrawing CenterDrawing => new UIDrawing()
         {
@@ -48,7 +51,7 @@ namespace TerraIntegration.Basic
 
                 DisplayOnly = true,
                 VariableValidator = (var) => LeftSlotValueTypes is not null && LeftSlotValueTypes.Any(t => t.IsAssignableFrom(var.VariableReturnType)),
-                HoverText = LeftSlotValueTypes is null ? null : string.Join(", ", LeftSlotValueTypes.Select(t => VariableValue.TypeToName(t, true))),
+                HoverText = TypeListWithDescription(LeftSlotValueTypes, LeftSlotDescription),
 
                 VariableChanged = (var) =>
                 {
@@ -63,7 +66,7 @@ namespace TerraIntegration.Basic
                     if (ValidRightTypes is null)
                     {
                         ValidRightTypes = null;
-                        RightSlot.HoverText = null;
+                        RightSlot.HoverText = RightSlotDescription;
                         RightSlot.Var = null;
                         return;
                     }
@@ -71,7 +74,7 @@ namespace TerraIntegration.Basic
                     if (RightSlot.Var is not null && !ValidRightTypes.Any(t => t.IsAssignableFrom(RightSlot.Var.Var.VariableReturnType)))
                         RightSlot.Var = null;
 
-                    RightSlot.HoverText = string.Join(", ", ValidRightTypes.Select(t => VariableValue.TypeToName(t, true)));
+                    RightSlot.HoverText = TypeListWithDescription(ValidRightTypes, RightSlotDescription);
                 }
             });
 
@@ -91,6 +94,7 @@ namespace TerraIntegration.Basic
 
                 DisplayOnly = true,
                 VariableValidator = (var) => ValidRightTypes is not null && ValidRightTypes.Any(t => t.IsAssignableFrom(var.VariableReturnType)),
+                HoverText = RightSlotDescription
             });
         }
 
@@ -106,6 +110,18 @@ namespace TerraIntegration.Basic
             doubleRef.RightId = RightSlot.Var.Var.Id;
 
             return doubleRef;
+        }
+
+        public string TypeListWithDescription(IEnumerable<Type> types, string description)
+        {
+            if (types is null) return description;
+
+            string result = string.Join(", ", string.Join(", ", types.Select(t => VariableValue.TypeToName(t, true))));
+
+            if (description is not null)
+                result += "\n" + description;
+
+            return result;
         }
 
         public override VariableValue GetValue(ComponentSystem system, List<Error> errors)

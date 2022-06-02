@@ -14,6 +14,8 @@ namespace TerraIntegration.Variables.Bitwise
         public override string Type => "not";
         public override string TypeDisplay => "Not";
 
+        public override SpriteSheetPos SpriteSheetPos => new(BooleanSheet, 2, 0);
+
         public override Type[] ReferenceReturnTypes => new[] { typeof(Values.Boolean), typeof(INumeric) };
 
         public override ReferenceVariable CreateVariable(Variable var)

@@ -9,7 +9,7 @@ using Terraria.ModLoader;
 
 namespace TerraIntegration.Values
 {
-    public class Wall : VariableValue, INamed
+    public class Wall : VariableValue, INamed, ITyped
     {
         public override string Type => "wall";
         public override string TypeDisplay => "Wall";
@@ -36,6 +36,7 @@ namespace TerraIntegration.Values
                 return WallLoader.GetWall(WallType)?.Name;
             }
         }
+        int ITyped.Type => WallType;
 
         static Dictionary<int, string> VanillaWallNameCache = new();
 

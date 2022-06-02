@@ -43,6 +43,7 @@ namespace TerraIntegration.UI
             {
                 Top = new(-21, 0.5f),
                 Left = new(-38, 1),
+                AcceptEmpty = true
             };
             Append(Slot);
 

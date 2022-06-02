@@ -16,6 +16,8 @@ namespace TerraIntegration.ComponentProperties.TileReader
         public override string PropertyName => "hasTile";
         public override string PropertyDisplay => "Has Tile";
 
+        public override SpriteSheetPos SpriteSheetPos => new(0, 0);
+
         public override Type VariableReturnType => typeof(Values.Boolean);
 
         public override VariableValue GetProperty(Components.TileReader component, Point16 pos, List<Error> errors)

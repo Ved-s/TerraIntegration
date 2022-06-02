@@ -16,6 +16,8 @@ namespace TerraIntegration.ValueConversions
         public override Type[] ConvertFrom => new[] { typeof(INumeric), typeof(IDecimal) };
         public override Type ConvertTo => typeof(Long);
 
+        public override SpriteSheetPos SpriteSheetPos => new(ConvSheet, 2, 1);
+
         public override bool AppliesTo(VariableValue value) => value is not Long;
         
         public override VariableValue GetProperty(ComponentSystem system, VariableValue value, List<Error> errors)

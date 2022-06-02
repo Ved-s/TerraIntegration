@@ -15,6 +15,8 @@ namespace TerraIntegration.Variables.Comparing
         public override string Type => "greater";
         public override string TypeDisplay => "Greater than";
 
+        public override SpriteSheetPos SpriteSheetPos => new(ComparingSheet, 1, 1);
+
         public override Type[] LeftSlotValueTypes => new[] { typeof(Interfaces.IComparable) };
 
         public override Type[] GetValidRightSlotTypes(Type leftSlotType)

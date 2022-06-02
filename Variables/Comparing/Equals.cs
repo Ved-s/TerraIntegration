@@ -15,7 +15,7 @@ namespace TerraIntegration.Variables.Comparing
         public override string Type => "equals";
         public override string TypeDisplay => "Equals";
 
-        public override SpriteSheetPos SpriteSheetPos => new(BasicSheet, 2, 1);
+        public override SpriteSheetPos SpriteSheetPos => new(ComparingSheet, 0, 0);
 
         public override Type[] LeftSlotValueTypes => new[] { typeof(IEquatable) };
 

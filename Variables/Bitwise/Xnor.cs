@@ -15,6 +15,8 @@ namespace TerraIntegration.Variables.Bitwise
         public override string Type => "xnor";
         public override string TypeDisplay => "Xnor";
 
+        public override SpriteSheetPos SpriteSheetPos => new(BooleanSheet, 3, 0);
+
         public override Type[] GetValidRightSlotTypes(Type leftSlotType)
         {
             return new[] { leftSlotType };

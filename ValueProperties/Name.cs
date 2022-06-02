@@ -17,6 +17,8 @@ namespace TerraIntegration.ComponentProperties.TileReader
         public override string PropertyName => "name";
         public override string PropertyDisplay => "Name";
 
+        public override SpriteSheetPos SpriteSheetPos => new(BasicSheet, 0, 2);
+
         public override Type[] ValueTypes => new[] { typeof(INamed) };
 
         public override Type VariableReturnType => typeof(Values.String);
