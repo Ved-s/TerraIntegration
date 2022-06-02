@@ -25,7 +25,7 @@ namespace TerraIntegration.UI
         static bool BackResizeH = false;
         static Vector2 BackGrabPos;
         static Vector2 InterfacePos = new(500, 320);
-        static Vector2 InterfaceSize = new(740, 480);
+        static Vector2 InterfaceSize;
 
         static UIPanel Back;
         static UITextPanel<string> Reload;

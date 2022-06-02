@@ -16,6 +16,14 @@ namespace TerraIntegration.Variables.Bitwise
 
         public override Type[] ReferenceReturnTypes => new[] { typeof(Values.Boolean), typeof(INumeric) };
 
+        public override ReferenceVariable CreateVariable(Variable var)
+        {
+            return new Not
+            {
+                VariableReturnType = var.VariableReturnType
+            };
+        }
+
         public override VariableValue GetValue(VariableValue value, ComponentSystem system, List<Error> errors)
         {
             if (value is Values.Boolean boolean)

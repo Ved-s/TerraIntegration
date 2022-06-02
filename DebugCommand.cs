@@ -119,7 +119,7 @@ namespace TerraIntegration
 
             string valstr = values.Count == 0 ?
                     $"All values are textured ({allValues})" :
-                    $"Not textured values: ({values.Count} of {allVariables})\n    {string.Join(", ", values)}";
+                    $"Not textured values: ({values.Count} of {allValues})\n    {string.Join(", ", values)}";
 
             string varstr = variables.Count == 0 ?
                     $"All variables are textured ({allVariables})" :
