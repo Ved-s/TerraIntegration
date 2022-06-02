@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Reflection;
 using TerraIntegration.Basic;
+using TerraIntegration.DataStructures;
 using TerraIntegration.DisplayedValues;
 using TerraIntegration.Interfaces;
 using Terraria.ID;
@@ -14,6 +15,8 @@ namespace TerraIntegration.Values
         public override string Type => "tile";
         public override string TypeDisplay => "Tile";
         public override Color TypeColor => Microsoft.Xna.Framework.Color.SaddleBrown;
+
+        public override SpriteSheetPos SpriteSheetPos => new(BasicSheet, 2, 2);
 
         public int TileType { get; set; }
         public int TileFrameX { get; set; }

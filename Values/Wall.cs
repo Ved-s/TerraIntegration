@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Reflection;
 using TerraIntegration.Basic;
+using TerraIntegration.DataStructures;
 using TerraIntegration.Interfaces;
 using Terraria.ID;
 using Terraria.ModLoader;
@@ -13,6 +14,8 @@ namespace TerraIntegration.Values
         public override string Type => "wall";
         public override string TypeDisplay => "Wall";
         public override Color TypeColor => Microsoft.Xna.Framework.Color.Brown;
+        
+        public override SpriteSheetPos SpriteSheetPos => new(BasicSheet, 3, 2);
 
         public int WallType { get; set; }
         public int WallFrameX { get; set; }
