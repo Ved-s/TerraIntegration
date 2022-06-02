@@ -13,7 +13,7 @@ namespace TerraIntegration.ValueProperties.Collection
 {
     public class First : ValueProperty
     {
-        public override Type ValueType => typeof(ICollection);
+        public override Type[] ValueTypes => new[] { typeof(ICollection) };
         public override string PropertyName => "first";
         public override string PropertyDisplay => "First";
 

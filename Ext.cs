@@ -29,5 +29,25 @@ namespace TerraIntegration
             builder.Append(']');
         }
         public static Vector2 Size(this CalculatedStyle style) => new(style.Width, style.Height);
+
+        public static IEnumerable<T> OrderBy<T>(this IEnumerable<T> ienum, params Func<T, bool>[] predicates)
+        {
+            List<T>[] order = new List<T>[predicates.Length + 1];
+            for (int i = 0; i < order.Length; i++)
+                order[i] = new();
+
+            foreach (T t in ienum)
+                for (int i = 0; i < order.Length; i++)
+                    if (i == predicates.Length || predicates[i](t))
+                    {
+                        order[i].Add(t);
+                        break;
+                    }
+            
+
+            foreach (var list in order)
+                foreach (var item in list)
+                    yield return item;
+        }
     }
 }

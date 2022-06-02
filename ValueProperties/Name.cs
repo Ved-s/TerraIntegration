@@ -17,7 +17,7 @@ namespace TerraIntegration.ComponentProperties.TileReader
         public override string PropertyName => "name";
         public override string PropertyDisplay => "Name";
 
-        public override Type ValueType => typeof(INamed);
+        public override Type[] ValueTypes => new[] { typeof(INamed) };
 
         public override Type VariableReturnType => typeof(Values.String);
 

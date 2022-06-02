@@ -14,7 +14,7 @@ namespace TerraIntegration.ValueProperties.Numeric
 {
     public class Increment : ValueProperty
     {
-        public override Type ValueType => typeof(INumeric);
+        public override Type[] ValueTypes => new[] { typeof(INumeric) };
         public override string PropertyName => "inc";
         public override string PropertyDisplay => "Increment";
 

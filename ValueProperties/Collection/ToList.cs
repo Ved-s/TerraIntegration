@@ -15,7 +15,7 @@ namespace TerraIntegration.ValueProperties.Collection
     [Autoload(false)]
     public class ToCollection : ValueProperty
     {
-        public override Type ValueType => typeof(ICollection);
+        public override Type[] ValueTypes => new[] { typeof(ICollection) };
         public override string PropertyName => "toCollection";
         public override string PropertyDisplay => "To Collection";
 

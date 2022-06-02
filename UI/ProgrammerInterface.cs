@@ -472,25 +472,26 @@ namespace TerraIntegration.UI
         {
             PropertiesList.Clear();
 
-            if (CurrentValue is not null || CurrentType is not null)
+            if (CurrentType is not null)
             {
-                Type valueType = CurrentValue?.GetType() ?? CurrentType;
-
-                IEnumerable<(Type, ValueProperty)> props = CurrentValue?.GetProperties() ??
-                    (ValueProperty.ByValueType.TryGetValue(CurrentType, out var properties) ?
-                    properties.Values.Select(p => (valueType, p)) : Array.Empty<(Type, ValueProperty)>());
-
-                foreach (var (type, prop) in props)
+                foreach (var (type, var) in Variable
+                    .GetRelated(CurrentType)
+                    .OrderBy(
+                    v => v.Item1 == CurrentType && v.Item2 is ValueProperty,
+                    v => v.Item2 is ValueProperty && v.Item2 is not ValueConversion,
+                    v => v.Item1 == CurrentType && v.Item2 is not ValueConversion,
+                    v => v.Item2 is not ValueConversion))
                 {
-                    if (!prop.TypeDisplay.ToLower().Contains(PropertiesSearch.CurrentString.ToLower())
-                        || CurrentValue is not null && !prop.AppliesTo(CurrentValue)) continue;
+                    if (!var.TypeDisplay.ToLower().Contains(PropertiesSearch.CurrentString.ToLower())
+                        || CurrentValue is not null && var is ValueProperty prop && !prop.AppliesTo(CurrentValue)
+                        || var is not IOwnProgrammerInterface owner) continue;
 
                     string headText = null;
 
-                    if (type != valueType)
+                    if (type != CurrentType)
                         headText = $"from {VariableValue.TypeToName(type, true)}";
 
-                    UITextPanel panel = CreateVariableButton(prop.TypeDisplay, Color.White, prop.VariableReturnType, prop.Type, () => PropertyClicked(prop), headText);
+                    UITextPanel panel = CreateVariableButton(var.TypeDisplay, Color.White, var.VariableReturnType, var.Type, () => PropertyClicked(owner), headText);
 
                     PropertiesList.Add(panel);
                 }
@@ -500,7 +501,7 @@ namespace TerraIntegration.UI
         static void ValueClicked(VariableValue value)
         {
             CurrentValue = value;
-            CurrentType = null;
+            CurrentType = value.GetType();
             SetInterface(value as IOwnProgrammerInterface);
             PopulateProperties();
         }

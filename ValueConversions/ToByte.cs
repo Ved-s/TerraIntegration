@@ -9,11 +9,11 @@ using TerraIntegration.Interfaces;
 using TerraIntegration.Values;
 using TerraIntegration.Variables;
 
-namespace TerraIntegration.ValueProperties.Numeric
+namespace TerraIntegration.ValueConversions
 {
     public class ToByte : ValueConversion
     {
-        public override Type ConvertFrom => typeof(INumeric);
+        public override Type[] ConvertFrom => new[] { typeof(INumeric), typeof(IDecimal) };
         public override Type ConvertTo => typeof(Values.Byte);
 
         public override SpriteSheetPos SpriteSheetPos => new(ConvSheet, 1, 0);
@@ -22,7 +22,11 @@ namespace TerraIntegration.ValueProperties.Numeric
         
         public override VariableValue GetProperty(ComponentSystem system, VariableValue value, List<Error> errors)
         {
-            long v = ((INumeric)value).NumericValue;
+            long v;
+            if (value is IDecimal @decimal)
+                v = (long)@decimal.DecimalValue;
+            else v = ((INumeric)value).NumericValue;
+
             return (VariableValue.GetInstance<Values.Byte>() as INumeric).GetFromNumeric(v, errors);
         }
     }

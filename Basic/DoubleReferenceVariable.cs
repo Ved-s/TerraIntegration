@@ -33,6 +33,8 @@ namespace TerraIntegration.Basic
         public Guid RightId { get; set; }
         public bool HasComplexInterface => false;
 
+        public override Type[] RelatedTypes => LeftSlotValueTypes;
+
         private Type[] ValidRightTypes;
         private Dictionary<Type, Type[]> ValidTypesCache = new();
         private HashSet<(Type, Type)> ValidTypePairs = new();

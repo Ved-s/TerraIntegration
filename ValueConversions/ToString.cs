@@ -10,11 +10,11 @@ using TerraIntegration.Interfaces;
 using TerraIntegration.Values;
 using TerraIntegration.Variables;
 
-namespace TerraIntegration.ValueProperties
+namespace TerraIntegration.ValueConversions
 {
     public class ToString : ValueConversion
     {
-        public override Type ConvertFrom => typeof(IToString);
+        public override Type[] ConvertFrom => new[] { typeof(IToString) };
         public override Type ConvertTo => typeof(Values.String);
 
         public override SpriteSheetPos SpriteSheetPos => new(ConvSheet, 0, 0);

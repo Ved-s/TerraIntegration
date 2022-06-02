@@ -13,13 +13,13 @@ namespace TerraIntegration.Variables
     {
         internal static SpriteSheet ConvSheet = new("TerraIntegration/Assets/Types/conv", new(32, 32));
 
-        public abstract Type ConvertFrom { get; }
+        public abstract Type[] ConvertFrom { get; }
         public abstract Type ConvertTo { get; }
 
         public virtual string DisplayName => "To {0}";
 
         public override Type VariableReturnType => ConvertTo;
-        public override Type ValueType => ConvertFrom;
+        public override Type[] ValueTypes => ConvertFrom;
         public override string PropertyName 
         {
             get 

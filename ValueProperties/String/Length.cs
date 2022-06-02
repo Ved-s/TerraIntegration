@@ -19,7 +19,7 @@ namespace TerraIntegration.ValueProperties.String
 
         public override SpriteSheetPos SpriteSheetPos => new(BasicSheet, 3, 1);
 
-        public override VariableValue GetProperty(Values.String value, List<Error> errors)
+        public override VariableValue GetProperty(ComponentSystem system, Values.String value, List<Error> errors)
         {
             return new Integer(value.Value?.Length ?? 0);
         }

@@ -159,18 +159,6 @@ namespace TerraIntegration.Basic
             return null;
         }
 
-        public IEnumerable<(Type, ValueProperty)> GetProperties()
-        {
-            Type type = GetType();
-            if (ValueProperty.ByValueType.TryGetValue(type, out var props))
-                foreach (ValueProperty prop in props.Values)
-                    yield return (type, prop);
-
-            foreach (Type interf in type.GetInterfaces())
-                if (ValueProperty.ByValueType.TryGetValue(interf, out var intprops))
-                    foreach (ValueProperty prop in intprops.Values)
-                        yield return (interf, prop);
-        }
         public bool HasProperties()
         {
             Type type = GetType();

@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using TerraIntegration.DataStructures;
 using TerraIntegration.Interfaces;
-using TerraIntegration.Values;
 using Terraria.ModLoader;
 using Terraria.ModLoader.IO;
 
@@ -43,6 +43,8 @@ namespace TerraIntegration.Basic
             }
             set => SetReturnTypeCache(value);
         }
+
+        public virtual Type[] RelatedTypes => null;
 
         public string ReturnTypeCacheName;
         public Type ReturnTypeCacheType;
@@ -305,19 +307,21 @@ namespace TerraIntegration.Basic
             return null;
         }
 
-        public static void Register(Variable v)
+        public static void Register(Variable v, bool skipSubtypeChecks = false)
         {
-            if (v is ComponentProperty pv)
+            if (!skipSubtypeChecks)
             {
-                ComponentProperty.Register(pv);
-                return;
+                if (v is ComponentProperty pv)
+                {
+                    ComponentProperty.Register(pv);
+                    return;
+                }
+                if (v is ValueProperty valpr)
+                {
+                    ValueProperty.Register(valpr);
+                    return;
+                }
             }
-            if (v is ValueProperty valpr)
-            {
-                ValueProperty.Register(valpr);
-                return;
-            }
-
             if (v?.Type is null) return;
             ByType[v.GetType()] = v;
             ByTypeName[v.Type] = v;
@@ -348,6 +352,21 @@ namespace TerraIntegration.Basic
                 return (TValue)value;
 
             return null;
+        }
+
+        public static IEnumerable<(Type, Variable)> GetRelated(Type type)
+        {
+            HashSet<Type> allTypes = new() { type };
+            allTypes.UnionWith(type.GetInterfaces().Where(i => i.GetInterfaces().Any(t => t == typeof(IValueInterface))));
+
+            foreach (Variable var in ByType.Values)
+            {
+                var rel = var.RelatedTypes;
+                if (rel is null) continue;
+                foreach (Type relType in rel)
+                    if (allTypes.Contains(relType))
+                        yield return (relType, var);
+            }
         }
     }
 

@@ -21,6 +21,8 @@ namespace TerraIntegration.Basic
         public UIVariableSlot InterfaceSlot { get; set; }
         public bool HasComplexInterface => false;
 
+        public override Type[] RelatedTypes => ReferenceReturnTypes;
+
         public void SetupInterface()
         {
             InterfaceSlot = new()

@@ -13,7 +13,7 @@ namespace TerraIntegration.ValueProperties.Collection
 {
     public class Length : ValueProperty
     {
-        public override Type ValueType => typeof(ICollection);
+        public override Type[] ValueTypes => new[] { typeof(ICollection) };
         public override string PropertyName => "len";
         public override string PropertyDisplay => "Length";
 
