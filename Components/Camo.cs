@@ -3,6 +3,7 @@ using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
 using System.Collections.Generic;
 using System.IO;
+using TerraIntegration.Basic;
 using TerraIntegration.DataStructures;
 using TerraIntegration.UI;
 using Terraria;
@@ -19,13 +20,7 @@ namespace TerraIntegration.Components
     {
         public Item CamoTileItem { get; set; }
 
-        internal int LastTileType = -1;
-
-        public override void Loaded()
-        {
-            if (HasVariable("camoTile"))
-                CamoTileItem = GetVariableItem("camoTile").Item;
-        }
+        internal TileMimic LastMimic = null;
     }
 
     public class Camo : Component<CamoData>
@@ -43,6 +38,19 @@ namespace TerraIntegration.Components
         public override Vector2 InterfaceOffset => new(24, 0);
 
         List<Error> Errors = new();
+
+        public Camo() 
+        {
+            VariableInfo = new ComponentVariableInfo[]
+            {
+                new()
+                {
+                    AcceptVariableReturnTypes = new[] { typeof(Values.Tile) },
+                    VariableName = "Tile",
+                    VariableSlot = "camoTile"
+                }
+            };
+        }
 
         public override void SetStaticDefaults()
         {
@@ -91,9 +99,7 @@ namespace TerraIntegration.Components
 
                 ItemValidator = (item) =>
                 {
-                    return item.createTile >= TileID.Dirt
-                    || item.ModItem is Items.Variable var
-                    && var.Var.VariableReturnType == typeof(Values.Tile);
+                    return item.createTile >= TileID.Dirt;
                 }
             };
             p.Append(Slot);
@@ -111,7 +117,7 @@ namespace TerraIntegration.Components
             }
 
             base.OnKilled(pos);
-            TileMimicking.MimicType.Remove(pos);
+            TileMimicking.MimicData.Remove(pos);
         }
         public override void OnLoaded(Point16 pos)
         {
@@ -119,7 +125,7 @@ namespace TerraIntegration.Components
             CamoData data = GetData(pos);
             if (data.CamoTileItem is not null && data.CamoTileItem.createTile > -1)
             {
-                TileMimicking.MimicType[pos] = (ushort)data.CamoTileItem.createTile;
+                TileMimicking.MimicData[pos] = new((ushort)data.CamoTileItem.createTile);
             }
         }
         public override void OnUpdate(Point16 pos)
@@ -130,15 +136,22 @@ namespace TerraIntegration.Components
 
             CamoData data = GetData(pos);
 
-            if (data.CamoTileItem?.ModItem is Items.Variable var && var.Var.VariableReturnType == typeof(Values.Tile))
+            if (data.TryGetVariable("camoTile", out Variable var))
             {
                 Errors.Clear();
-                Values.Tile tile = var.Var.GetValue(data.System, Errors) as Values.Tile;
-                if (tile is null || Errors.Count > 0)
+                Values.Tile tile = var.GetValue(data.System, Errors) as Values.Tile;
+
+                TileMimic mimic = null;
+
+                if (tile is not null && Errors.Count <= 0 && tile.TileType >= 0)
                 {
-                    CamoChanged(-1, pos, false);
+                    mimic = new();
+                    mimic.Type = (ushort)tile.TileType;
+                    mimic.FrameX = (short)tile.TileFrameX;
+                    mimic.FrameY = (short)tile.TileFrameY;
                 }
-                else CamoChanged(tile.TileType, pos, false);
+
+                CamoChanged(mimic, pos, false);
             }
         }
 
@@ -146,7 +159,7 @@ namespace TerraIntegration.Components
         {
             TagCompound tag = new TagCompound();
 
-            if (data.CamoTileItem is not null && !data.HasVariable("camoTile"))
+            if (data.CamoTileItem is not null)
                 tag["item"] = ItemIO.Save(data.CamoTileItem);
 
             return tag;
@@ -166,17 +179,14 @@ namespace TerraIntegration.Components
         }
         public override void SendCustomData(CamoData data, BinaryWriter writer)
         {
-            bool item = data.CamoTileItem is not null && !data.HasVariable("camoTile");
+            bool item = data.CamoTileItem is not null;
 
             writer.Write(item);
             if (item)
             {
                 ItemIO.Send(data.CamoTileItem, writer, true);
-                if (data.LastTileType >= 0 && data.CamoTileItem.createTile < 0)
-                    writer.Write(data.LastTileType);
-                else 
-                    writer.Write(-1);
             }
+            TileMimic.SaveData(data.LastMimic, writer);
         }
         public override CamoData ReceiveCustomData(BinaryReader reader, Point16 pos)
         {
@@ -184,12 +194,9 @@ namespace TerraIntegration.Components
             if (reader.ReadBoolean())
             {
                 cd.CamoTileItem = ItemIO.Receive(reader, true);
-                CamoChanged(cd.CamoTileItem, pos, true);
-                int tileType = reader.ReadInt32();
-                if (tileType >= 0)
-                    CamoChanged(tileType, pos, true);
+                CamoChanged(cd.CamoTileItem, pos, true);  
             }
-
+            CamoChanged(TileMimic.LoadData(reader), pos, true);
             return cd;
         }
 
@@ -197,23 +204,13 @@ namespace TerraIntegration.Components
         {
             CamoData data = GetData(pos);
 
-            if (camo?.ModItem is Items.Variable var)
-            {
-                data.SetVariable("camoTile", var);
-                OnVariableChanged(pos, "camoTile");
-                noSync = true;
-            }
+            TileMimic mimic = null;
 
-            if (camo is null || camo.createTile < TileID.Dirt)
+            if (camo is not null && camo.createTile >= TileID.Dirt)
             {
-                if (camo is null && data.HasVariable("camoTile"))
-                {
-                    data.ClearVariable("camoTile");
-                    OnVariableChanged(pos, "camoTile");
-                }
-                CamoChanged(-1, pos, true);
+                mimic = new((ushort)camo.createTile);
             }
-            else CamoChanged(camo.createTile, pos, true);
+            CamoChanged(mimic, pos, true);
 
             if (!noSync && Main.netMode != NetmodeID.SinglePlayer)
             {
@@ -226,24 +223,24 @@ namespace TerraIntegration.Components
                 }
             }
         }
-        public void CamoChanged(int tileType, Point16 pos, bool noSync)
+        public void CamoChanged(TileMimic mimic, Point16 pos, bool noSync)
         {
             CamoData data = GetData(pos);
 
-            if (tileType == data.LastTileType) return;
-            data.LastTileType = tileType;
-            if (tileType > -1)
+            if (Util.ObjectsNullEqual(mimic, data.LastMimic)) return;
+            data.LastMimic = mimic;
+            if (mimic is not null)
             {
-                TileMimicking.MimicType[pos] = (ushort)tileType;
+                TileMimicking.MimicData[pos] = mimic;
             }
-            else TileMimicking.MimicType.Remove(pos);
+            else TileMimicking.MimicData.Remove(pos);
 
             WorldGen.SquareTileFrame(pos.X, pos.Y, false);
 
             if (!noSync && Main.netMode != NetmodeID.SinglePlayer)
             {
                 ModPacket p = CreatePacket(pos, 2);
-                p.Write(tileType);
+                TileMimic.SaveData(mimic, p);
                 p.Send();
             }
         }
@@ -254,7 +251,7 @@ namespace TerraIntegration.Components
             {
                 case 0:
                     GetData(pos).CamoTileItem = null;
-                    CamoChanged(null, pos, true);
+                    CamoChanged(null as Item, pos, true);
                     broadcast = true;
                     return true;
                 case 1:
@@ -264,8 +261,7 @@ namespace TerraIntegration.Components
                     broadcast = true;
                     return true;
                 case 2:
-                    int tileType = reader.ReadInt32();
-                    CamoChanged(tileType, pos, true);
+                    CamoChanged(TileMimic.LoadData(reader), pos, true);
                     broadcast = true;
                     return true;
 
@@ -277,14 +273,12 @@ namespace TerraIntegration.Components
         public override bool PreDraw(int i, int j, SpriteBatch spriteBatch)
         {
             CamoData data = GetData(new(i, j));
-            int type = data.LastTileType;
+            bool anyCamo = data.CamoTileItem is not null || data.HasVariable("camoTile"); 
 
-            if (data.CamoTileItem is not null && data.CamoTileItem.createTile >= TileID.Dirt)
-                type = data.CamoTileItem.createTile;
-
-            if (type <= -1
-                || !TileMimicking.MimicResult.TryGetValue(new(i, j), out TileMimicking.TileMimic mimic)
-                || mimic.Type != type
+            if (!anyCamo
+                || data.LastMimic is null
+                || !TileMimicking.MimicData.TryGetValue(new(i, j), out TileMimic mimic)
+                || data.LastMimic.Type != mimic.Type
                 || Main.LocalPlayer.CanSeeInvisibleBlocks) return true;
 
             Asset<Texture2D> tile = TextureAssets.Tile[mimic.Type];

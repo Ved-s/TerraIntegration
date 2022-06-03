@@ -184,6 +184,8 @@ namespace TerraIntegration.Components
             ComponentData data = GetData(pos);
             data.UpdateFrequency = rate;
 
+            Statistics.LogMessage($"Set updates to {rate} at {pos} for {data.Component?.Type}");
+
             Networking.SendComponentFrequency(pos);
 
             SetUpdates(pos, rate > 0);
@@ -435,6 +437,11 @@ namespace TerraIntegration.Components
         public bool HasVariable(string slot)
         {
             return slot is not null && Variables.ContainsKey(slot) && Variables[slot] is not null;
+        }
+        public bool TryGetVariable(string slot, out Variable var)
+        {
+            var = GetVariable(slot);
+            return var is not null;
         }
     }
 

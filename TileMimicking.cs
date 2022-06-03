@@ -1,32 +1,25 @@
 ﻿using Microsoft.Xna.Framework;
+using System;
 using System.Collections.Generic;
+using System.IO;
 using TerraIntegration.DataStructures;
 using Terraria;
+using Terraria.ModLoader;
 using Terraria.ObjectData;
 
 namespace TerraIntegration
 {
     public static class TileMimicking
     {
-        public static Dictionary<Point16, ushort> MimicType = new();
-        public static Dictionary<Point16, TileMimic> MimicResult = new();
-
+        public static Dictionary<Point16, TileMimic> MimicData = new();
         public static Dictionary<Point16, TileMimic> TileMimicsInProgress = new();
-
-        public class TileMimic
-        {
-            public ushort Type;
-            public short FrameX;
-            public short FrameY;
-
-            public Rectangle FrameRect() => new(FrameX, FrameY, 16, 16);
-        }
 
         public static void Clear()
         {
-            MimicType.Clear();
-            MimicResult.Clear();
+            MimicData.Clear();
         }
+
+        public static bool IsMimicking(int x, int y) => TileMimicsInProgress.ContainsKey(new(x, y));
 
         public static ushort GetRealTileType(int x, int y)
         {
@@ -63,19 +56,19 @@ namespace TerraIntegration
 
         public static void PrepareTileMimicking(Point16 pos)
         {
-            if (TileMimicsInProgress.ContainsKey(pos) 
-                || !MimicType.TryGetValue(pos, out ushort mimicType)) return;
+            if (TileMimicsInProgress.ContainsKey(pos)
+                || !MimicData.TryGetValue(pos, out TileMimic mimic)) return;
 
-            if (!NeedsMimicking(mimicType))
+            if (!NeedsMimicking(mimic.Type))
             {
-                TileObjectData tileObject = TileObjectData.GetTileData(mimicType, 0);
+                TileObjectData tileObject = TileObjectData.GetTileData(mimic.Type, 0);
                 if (tileObject is not null)
                 {
                     var orig = tileObject.Origin;
 
-                    MimicResult[pos] = new()
+                    MimicData[pos] = new()
                     {
-                        Type = mimicType,
+                        Type = mimic.Type,
                         FrameX = (short)(orig.X * 16),
                         FrameY = (short)(orig.Y * 16),
                     };
@@ -83,23 +76,16 @@ namespace TerraIntegration
                 return;
             }
 
-            TileMimic mimicTile;
-            if (MimicResult.TryGetValue(pos, out mimicTile))
-            {
-                if (mimicTile.Type != mimicType)
-                    mimicTile = new();
-            } else mimicTile = new();
             Tile tile = Main.tile[pos.X, pos.Y];
-            mimicTile.Type = mimicType;
 
             TileMimic realTile = new();
             realTile.Type = tile.TileType;
             realTile.FrameX = tile.TileFrameX;
             realTile.FrameY = tile.TileFrameY;
 
-            tile.TileType = mimicTile.Type;
-            tile.TileFrameX = mimicTile.FrameX;
-            tile.TileFrameY = mimicTile.FrameY;
+            tile.TileType = mimic.Type;
+            tile.TileFrameX = mimic.FrameX;
+            tile.TileFrameY = mimic.FrameY;
 
             TileMimicsInProgress.Add(pos, realTile);
         }
@@ -115,7 +101,7 @@ namespace TerraIntegration
             mimicTile.FrameX = tile.TileFrameX;
             mimicTile.FrameY = tile.TileFrameY;
 
-            MimicResult[pos] = mimicTile;
+            MimicData[pos] = mimicTile;
 
             tile.TileType = realTile.Type;
             tile.TileFrameX = realTile.FrameX;
@@ -132,6 +118,74 @@ namespace TerraIntegration
         public static bool NeedsMimicking(int type)
         {
             return !Main.tileFrameImportant[type];
+        }
+    }
+
+    public class TileMimic
+    {
+        public ushort Type;
+        public short FrameX;
+        public short FrameY;
+
+        public TileMimic() { }
+
+        public TileMimic(ushort type)
+        {
+            Type = type;
+        }
+
+        public TileMimic(ushort type, short frameX, short frameY)
+        {
+            Type = type;
+            FrameX = frameX;
+            FrameY = frameY;
+        }
+
+        public static void SaveData(TileMimic mimic, BinaryWriter writer)
+        {
+            if (mimic is null)
+            {
+                writer.Write(false);
+                return;
+            }
+
+            writer.Write(true);
+            writer.Write(mimic.Type);
+            writer.Write(mimic.FrameX);
+            writer.Write(mimic.FrameY);
+        }
+
+        public static TileMimic LoadData(BinaryReader reader)
+        {
+            if (!reader.ReadBoolean())
+                return null;
+
+            return new(reader.ReadUInt16(), reader.ReadInt16(), reader.ReadInt16());
+        }
+
+        public Rectangle FrameRect() => new(FrameX, FrameY, 16, 16);
+
+        public override bool Equals(object obj)
+        {
+            return obj is TileMimic mimic &&
+                   Type == mimic.Type &&
+                   FrameX == mimic.FrameX &&
+                   FrameY == mimic.FrameY;
+        }
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(Type, FrameX, FrameY);
+        }
+
+        public static bool operator ==(TileMimic left, TileMimic right)
+        {
+            return EqualityComparer<TileMimic>.Default.Equals(left, right);
+        }
+
+        public static bool operator !=(TileMimic left, TileMimic right)
+        {
+            return !(left == right);
         }
     }
 }

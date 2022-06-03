@@ -118,7 +118,7 @@ namespace TerraIntegration
 
         public void RemoveAll(Point16 pos)
         {
-            TileMimicking.MimicType.Remove(pos);
+            TileMimicking.MimicData.Remove(pos);
             if (ComponentData.TryGetValue(pos, out ComponentData data))
             {
                 data.Destroy(pos);

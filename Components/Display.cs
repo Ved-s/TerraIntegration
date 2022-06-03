@@ -88,7 +88,7 @@ namespace TerraIntegration.Components
         }
         public override bool TileFrame(int i, int j, ref bool resetFrame, ref bool noBreak)
         {
-            if (Main.netMode != NetmodeID.MultiplayerClient)
+            if (Main.netMode != NetmodeID.MultiplayerClient && !TileMimicking.IsMimicking(i, j))
             {
                 Point16 pos = new(i, j);
                 if (!GetData(pos).FrameScanCompleted)
