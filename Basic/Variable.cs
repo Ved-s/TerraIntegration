@@ -370,6 +370,30 @@ namespace TerraIntegration.Basic
                         yield return (relType, var);
             }
         }
+
+        protected bool TryGetValueType<TValue>(VariableValue value, List<Error> errors, out TValue newValue) where TValue : VariableValue
+        {
+            newValue = null;
+            if (CheckValueType(value, typeof(TValue), errors))
+            {
+                newValue = value as TValue;
+                return true;
+            }
+            return false;
+        }
+
+        protected bool CheckValueType(VariableValue value, Type type, List<Error> errors)
+        {
+            if (value is null && errors.Count > 0) return false;
+
+            if (value is null || value.GetType().IsAssignableTo(type))
+            {
+                errors.Add(Error.ExpectedValue(type, Id));
+                return false;
+            }
+
+            return true;
+        }
     }
 
     public class UnloadedVariable : Variable

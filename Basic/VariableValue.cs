@@ -93,6 +93,8 @@ namespace TerraIntegration.Basic
         protected virtual void SaveCustomData(BinaryWriter writer) { }
         protected virtual VariableValue LoadCustomData(BinaryReader reader) { return (VariableValue)Activator.CreateInstance(GetType()); }
 
+        public static string TypeToName<T>(bool colored = true)
+            => TypeToName(typeof(T), colored);
         public static string TypeToName(Type type, bool colored)
         {
             if (type is null)

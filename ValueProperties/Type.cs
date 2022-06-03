@@ -16,6 +16,8 @@ namespace TerraIntegration.ValueProperties
         public override string PropertyName => "type";
         public override string PropertyDisplay => "Type";
 
+        public override Type VariableReturnType => typeof(Integer);
+
         public override VariableValue GetProperty(ComponentSystem system, VariableValue value, List<Error> errors)
         {
             return new Integer(((ITyped)value).Type);
