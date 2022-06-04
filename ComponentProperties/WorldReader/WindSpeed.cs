@@ -14,6 +14,8 @@ namespace TerraIntegration.ComponentProperties.WorldReader
         public override string PropertyName => "windSpeed";
         public override string PropertyDisplay => "Wind speed";
 
+        public override SpriteSheetPos SpriteSheetPos => new(1, 1);
+
         public override Type VariableReturnType => typeof(Values.Float);
 
         public override VariableValue GetProperty(Components.WorldReader component, Point16 pos, List<Error> errors)

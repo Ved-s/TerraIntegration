@@ -14,6 +14,8 @@ namespace TerraIntegration.ComponentProperties.WorldReader
         public override string PropertyName => "day";
         public override string PropertyDisplay => "Is Daytime";
 
+        public override SpriteSheetPos SpriteSheetPos => new(1, 0);
+
         public override Type VariableReturnType => typeof(Values.Boolean);
 
         public override VariableValue GetProperty(Components.WorldReader component, Point16 pos, List<Error> errors)
