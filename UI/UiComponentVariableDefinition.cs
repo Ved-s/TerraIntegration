@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using TerraIntegration.Basic;
+using TerraIntegration.DataStructures;
 using TerraIntegration.Values;
 using TerraIntegration.Variables;
 using Terraria;
@@ -17,25 +18,40 @@ namespace TerraIntegration.UI
 {
     public class UIComponentVariableDefinition : UIPanel
     {
-        public string VariableType { get; set; } = "any";
+        public ComponentProperty Property { get; }
+        public PositionedComponent Component { get; }
 
         public Action<Items.Variable> DefineVariable;
 
-        private UIText TextName;
+        private UITextPanel TextName;
         private UIVariableSlot Slot;
+        List<Error> Errors = new();
 
-        public UIComponentVariableDefinition()
+        public UIComponentVariableDefinition(ComponentProperty property, PositionedComponent component)
         {
+            Property = property;
+            Component = component;
+
             Height = new(58, 0);
             MinWidth = new(200, 0);
+            PaddingTop = 0;
+            PaddingBottom = 0;
 
-            TextName = new("unregistered variable")
+            TextName = new(property.TypeDisplay)
             {
                 Left = new(44, 0),
                 Width = new(-82, 1),
                 Height = new(0, 1),
-                MarginTop = 10,
-                TextOriginX = 0
+
+                BackgroundColor = Color.Transparent,
+                BorderColor = Color.Transparent,
+
+                TextAlign = new(0, .5f),
+
+                PaddingTop = 8,
+                PaddingBottom = 8,
+                PaddingLeft = 0,
+                PaddingRight = 0,
             };
             Append(TextName);
 
@@ -54,51 +70,43 @@ namespace TerraIntegration.UI
         {
             base.Update(gameTime);
 
-            if (!Variable.ByTypeName.TryGetValue(VariableType, out Variable var))
-                return;
+            if (Component.Component is null || Property is null) return;
 
-            TextName.SetText(var.TypeDisplay);
+            Errors.Clear();
+            ComponentSystem system = null;//Component.GetData().System;
+            string value = Property.GetProperty(Component, Errors)?.Display(system)?.HoverText;
+
+            if (value is null)
+                TextName.Text = Property.TypeDisplay;
+            else 
+                TextName.Text = Property.TypeDisplay + "\n[c/aaaaaa:Value:] " + value.Replace('\n', ' ');
         }
 
         protected override void DrawSelf(SpriteBatch spriteBatch)
         {
             base.DrawSelf(spriteBatch);
 
-            const float size = 40;
-
-            if (!Variable.ByTypeName.TryGetValue(VariableType, out Variable var))
+            if (Property is null) 
                 return;
+
+            const float size = 40;
 
             CalculatedStyle dim = GetDimensions();
 
             Vector2 pos = new Vector2(8, (dim.Height - size) / 2);
             pos += dim.Position();
 
-            VariableRenderer.DrawVariableOverlay(spriteBatch, true, var.VariableReturnType, var.Type, pos, new(size), Color.White, 0f, Vector2.Zero);
+            VariableRenderer.DrawVariableOverlay(spriteBatch, true, Property.VariableReturnType, Property.Type, pos, new(size), Color.White, 0f, Vector2.Zero);
 
             Rectangle hitbox = new((int)pos.X, (int)pos.Y, (int)size, (int)size);
             if (hitbox.Contains(Main.MouseScreen.ToPoint())) 
             {
-                string returns;
-
-                if (var.VariableReturnType is null) returns = null;
-                else if (VariableValue.ByType.TryGetValue(var.VariableReturnType, out VariableValue val))
-                {
-                    returns = Util.ColorTag(val.TypeColor, val.TypeDisplay);
-                }
-                else if (var.VariableReturnType?.IsInterface ?? false)
-                {
-                    string i = var.VariableReturnType.Name;
-                    if (i.StartsWith('I')) i = i[1..];
-
-                    returns = $"[c/aabb00:{i}]";
-                }
-                else returns = $"[c/ffaaaa:unregistered type ({var.VariableReturnType.Name})]";
+                string returns = VariableValue.TypeToName(Property.VariableReturnType, true);
 
                 ModContent.GetInstance<ComponentWorld>().HoverText =
-                    $"[c/aaaa00:Type:] {var.TypeDisplay}" +
+                    $"[c/aaaa00:Type:] {Property.TypeDisplay}" +
                     (returns is null ? "" : $"\n[c/aaaa00:Returns:] {returns}") +
-                    (var.TypeDescription is null ? "" : "\n" + var.TypeDescription);
+                    (Property.TypeDescription is null ? "" : "\n" + Property.TypeDescription);
             }
         }
 

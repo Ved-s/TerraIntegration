@@ -37,8 +37,12 @@ namespace TerraIntegration.UI
 
             if (Text is null) return;
 
-            TextSnippet[] snippets = ChatManager.ParseMessage(Text, Color).ToArray();
+            string text = Text;
+
+            TextSnippet[] snippets = ChatManager.ParseMessage(text, Color).ToArray();
             Vector2 textSize = ChatManager.GetStringSize(FontAssets.MouseText.Value, snippets, new(1));
+
+            textSize.Y = (text.Count(c => c == '\n') + 1) * FontAssets.MouseText.Value.LineSpacing;
 
             CalculatedStyle inner = GetInnerDimensions();
 

@@ -202,7 +202,7 @@ namespace TerraIntegration.Basic
     public class UnloadedVariableValue : VariableValue
     {
         public override string Type => "unloaded";
-        public override string TypeDisplay => "Unloaded value";
+        public override string TypeDisplay => $"Unloaded value" + (ValueType.IsNullEmptyOrWhitespace() ? null : $" ({ValueType})");
 
         public override Color TypeColor => Color.Red;
         public override DisplayedValue Display(ComponentSystem system) => new ColorTextDisplay("Unloaded", TypeColor);

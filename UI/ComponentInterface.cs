@@ -149,22 +149,46 @@ namespace TerraIntegration.UI
             IEnumerable<ComponentProperty> props = InterfaceComponent.Component.GetProperties();
             if (props is not null)
             {
-                int y = (int)pos.Y;
+                int height = 0;
+
+                Interface.CurrentState.MinWidth.Set(250, 0);
+
+                UIList list = new()
+                {
+                    Width = new(0, 1),
+                    Height = new(247, 0),
+
+                    Top = new(pos.Y, 0),
+                    Left = new(pos.X, 0),
+                };
 
                 foreach (ComponentProperty v in props)
                 {
-                    var def = new UIComponentVariableDefinition()
+                    var def = new UIComponentVariableDefinition(v, InterfaceComponent)
                     {
-                        Top = new(y, 0),
-                        Left = new(pos.X, 0),
                         Width = new(0, 1),
 
-                        VariableType = v.Type,
                         DefineVariable = (var) => var.Var = v.CreateVariable(InterfaceComponent)
                     };
-                    Interface.CurrentState.Append(def);
+                    list.Add(def);
 
-                    y += (int)(def.Height.Pixels) + 4;
+                    height += (int)(def.Height.Pixels) + 4;
+                }
+
+                Interface.CurrentState.Append(list);
+
+                if (height > list.Height.Pixels)
+                {
+                    list.Width = new(-22, 1);
+
+                    UIScrollbar sb = new()
+                    {
+                        Height = new(list.Height.Pixels - 12, 0),
+                        Top = new(pos.Y + 6, 0),
+                        Left = new(-20, 1),
+                    };
+                    list.SetScrollbar(sb);
+                    Interface.CurrentState.Append(sb);
                 }
             }
         }
@@ -253,9 +277,13 @@ namespace TerraIntegration.UI
 
         public void SetupTabSwitch()
         {
-            if (GetTabsAvailable() < 2) return;
+            int tabs = GetTabsAvailable();
+            if (tabs == 0) return;
 
             int x = 0;
+
+            List<UITextPanel<string>> uiTabs = new();
+
             for (int i = 0; i < Tabs.Count; i++)
             {
                 ComponentUITab tab = Tabs[i];
@@ -284,7 +312,15 @@ namespace TerraIntegration.UI
                     SetupUI();
                 };
                 Interface.CurrentState.Append(tabpanel);
+                uiTabs.Add(tabpanel);
+
                 x += (int)tabpanel.MinWidth.Pixels + 4;
+            }
+
+            x -= 4;
+            foreach (var tab in uiTabs)
+            {
+                tab.Width = new(0, tab.MinWidth.Pixels / x);
             }
         }
 
@@ -305,6 +341,9 @@ namespace TerraIntegration.UI
             InterfaceComponent.Component.UpdateInterface(InterfaceComponent.Pos);
 
             UIState s = Interface.CurrentState;
+
+            s.MinWidth = StyleDimension.Empty;
+            s.MinHeight = StyleDimension.Empty;
 
             s.RemoveAllChildren();
 
@@ -429,20 +468,19 @@ namespace TerraIntegration.UI
 
                     if (e is not null)
                     {
-                        bool hasPanel = false;
-
+                        bool hasBlockingUI = false;
                         do
                         {
-                            if (e is UIPanel)
+                            if (e is UIPanel || e is UIScrollbar)
                             {
-                                hasPanel = true;
+                                hasBlockingUI = true;
                                 break;
                             }
                             e = e.Parent;
                         }
                         while (e is not null && e.Parent is not null && e is not UIState);
 
-                        Main.LocalPlayer.mouseInterface = hasPanel;
+                        Main.LocalPlayer.mouseInterface = hasBlockingUI;
                     }
                 }
             }

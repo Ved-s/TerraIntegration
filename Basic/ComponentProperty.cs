@@ -184,7 +184,7 @@ namespace TerraIntegration.Basic
 
         public sealed override VariableValue GetProperty(PositionedComponent c, List<Error> errors)
         {
-            return GetProperty(c.Component as TComponent, ComponentPos, errors);
+            return GetProperty(c.Component as TComponent, c.Pos, errors);
         }
     }
 }
