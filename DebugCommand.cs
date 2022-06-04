@@ -105,7 +105,7 @@ namespace TerraIntegration
                 if (val.Type != "any" && val.Type != "unloaded")
                 {
                     allValues++;
-                    if (val.Texture is null && (val.SpriteSheetPos.SpriteSheet ?? val.DefaultSpriteSheet) is null)
+                    if (val.Texture is null && !val.SpriteSheetPos.HasValue)
                         values.Add(val.Type);
                 }
 
@@ -113,7 +113,7 @@ namespace TerraIntegration
                 if (var.Type != "any" && var.Type != "unloaded")
                 {
                     allVariables++;
-                    if (var.Texture is null && (var.SpriteSheetPos.SpriteSheet ?? var.DefaultSpriteSheet) is null)
+                    if (var.Texture is null && !var.SpriteSheetPos.HasValue)
                         variables.Add(var.Type);
                 }
 

@@ -18,6 +18,8 @@ namespace TerraIntegration.Variables
         public override string Type => "tern";
         public override string TypeDisplay => "Ternary operator";
 
+        public override SpriteSheetPos SpriteSheetPos => new(BasicSheet, 3, 2);
+
         public override Type[] RelatedTypes => new[] { typeof(Values.Boolean) };
 
         public Guid Condition, TrueValue, FalseValue;

@@ -14,6 +14,8 @@ namespace TerraIntegration.ValueProperties.Tile
         public override string PropertyDisplay => "Is actuated";
         public override Type VariableReturnType => typeof(Values.Boolean);
 
+        public override SpriteSheetPos SpriteSheetPos => new(TileSheet, 2, 1);
+
         public override VariableValue GetProperty(ComponentSystem system, Values.Tile value, List<Error> errors)
             => new Values.Boolean(value.Actuated);
     }
@@ -23,6 +25,8 @@ namespace TerraIntegration.ValueProperties.Tile
         public override string PropertyName => "actuator";
         public override string PropertyDisplay => "Has actuator";
         public override Type VariableReturnType => typeof(Values.Boolean);
+
+        public override SpriteSheetPos SpriteSheetPos => new(TileSheet, 3, 1);
 
         public override VariableValue GetProperty(ComponentSystem system, Values.Tile value, List<Error> errors)
             => new Values.Boolean(value.Actuator);
@@ -34,6 +38,8 @@ namespace TerraIntegration.ValueProperties.Tile
         public override string PropertyDisplay => "Has red wire";
         public override Type VariableReturnType => typeof(Values.Boolean);
 
+        public override SpriteSheetPos SpriteSheetPos => new(TileSheet, 0, 2);
+
         public override VariableValue GetProperty(ComponentSystem system, Values.Tile value, List<Error> errors)
             => new Values.Boolean(value.RedWire);
     }
@@ -43,6 +49,8 @@ namespace TerraIntegration.ValueProperties.Tile
         public override string PropertyName => "wireGreen";
         public override string PropertyDisplay => "Has green wire";
         public override Type VariableReturnType => typeof(Values.Boolean);
+
+        public override SpriteSheetPos SpriteSheetPos => new(TileSheet, 1, 2);
 
         public override VariableValue GetProperty(ComponentSystem system, Values.Tile value, List<Error> errors)
             => new Values.Boolean(value.GreenWire);
@@ -54,6 +62,8 @@ namespace TerraIntegration.ValueProperties.Tile
         public override string PropertyDisplay => "Has blue wire";
         public override Type VariableReturnType => typeof(Values.Boolean);
 
+        public override SpriteSheetPos SpriteSheetPos => new(TileSheet, 2, 2);
+
         public override VariableValue GetProperty(ComponentSystem system, Values.Tile value, List<Error> errors)
             => new Values.Boolean(value.BlueWire);
     }
@@ -63,6 +73,8 @@ namespace TerraIntegration.ValueProperties.Tile
         public override string PropertyName => "wireYellow";
         public override string PropertyDisplay => "Has yellow wire";
         public override Type VariableReturnType => typeof(Values.Boolean);
+
+        public override SpriteSheetPos SpriteSheetPos => new(TileSheet, 3, 2);
 
         public override VariableValue GetProperty(ComponentSystem system, Values.Tile value, List<Error> errors)
             => new Values.Boolean(value.YellowWire);

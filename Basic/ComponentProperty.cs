@@ -146,7 +146,7 @@ namespace TerraIntegration.Basic
                 ByComponentType[property.ComponentType] = prop;
             }
             prop[property.PropertyName] = property;
-            Variable.ByTypeName[property.Type] = property;
+            Register(property, true);
         }
         public static new void Unregister()
         {

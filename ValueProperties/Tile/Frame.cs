@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using TerraIntegration.Basic;
 using TerraIntegration.DataStructures;
 using TerraIntegration.Values;
@@ -14,6 +11,8 @@ namespace TerraIntegration.ValueProperties.Tile
         public override Type[] ValueTypes => new[] { typeof(Values.Tile), typeof(Wall) };
         public override string PropertyName => "frameX";
         public override string PropertyDisplay => "Frame X";
+
+        public override SpriteSheetPos SpriteSheetPos => new(TileSheet, 3, 0);
 
         public override Type VariableReturnType => typeof(Integer);
 
@@ -33,6 +32,8 @@ namespace TerraIntegration.ValueProperties.Tile
         public override string PropertyName => "frameY";
         public override string PropertyDisplay => "Frame Y";
 
+        public override SpriteSheetPos SpriteSheetPos => new(TileSheet, 0, 1);
+
         public override Type VariableReturnType => typeof(Integer);
 
         public override VariableValue GetProperty(ComponentSystem system, VariableValue value, List<Error> errors)
@@ -50,6 +51,8 @@ namespace TerraIntegration.ValueProperties.Tile
         public override Type[] ValueTypes => new[] { typeof(Values.Tile), typeof(Wall) };
         public override string PropertyName => "frameNum";
         public override string PropertyDisplay => "Frame Number";
+
+        public override SpriteSheetPos SpriteSheetPos => new(TileSheet, 1, 1);
 
         public override Type VariableReturnType => typeof(Integer);
 

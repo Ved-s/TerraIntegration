@@ -16,6 +16,8 @@ namespace TerraIntegration.Variables
         public override string Type => "strFormat";
         public override string TypeDisplay => "Format";
 
+        public override SpriteSheetPos SpriteSheetPos => new(BasicSheet, 2, 2);
+
         public override Type[] LeftSlotValueTypes => new[] { typeof(Values.String) };
         List<string> Strings = new();
 
