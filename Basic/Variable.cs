@@ -239,7 +239,7 @@ namespace TerraIntegration.Basic
             else id = Guid.NewGuid();
 
             if (tag.ContainsKey("data"))
-                newVar = var.LoadCustomTag(tag["data"]);
+                newVar = var.LoadCustomTag(tag.GetCompound("data"));
             if (newVar is null && tag.ContainsKey("bytes"))
             {
                 MemoryStream ms = new MemoryStream(tag.GetByteArray("bytes"));
@@ -260,8 +260,8 @@ namespace TerraIntegration.Basic
         protected virtual void SaveCustomData(BinaryWriter writer) { }
         protected virtual Variable LoadCustomData(BinaryReader reader) => (Variable)Activator.CreateInstance(GetType());
 
-        protected virtual object SaveCustomTag() => null;
-        protected virtual Variable LoadCustomTag(object data) => null;
+        protected virtual TagCompound SaveCustomTag() => null;
+        protected virtual Variable LoadCustomTag(TagCompound data) => null;
 
         public virtual void HandlePacket(Point16 pos, ushort messageType, BinaryReader reader, int whoAmI, ref bool broadcast) { }
         public ModPacket CreatePacket(Point16 pos, ushort messageType) => Networking.CreateVariablePacket(Type, pos, messageType);
@@ -386,7 +386,7 @@ namespace TerraIntegration.Basic
         {
             if (value is null && errors.Count > 0) return false;
 
-            if (value is null || value.GetType().IsAssignableTo(type))
+            if (value is null || !value.GetType().IsAssignableTo(type))
             {
                 errors.Add(Error.ExpectedValue(type, Id));
                 return false;

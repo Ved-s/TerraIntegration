@@ -12,7 +12,7 @@ namespace TerraIntegration.ValueProperties.Tile
     public class TileWallColor : ValueProperty
     {
         public override Type[] ValueTypes => new[] { typeof(Values.Tile), typeof(Wall) };
-        public override string PropertyName => "color";
+        public override string PropertyName => "tileWallColor";
         public override string PropertyDisplay => "Color";
 
         public override Type VariableReturnType => typeof(Values.Byte);

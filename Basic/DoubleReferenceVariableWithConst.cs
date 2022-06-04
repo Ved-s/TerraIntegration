@@ -3,13 +3,11 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using TerraIntegration.DataStructures;
 using TerraIntegration.UI;
-using TerraIntegration.Values;
 using Terraria.GameContent.UI.Elements;
 using Terraria.ModLoader;
+using Terraria.ModLoader.IO;
 
 namespace TerraIntegration.Basic
 {
@@ -35,10 +33,9 @@ namespace TerraIntegration.Basic
 
         public override Type[] RelatedTypes => LeftSlotValueTypes;
 
-        private Type[] ValidRightTypes;
         private Dictionary<Type, Type[]> ValidTypesCache = new();
         private HashSet<(Type, Type)> ValidTypePairs = new();
-        
+
         public void SetupInterface()
         {
             Interface.Append(LeftSlot = new()
@@ -54,20 +51,13 @@ namespace TerraIntegration.Basic
                 {
                     if (var?.Var.VariableReturnType is null)
                     {
-                        ValidRightTypes = null;
-                        RightSlot.ValidTypes = null;
+                        RightSlot.ValidConstTypes = null;
+                        RightSlot.ValidRefTypes = null;
                         return;
                     }
 
-                    ValidRightTypes = GetValidRightSlotTypes(var.Var.VariableReturnType);
-                    if (ValidRightTypes is null)
-                    {
-                        ValidRightTypes = null;
-                        RightSlot.ValidTypes = null;
-                        return;
-                    }
-
-                    RightSlot.ValidTypes = ValidRightTypes;
+                    RightSlot.ValidConstTypes = GetValidRightConstantSlotTypes(var.Var.VariableReturnType);
+                    RightSlot.ValidRefTypes = GetValidRightReferenceSlotTypes(var.Var.VariableReturnType);
                 }
             });
 
@@ -159,6 +149,39 @@ namespace TerraIntegration.Basic
 
             return doubleRef;
         }
+
+        protected override TagCompound SaveCustomTag()
+        {
+            TagCompound tag = new()
+            {
+                ["lid"] = Left.ToByteArray()
+            };
+
+            if (Right is not null)
+            {
+                if (Right.IsRef)
+                    tag["rid"] = Right.RefId.ToByteArray();
+                else
+                    tag["rv"] = Util.WriteToByteArray(w => VariableValue.SaveData(Right.Value, w));
+            }
+
+            return tag;
+        }
+        protected override Variable LoadCustomTag(TagCompound data)
+        {
+            DoubleReferenceVariableWithConst var = this.NewInstance();
+
+            if (data.ContainsKey("lid"))
+                var.Left = new(data.GetByteArray("lid"));
+
+            if (data.ContainsKey("rid"))
+                var.Right = new(new Guid(data.GetByteArray("rid")));
+            else if (data.ContainsKey("rv"))
+                var.Right = new(Util.ReadFromByteArray(data.GetByteArray("rv"), VariableValue.LoadData));
+
+            return var;
+        }
+
         public override void ModifyTooltips(List<TooltipLine> tooltips)
         {
             if (Left != default && Right is not null)
@@ -166,9 +189,11 @@ namespace TerraIntegration.Basic
         }
 
         public abstract VariableValue GetValue(ComponentSystem system, VariableValue left, VariableValue right, List<Error> errors);
-        public abstract Type[] GetValidRightSlotTypes(Type leftSlotType);
+        public virtual Type[] GetValidRightReferenceSlotTypes(Type leftSlotType) => GetValidRightSlotTypes(leftSlotType);
+        public virtual Type[] GetValidRightConstantSlotTypes(Type leftSlotType) => GetValidRightSlotTypes(leftSlotType);
+        public virtual Type[] GetValidRightSlotTypes(Type leftSlotType) => null;
 
-        public virtual DoubleReferenceVariableWithConst CreateVariable(Variable left, ValueOrRef right) 
+        public virtual DoubleReferenceVariableWithConst CreateVariable(Variable left, ValueOrRef right)
             => (DoubleReferenceVariableWithConst)Activator.CreateInstance(GetType());
     }
 }

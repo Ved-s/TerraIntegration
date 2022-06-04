@@ -14,7 +14,7 @@ using Terraria.ModLoader;
 
 namespace TerraIntegration.Variables.Numeric
 {
-    public class Divide : DoubleReferenceVariable
+    public class Divide : DoubleReferenceVariableWithConst
     {
         public override string Type => "div";
         public override string TypeDisplay => "Divide";
@@ -23,18 +23,14 @@ namespace TerraIntegration.Variables.Numeric
 
         public override Type[] LeftSlotValueTypes => new[] { typeof(IDivisible) };
 
-        public Divide() { }
-        public Divide(Guid left, Guid right)
-        {
-            LeftId = left;
-            RightId = right;
-        }
-        public override Type[] GetValidRightSlotTypes(Type leftSlotType)
+        public override Type[] GetValidRightReferenceSlotTypes(Type leftSlotType)
         {
             if (VariableValue.ByType.TryGetValue(leftSlotType, out VariableValue value) && value is IDivisible divisible)
                 return divisible.ValidDivideTypes;
             return null;
         }
+        public override Type[] GetValidRightConstantSlotTypes(Type leftSlotType) => new[] { leftSlotType };
+
         public override VariableValue GetValue(ComponentSystem system, VariableValue left, VariableValue right, List<Error> errors)
         {
             IDivisible divisible = (IDivisible)left;
@@ -45,7 +41,7 @@ namespace TerraIntegration.Variables.Numeric
                 SetReturnTypeCache(result.GetType());
             return result;
         }
-        public override DoubleReferenceVariable CreateVariable(Variable left, Variable right)
+        public override DoubleReferenceVariableWithConst CreateVariable(Variable left, ValueOrRef right)
         {
             return new Divide()
             {

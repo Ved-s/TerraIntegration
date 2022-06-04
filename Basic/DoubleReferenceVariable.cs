@@ -10,6 +10,7 @@ using TerraIntegration.UI;
 using TerraIntegration.Values;
 using Terraria.GameContent.UI.Elements;
 using Terraria.ModLoader;
+using Terraria.ModLoader.IO;
 
 namespace TerraIntegration.Basic
 {
@@ -164,6 +165,7 @@ namespace TerraIntegration.Basic
 
             return GetValue(system, left, right, errors);
         }
+
         protected override void SaveCustomData(BinaryWriter writer)
         {
             writer.Write(LeftId.ToByteArray());
@@ -178,6 +180,28 @@ namespace TerraIntegration.Basic
 
             return doubleRef;
         }
+
+        protected override TagCompound SaveCustomTag()
+        {
+            return new()
+            {
+                ["rid"] = RightId.ToByteArray(),
+                ["lid"] = LeftId.ToByteArray(),
+            };
+        }
+        protected override Variable LoadCustomTag(TagCompound data)
+        {
+            DoubleReferenceVariable doubleRef = this.NewInstance();
+
+            if (data.ContainsKey("rid"))
+                doubleRef.RightId = new(data.GetByteArray("rid"));
+
+            if (data.ContainsKey("lid"))
+                doubleRef.LeftId = new(data.GetByteArray("lid"));
+
+            return doubleRef;
+        }
+
         public override void ModifyTooltips(List<TooltipLine> tooltips)
         {
             if (LeftId != default && RightId != default)

@@ -14,7 +14,7 @@ using Terraria.ModLoader;
 
 namespace TerraIntegration.Variables.Numeric
 {
-    public class Add : DoubleReferenceVariable
+    public class Add : DoubleReferenceVariableWithConst
     {
         public override string Type => "add";
         public override string TypeDisplay => "Add";
@@ -23,49 +23,14 @@ namespace TerraIntegration.Variables.Numeric
 
         public override Type[] LeftSlotValueTypes => new[] { typeof(IAddable) };
 
-        public Add() { }
-        public Add(Guid left, Guid right)
-        {
-            LeftId = left;
-            RightId = right;
-        }
-        public override Type[] GetValidRightSlotTypes(Type leftSlotType)
+        public override Type[] GetValidRightReferenceSlotTypes(Type leftSlotType)
         {
             if (VariableValue.ByType.TryGetValue(leftSlotType, out VariableValue value) && value is IAddable addable)
                 return addable.ValidAddTypes;
             return null;
         }
-        public override Variable GetFromCommand(CommandCaller caller, List<string> args)
-        {
-            if (args.Count < 1)
-            {
-                caller.Reply("Argument required: first variable id");
-                return null;
-            }
-            if (args.Count < 2)
-            {
-                caller.Reply("Argument required: second variable id");
-                return null;
-            }
+        public override Type[] GetValidRightConstantSlotTypes(Type leftSlotType) => new[] { leftSlotType };
 
-            Guid? first = World.Guids.GetGuid(args[0]);
-            Guid? second = World.Guids.GetGuid(args[1]);
-
-            if (first is null)
-            {
-                caller.Reply($"First id not found: {args[0]}");
-                return null;
-            }
-            if (second is null)
-            {
-                caller.Reply($"Second id not found: {args[1]}");
-                return null;
-            }
-            args.RemoveAt(0);
-            args.RemoveAt(0);
-
-            return new Add(first.Value, second.Value);
-        }
         public override VariableValue GetValue(ComponentSystem system, VariableValue left, VariableValue right, List<Error> errors)
         {
             IAddable addable = (IAddable)left;
@@ -76,7 +41,7 @@ namespace TerraIntegration.Variables.Numeric
                 SetReturnTypeCache(result.GetType());
             return result;
         }
-        public override DoubleReferenceVariable CreateVariable(Variable left, Variable right)
+        public override DoubleReferenceVariableWithConst CreateVariable(Variable left, ValueOrRef right)
         {
             return new Add()
             {

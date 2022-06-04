@@ -10,7 +10,7 @@ using TerraIntegration.Values;
 
 namespace TerraIntegration.Variables.Comparing
 {
-    public class NotEquals : DoubleReferenceVariable
+    public class NotEquals : DoubleReferenceVariableWithConst
     {
         public override string Type => "notEquals";
         public override string TypeDisplay => "Not equals";
@@ -18,6 +18,8 @@ namespace TerraIntegration.Variables.Comparing
         public override SpriteSheetPos SpriteSheetPos => new(ComparingSheet, 1, 0);
 
         public override Type[] LeftSlotValueTypes => new[] { typeof(IEquatable) };
+
+        public override Type VariableReturnType => typeof(Values.Boolean);
 
         public override Type[] GetValidRightSlotTypes(Type leftSlotType)
         {

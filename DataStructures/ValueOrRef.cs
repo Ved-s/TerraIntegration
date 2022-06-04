@@ -10,9 +10,9 @@ namespace TerraIntegration.DataStructures
 {
     public class ValueOrRef
     {
-        VariableValue Value;
-        Guid RefId;
-        bool IsRef;
+        public VariableValue Value;
+        public Guid RefId;
+        public bool IsRef;
 
         public ValueOrRef(VariableValue value) 
         {

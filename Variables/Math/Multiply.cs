@@ -14,7 +14,7 @@ using Terraria.ModLoader;
 
 namespace TerraIntegration.Variables.Numeric
 {
-    public class Multiply : DoubleReferenceVariable
+    public class Multiply : DoubleReferenceVariableWithConst
     {
         public override string Type => "mul";
         public override string TypeDisplay => "Multiply";
@@ -23,18 +23,14 @@ namespace TerraIntegration.Variables.Numeric
 
         public override Type[] LeftSlotValueTypes => new[] { typeof(IMultipliable) };
 
-        public Multiply() { }
-        public Multiply(Guid left, Guid right)
-        {
-            LeftId = left;
-            RightId = right;
-        }
-        public override Type[] GetValidRightSlotTypes(Type leftSlotType)
+        public override Type[] GetValidRightReferenceSlotTypes(Type leftSlotType)
         {
             if (VariableValue.ByType.TryGetValue(leftSlotType, out VariableValue value) && value is IMultipliable multipliable)
                 return multipliable.ValidMultiplyTypes;
             return null;
         }
+        public override Type[] GetValidRightConstantSlotTypes(Type leftSlotType) => new[] { leftSlotType };
+
         public override VariableValue GetValue(ComponentSystem system, VariableValue left, VariableValue right, List<Error> errors)
         {
             IMultipliable multipliable = (IMultipliable)left;
@@ -45,7 +41,7 @@ namespace TerraIntegration.Variables.Numeric
                 SetReturnTypeCache(result.GetType());
             return result;
         }
-        public override DoubleReferenceVariable CreateVariable(Variable left, Variable right)
+        public override DoubleReferenceVariableWithConst CreateVariable(Variable left, ValueOrRef right)
         {
             return new Multiply()
             {

@@ -10,7 +10,7 @@ using TerraIntegration.Values;
 
 namespace TerraIntegration.Variables.Comparing
 {
-    public class GreaterThan : DoubleReferenceVariable
+    public class GreaterThan : DoubleReferenceVariableWithConst
     {
         public override string Type => "greater";
         public override string TypeDisplay => "Greater than";
@@ -18,6 +18,8 @@ namespace TerraIntegration.Variables.Comparing
         public override SpriteSheetPos SpriteSheetPos => new(ComparingSheet, 1, 1);
 
         public override Type[] LeftSlotValueTypes => new[] { typeof(Interfaces.IComparable) };
+
+        public override Type VariableReturnType => typeof(Values.Boolean);
 
         public override Type[] GetValidRightSlotTypes(Type leftSlotType)
         {

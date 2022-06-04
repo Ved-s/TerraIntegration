@@ -14,7 +14,7 @@ using Terraria.ModLoader;
 
 namespace TerraIntegration.Variables.Numeric
 {
-    public class Modulo : DoubleReferenceVariable
+    public class Modulo : DoubleReferenceVariableWithConst
     {
         public override string Type => "mod";
         public override string TypeDisplay => "Modulo";
@@ -23,18 +23,14 @@ namespace TerraIntegration.Variables.Numeric
 
         public override Type[] LeftSlotValueTypes => new[] { typeof(IModulable) };
 
-        public Modulo() { }
-        public Modulo(Guid left, Guid right)
-        {
-            LeftId = left;
-            RightId = right;
-        }
-        public override Type[] GetValidRightSlotTypes(Type leftSlotType)
+        public override Type[] GetValidRightReferenceSlotTypes(Type leftSlotType)
         {
             if (VariableValue.ByType.TryGetValue(leftSlotType, out VariableValue value) && value is IModulable modulable)
                 return modulable.ValidModuloTypes;
             return null;
         }
+        public override Type[] GetValidRightConstantSlotTypes(Type leftSlotType) => new[] { leftSlotType };
+
         public override VariableValue GetValue(ComponentSystem system, VariableValue left, VariableValue right, List<Error> errors)
         {
             IModulable modulable = (IModulable)left;
@@ -45,7 +41,7 @@ namespace TerraIntegration.Variables.Numeric
                 SetReturnTypeCache(result.GetType());
             return result;
         }
-        public override DoubleReferenceVariable CreateVariable(Variable left, Variable right)
+        public override DoubleReferenceVariableWithConst CreateVariable(Variable left, ValueOrRef right)
         {
             return new Modulo()
             {

@@ -1,13 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using TerraIntegration.Components;
 using TerraIntegration.DataStructures;
-using TerraIntegration.Values;
-using TerraIntegration.Variables;
 using Terraria.ModLoader;
 using Terraria.ModLoader.IO;
 
@@ -54,7 +49,7 @@ namespace TerraIntegration.Basic
 
         public override string TypeDescription => PropertyDescription;
         public override string TypeDisplay => PropertyDisplay;
-        
+
         public abstract VariableValue GetProperty(PositionedComponent c, List<Error> errors);
 
         public virtual ComponentProperty CreateVariable(PositionedComponent c)
@@ -96,7 +91,7 @@ namespace TerraIntegration.Basic
             return pv;
         }
 
-        protected override object SaveCustomTag()
+        protected override TagCompound SaveCustomTag()
         {
             return new TagCompound()
             {
@@ -104,22 +99,19 @@ namespace TerraIntegration.Basic
                 ["comy"] = ComponentPos.Y,
             };
         }
-        protected override Variable LoadCustomTag(object data)
+        protected override Variable LoadCustomTag(TagCompound data)
         {
             ComponentProperty pv = (ComponentProperty)Activator.CreateInstance(GetType());
 
-            if (data is TagCompound tag)
-            {
-                Point16 pos = default;
+            Point16 pos = default;
 
-                if (tag.ContainsKey("comx"))
-                    pos.X = tag.GetShort("comx");
+            if (data.ContainsKey("comx"))
+                pos.X = data.GetShort("comx");
 
-                if (tag.ContainsKey("comy"))
-                    pos.Y = tag.GetShort("comy");
+            if (data.ContainsKey("comy"))
+                pos.Y = data.GetShort("comy");
 
-                pv.ComponentPos = pos;
-            }
+            pv.ComponentPos = pos;
 
             return pv;
         }

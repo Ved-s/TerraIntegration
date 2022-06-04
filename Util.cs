@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -134,6 +135,19 @@ namespace TerraIntegration
 		public static Vector2 WorldToScreen(Point worldPos)
 		{
 			return WorldPixelsToScreen(worldPos.ToVector2() * 16);
+		}
+
+		public static byte[] WriteToByteArray(Action<BinaryWriter> action)
+		{
+			using MemoryStream ms = new MemoryStream();
+			action(new(ms));
+			return ms.ToArray();
+		}
+
+		public static T ReadFromByteArray<T>(byte[] array, Func<BinaryReader, T> func)
+		{
+			using MemoryStream ms = new MemoryStream(array);
+			return func(new(ms));
 		}
 	}
 }

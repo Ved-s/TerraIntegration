@@ -49,5 +49,10 @@ namespace TerraIntegration
                 foreach (var item in list)
                     yield return item;
         }
+
+        public static T NewInstance<T>(this T obj)
+        {
+            return (T)Activator.CreateInstance(obj.GetType());
+        }
     }
 }

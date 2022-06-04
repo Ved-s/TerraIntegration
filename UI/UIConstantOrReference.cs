@@ -2,8 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using TerraIntegration.Basic;
 using TerraIntegration.DataStructures;
 using TerraIntegration.Variables;
@@ -13,25 +11,62 @@ namespace TerraIntegration.UI
 {
     public class UIConstantOrReference : UIPanel
     {
-        public Type[] ValidTypes 
+        public Type[] ValidRefTypes
         {
-            get => validTypes;
+            get => validRefTypes;
             set
             {
-                validTypes = value;
+                validRefTypes = value;
 
                 SetType(null);
                 Switch.Index = 0;
+                List<ValueVariablePair> switches = new();
                 if (value is not null)
                 {
-                    List<ValueVariablePair> switches = new() { new(null, "ref") };
-                    switches.AddRange(value.Select(t => new ValueVariablePair(t, null, "Constant")));
-                    Switch.SwitchValues = switches.ToArray();
+                    switches.Add(new(null, "ref"));
                 }
-                else
+                if (validConstTypes is not null)
                 {
-                    Switch.SwitchValues = null;
+                    switches.AddRange(validConstTypes
+                    .SelectMany(t =>
+                        t.IsInterface ?
+                        VariableValue.ByType
+                            .Where(kvp => kvp.Key.IsAssignableTo(t))
+                            .Select(kvp => kvp.Key)
+                        : new[] { t })
+                    .Select(t => new ValueVariablePair(t, null, "Constant")));
                 }
+                Switch.SwitchValues = switches.ToArray();
+
+            }
+        }
+        public Type[] ValidConstTypes
+        {
+            get => validConstTypes;
+            set
+            {
+                validConstTypes = value;
+
+                SetType(null);
+                Switch.Index = 0;
+
+                List<ValueVariablePair> switches = new();
+
+                if (validRefTypes?.Length is not null and > 0)
+                    switches.Add(new(null, "ref"));
+
+                if (value is not null)
+                {
+                    switches.AddRange(value
+                        .SelectMany(t =>
+                            t.IsInterface ?
+                            VariableValue.ByType
+                                .Where(kvp => kvp.Key.IsAssignableTo(t))
+                                .Select(kvp => kvp.Key)
+                            : new[] { t })
+                        .Select(t => new ValueVariablePair(t, null, "Constant")));
+                }
+                Switch.SwitchValues = switches.ToArray();
             }
         }
 
@@ -39,7 +74,8 @@ namespace TerraIntegration.UI
         IOwnProgrammerInterface Owner;
         UIVariableSwitch Switch;
 
-        private Type[] validTypes;
+        private Type[] validRefTypes;
+        private Type[] validConstTypes;
 
         public UIConstantOrReference()
         {
@@ -61,7 +97,7 @@ namespace TerraIntegration.UI
             SetType(null);
         }
 
-        public void SetType(Type valueType) 
+        public void SetType(Type valueType)
         {
             if (Owner is not null && Owner.Interface is not null)
             {
@@ -87,13 +123,13 @@ namespace TerraIntegration.UI
                     Left = new(-21, .5f),
                     DisplayOnly = true,
 
-                    VariableValidator = (var) => ValidTypes is not null && ValidTypes.Any(t => t.IsAssignableFrom(var.VariableReturnType)),
-                    HoverText = ValidTypes is null ? null : string.Join(", ", ValidTypes.Select(t => VariableValue.TypeToName(t, true)))
+                    VariableValidator = (var) => ValidRefTypes is not null && ValidRefTypes.Any(t => t.IsAssignableFrom(var.VariableReturnType)),
+                    HoverText = ValidRefTypes is null ? null : string.Join(", ", ValidRefTypes.Select(t => VariableValue.TypeToName(t, true)))
                 });
                 return;
             }
 
-            if (!VariableValue.ByType.TryGetValue(valueType, out var value) 
+            if (!VariableValue.ByType.TryGetValue(valueType, out var value)
                 || value is not IOwnProgrammerInterface owner
                 || owner.HasComplexInterface)
                 return;
@@ -121,7 +157,7 @@ namespace TerraIntegration.UI
             Append(Owner.Interface);
         }
 
-        public ValueOrRef GetValue() 
+        public ValueOrRef GetValue()
         {
             ValueVariablePair vvp = Switch.Current.Value;
             if (vvp.ValueType is null && RefSlot?.Var?.Var is not null)
