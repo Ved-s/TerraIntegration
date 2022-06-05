@@ -16,8 +16,8 @@ namespace TerraIntegration.Variables.Numeric
 {
     public class Abs : ReferenceVariable
     {
-        public override string Type => "abs";
-        public override string TypeDisplay => "Absolute";
+        public override string TypeName => "abs";
+        public override string TypeDefaultDisplayName => "Absolute";
 
         public override Type[] ReferenceReturnTypes => new[] { typeof(INumeric), typeof(IDecimal) };
 

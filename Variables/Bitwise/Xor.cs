@@ -12,8 +12,8 @@ namespace TerraIntegration.Variables.Bitwise
     public class Xor : DoubleReferenceVariableWithConst
     {
         public override Type[] LeftSlotValueTypes => new[] { typeof(Values.Boolean), typeof(INumeric) };
-        public override string Type => "xor";
-        public override string TypeDisplay => "Xor";
+        public override string TypeName => "xor";
+        public override string TypeDefaultDisplayName => "Xor";
 
         public override SpriteSheetPos SpriteSheetPos => new(BooleanSheet, 0, 1);
 

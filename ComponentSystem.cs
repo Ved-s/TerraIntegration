@@ -150,7 +150,7 @@ namespace TerraIntegration
                 if (component.CanHaveVariables)
                     ComponentsWithVariables.Add(positioned);
 
-                string type = component.ComponentType;
+                string type = component.TypeName;
                 if (!ComponentsByType.TryGetValue(type, out var componentsByType))
                 {
                     componentsByType = new();
@@ -244,9 +244,9 @@ namespace TerraIntegration
             {
                 if (ComponentsByPos.TryGetValue(pos, out Component c))
                 {
-                    if (type is not null && c.ComponentType != type)
+                    if (type is not null && c.TypeName != type)
                     {
-                        errors.Add(new(ErrorType.WrongComponentAtPos, pos.X, pos.Y, c.ComponentType, type));
+                        errors.Add(new(ErrorType.WrongComponentAtPos, pos.X, pos.Y, c.TypeName, type));
                         return null;
                     }
                     return c;

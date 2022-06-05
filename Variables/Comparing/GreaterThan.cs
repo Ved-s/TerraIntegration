@@ -12,8 +12,8 @@ namespace TerraIntegration.Variables.Comparing
 {
     public class GreaterThan : DoubleReferenceVariableWithConst
     {
-        public override string Type => "greater";
-        public override string TypeDisplay => "Greater than";
+        public override string TypeName => "greater";
+        public override string TypeDefaultDisplayName => "Greater than";
 
         public override SpriteSheetPos SpriteSheetPos => new(ComparingSheet, 1, 1);
 

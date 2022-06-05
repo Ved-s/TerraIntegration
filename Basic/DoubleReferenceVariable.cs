@@ -29,7 +29,7 @@ namespace TerraIntegration.Basic
         {
             OnDraw = (e, sb, style) =>
             {
-                VariableRenderer.DrawVariableOverlay(sb, false, null, Type, style.Position() - new Vector2(16), new(32), Color.White, 0f, Vector2.Zero);
+                VariableRenderer.DrawVariableOverlay(sb, false, null, TypeName, style.Position() - new Vector2(16), new(32), Color.White, 0f, Vector2.Zero);
             }
         };
 

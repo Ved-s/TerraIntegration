@@ -64,9 +64,9 @@ namespace TerraIntegration.Components
 
         public readonly static SpriteSheet TypeSheet = new("TerraIntegration/Assets/Types/display", new(32, 32));
 
-        public override string ComponentType => "display";
-        public override string ComponentDisplayName => "Variable display";
-        public override string ComponentDescription => "Displays display variables.\nAlso they can be connected into bigger\ndisplays of rectangular shape.";
+        public override string TypeName => "display";
+        public override string TypeDefaultDisplayName => "Variable display";
+        public override string TypeDefaultDescription => "Displays display variables.\nAlso they can be connected into bigger\ndisplays of rectangular shape.";
 
         public override bool HasCustomInterface => true;
 

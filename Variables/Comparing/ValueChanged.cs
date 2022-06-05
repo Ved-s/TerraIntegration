@@ -10,8 +10,8 @@ namespace TerraIntegration.Variables.Comparing
 {
     public class ValueChanged : ReferenceVariable
     {
-        public override string Type => "changed";
-        public override string TypeDisplay => "Value Changed";
+        public override string TypeName => "changed";
+        public override string TypeDefaultDisplayName => "Value Changed";
 
         public override Type VariableReturnType => typeof(Values.Boolean);
 

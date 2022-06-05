@@ -16,8 +16,8 @@ namespace TerraIntegration.Variables.Numeric
 {
     public class Subtract : DoubleReferenceVariableWithConst
     {
-        public override string Type => "sub";
-        public override string TypeDisplay => "Subtract";
+        public override string TypeName => "sub";
+        public override string TypeDefaultDisplayName => "Subtract";
 
         public override SpriteSheetPos SpriteSheetPos => new(MathSheet, 3, 0);
 

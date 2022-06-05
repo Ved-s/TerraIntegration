@@ -15,8 +15,8 @@ namespace TerraIntegration.Variables
 {
     public class Constant : Variable
     {
-        public override string Type => "const";
-        public override string TypeDisplay => "Constant";
+        public override string TypeName => "const";
+        public override string TypeDefaultDisplayName => "Constant";
 
         public VariableValue Value { get; set; }
 

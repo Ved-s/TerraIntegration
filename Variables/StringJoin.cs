@@ -13,8 +13,8 @@ namespace TerraIntegration.Variables
 {
     public class StringJoin : DoubleReferenceVariable
     {
-        public override string Type => "strJoin";
-        public override string TypeDisplay => "Join";
+        public override string TypeName => "strJoin";
+        public override string TypeDefaultDisplayName => "Join";
 
         public override Type[] LeftSlotValueTypes => new[] { typeof(Values.String) };
         List<string> Strings = new();

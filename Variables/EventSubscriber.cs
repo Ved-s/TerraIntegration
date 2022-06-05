@@ -16,8 +16,8 @@ namespace TerraIntegration.Variables
 {
     public class EventSubscriber : Variable, IOwnProgrammerInterface
     {
-        public override string Type => "eventsub";
-        public override string TypeDisplay => "Event Subscriber";
+        public override string TypeName => "eventsub";
+        public override string TypeDefaultDisplayName => "Event Subscriber";
 
         public override Type VariableReturnType => typeof(Values.Boolean);
 

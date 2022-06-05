@@ -16,8 +16,8 @@ namespace TerraIntegration.Variables.Numeric
 {
     public class Modulo : DoubleReferenceVariableWithConst
     {
-        public override string Type => "mod";
-        public override string TypeDisplay => "Modulo";
+        public override string TypeName => "mod";
+        public override string TypeDefaultDisplayName => "Modulo";
 
         public override SpriteSheetPos SpriteSheetPos => new(MathSheet, 2, 1);
 

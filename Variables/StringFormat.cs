@@ -13,8 +13,8 @@ namespace TerraIntegration.Variables
 {
     public class StringFormat : DoubleReferenceVariable
     {
-        public override string Type => "strFormat";
-        public override string TypeDisplay => "Format";
+        public override string TypeName => "strFormat";
+        public override string TypeDefaultDisplayName => "Format";
 
         public override SpriteSheetPos SpriteSheetPos => new(BasicSheet, 2, 2);
 

@@ -16,8 +16,8 @@ namespace TerraIntegration.Variables.Numeric
 {
     public class Multiply : DoubleReferenceVariableWithConst
     {
-        public override string Type => "mul";
-        public override string TypeDisplay => "Multiply";
+        public override string TypeName => "mul";
+        public override string TypeDefaultDisplayName => "Multiply";
 
         public override SpriteSheetPos SpriteSheetPos => new(MathSheet, 0, 1);
 

@@ -9,7 +9,7 @@ using Terraria.ModLoader.IO;
 
 namespace TerraIntegration.Basic
 {
-    public abstract class Variable
+    public abstract class Variable : ITypedObject
     {
         internal readonly static SpriteSheet BasicSheet = new("TerraIntegration/Assets/Types/basic", new(32, 32));
         internal readonly static SpriteSheet MathSheet = new("TerraIntegration/Assets/Types/math", new(32, 32));
@@ -33,10 +33,15 @@ namespace TerraIntegration.Basic
 
         public string ShortId => ModContent.GetInstance<ComponentWorld>().Guids.GetShortGuid(Id);
 
-        public abstract string Type { get; }
-        public abstract string TypeDisplay { get; }
+        public abstract string TypeName { get; }
+        public string TypeDisplayName => Util.GetLangTextOrNull(DisplayNameLocalizationKey) ?? TypeDefaultDisplayName;
+        public string TypeDescription => Util.GetLangTextOrNull(DescriptionLocalizationKey) ?? TypeDefaultDescription;
 
-        public virtual string TypeDescription => null;
+        public virtual string TypeDefaultDisplayName { get; }
+        public virtual string TypeDefaultDescription { get; }
+
+        public virtual string DescriptionLocalizationKey => "Mods.TerraIntegration.Descriptions.Variables." + TypeName;
+        public virtual string DisplayNameLocalizationKey => "Mods.TerraIntegration.Names.Variables." + TypeName;
 
         public virtual Type VariableReturnType
         {
@@ -74,7 +79,7 @@ namespace TerraIntegration.Basic
                 return;
             }
 
-            writer.Write(var.Type);
+            writer.Write(var.TypeName);
             writer.Write(var.Name ?? "");
 
             long lenPos = writer.BaseStream.Position;
@@ -175,7 +180,7 @@ namespace TerraIntegration.Basic
                 return tag;
             }
 
-            tag["type"] = var.Type;
+            tag["type"] = var.TypeName;
 
             if (var.Name is not null)
                 tag["name"] = var.Name;
@@ -265,7 +270,7 @@ namespace TerraIntegration.Basic
         protected virtual Variable LoadCustomTag(TagCompound data) => null;
 
         public virtual void HandlePacket(Point16 pos, ushort messageType, BinaryReader reader, int whoAmI, ref bool broadcast) { }
-        public ModPacket CreatePacket(Point16 pos, ushort messageType) => Networking.CreateVariablePacket(Type, pos, messageType);
+        public ModPacket CreatePacket(Point16 pos, ushort messageType) => Networking.CreateVariablePacket(TypeName, pos, messageType);
 
         public virtual void ModifyTooltips(List<TooltipLine> tooltips) { }
 
@@ -325,9 +330,9 @@ namespace TerraIntegration.Basic
                     return;
                 }
             }
-            if (v?.Type is null) return;
+            if (v?.TypeName is null) return;
             ByType[v.GetType()] = v;
-            ByTypeName[v.Type] = v;
+            ByTypeName[v.TypeName] = v;
         }
         internal static void Unregister()
         {
@@ -399,8 +404,8 @@ namespace TerraIntegration.Basic
 
     public class UnloadedVariable : Variable
     {
-        public override string Type => "unloaded";
-        public override string TypeDisplay => $"Unloaded variable ({UnloadedTypeName})";
+        public override string TypeName => "unloaded";
+        public override string TypeDefaultDisplayName => $"Unloaded variable ({UnloadedTypeName})";
 
         public override SpriteSheetPos SpriteSheetPos => new(BasicSheet, 0, 0);
 

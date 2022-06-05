@@ -114,21 +114,21 @@ namespace TerraIntegration
                 }
 
             foreach (Variable var in Variable.ByTypeName.Values)
-                if (var.Type != "unloaded")
+                if (var.TypeName != "unloaded")
                 {
                     allVariables++;
                     if (var.Texture is null && !var.SpriteSheetPos.HasValue)
-                        variableTextures.Add(var.Type);
+                        variableTextures.Add(var.TypeName);
                     if (var.TypeDescription is null)
-                        variableDescriptions.Add(var.Type);
+                        variableDescriptions.Add(var.TypeName);
                 }
 
             foreach (Component com in Component.ByType.Values)
-                if (com.ComponentType != "unloaded")
+                if (com.TypeName != "unloaded")
                 {
                     allComponents++;
-                    if (com.ComponentDescription is null)
-                        componentDescriptions.Add(com.ComponentType);
+                    if (com.TypeDescription is null)
+                        componentDescriptions.Add(com.TypeName);
                 }
 
             caller.Reply(valueTextures.Count == 0 ?

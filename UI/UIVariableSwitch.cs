@@ -65,7 +65,7 @@ namespace TerraIntegration.UI
                 string variable =
                     cur.Value.VariableType is not null
                     && Variable.ByTypeName.TryGetValue(cur.Value.VariableType, out Variable var) ?
-                    var.TypeDisplay : null;
+                    var.TypeDisplayName : null;
 
                 string value = cur.Value.ValueType is not null ? VariableValue.TypeToName(cur.Value.ValueType, true) : null;
 

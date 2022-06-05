@@ -15,8 +15,8 @@ namespace TerraIntegration.Variables
 {
     public class TernaryOp : Variable, IOwnProgrammerInterface
     {
-        public override string Type => "tern";
-        public override string TypeDisplay => "Ternary operator";
+        public override string TypeName => "tern";
+        public override string TypeDefaultDisplayName => "Ternary operator";
 
         public override SpriteSheetPos SpriteSheetPos => new(BasicSheet, 3, 2);
 

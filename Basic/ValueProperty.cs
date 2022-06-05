@@ -16,7 +16,7 @@ namespace TerraIntegration.Basic
         public static readonly List<ValueProperty> AllProperties = new();
         public static readonly List<ValueProperty> WaitingValue = new();
 
-        public sealed override string Type => $"{(ValueTypeName is null ? "" : ValueTypeName + ".")}{PropertyName}";
+        public sealed override string TypeName => $"{(ValueTypeName is null ? "" : ValueTypeName + ".")}{PropertyName}";
 
         public abstract Type[] ValueTypes { get; }
         public string ValueTypeName
@@ -43,8 +43,8 @@ namespace TerraIntegration.Basic
         public abstract string PropertyDisplay { get; }
         public virtual string PropertyDescription => null;
 
-        public sealed override string TypeDescription => PropertyDescription;
-        public sealed override string TypeDisplay => PropertyDisplay;
+        public sealed override string TypeDefaultDescription => PropertyDescription;
+        public sealed override string TypeDefaultDisplayName => PropertyDisplay;
 
         public override Type[] ReferenceReturnTypes => ValueTypes;
         public override Type[] RelatedTypes => ValueTypes;
@@ -97,7 +97,7 @@ namespace TerraIntegration.Basic
                 }
                 prop[property.PropertyName] = property;
             }
-            ByTypeName[property.Type] = property;
+            ByTypeName[property.TypeName] = property;
             Register(property, true);
         }
 

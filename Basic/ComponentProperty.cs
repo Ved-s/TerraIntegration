@@ -14,7 +14,7 @@ namespace TerraIntegration.Basic
         public static readonly List<ComponentProperty> AllProperties = new();
         public static readonly List<ComponentProperty> WaitingComponent = new();
 
-        public override string Type => $"{ComponentType}.{PropertyName}";
+        public override string TypeName => $"{ComponentType}.{PropertyName}";
 
         public abstract string ComponentType { get; }
         public abstract string PropertyName { get; }
@@ -47,8 +47,8 @@ namespace TerraIntegration.Basic
             set => BoundComponentCache = value;
         }
 
-        public override string TypeDescription => PropertyDescription;
-        public override string TypeDisplay => PropertyDisplay;
+        public override string TypeDefaultDescription => PropertyDescription;
+        public override string TypeDefaultDisplayName => PropertyDisplay;
 
         public abstract VariableValue GetProperty(PositionedComponent c, List<Error> errors);
 
@@ -73,7 +73,7 @@ namespace TerraIntegration.Basic
             if (ComponentPos != default)
             {
                 Component c = BoundComponent;
-                string line = $"[c/aaaa00:Bound to:] {(c is null ? "Unregistered component" : (c.ComponentDisplayName ?? c.Name))} at {ComponentPos.X}, {ComponentPos.Y}";
+                string line = $"[c/aaaa00:Bound to:] {(c is null ? "Unregistered component" : (c.TypeDisplayName ?? c.Name))} at {ComponentPos.X}, {ComponentPos.Y}";
                 tooltips.Add(new(Mod, "TIPropBoundTo", line));
             }
         }
@@ -164,7 +164,7 @@ namespace TerraIntegration.Basic
                 if (Component.ByType.TryGetValue(typeof(TComponent), out Component instance))
                     BoundComponentCache = instance;
 
-                return BoundComponentCache?.ComponentType;
+                return BoundComponentCache?.TypeName;
             }
         }
 

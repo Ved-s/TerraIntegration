@@ -12,8 +12,8 @@ namespace TerraIntegration.Variables.Bitwise
     public class Or : DoubleReferenceVariableWithConst
     {
         public override Type[] LeftSlotValueTypes => new[] { typeof(Values.Boolean), typeof(INumeric) };
-        public override string Type => "or";
-        public override string TypeDisplay => "Or";
+        public override string TypeName => "or";
+        public override string TypeDefaultDisplayName => "Or";
 
         public override SpriteSheetPos SpriteSheetPos => new(BooleanSheet, 1, 0);
 

@@ -25,9 +25,9 @@ namespace TerraIntegration.Components
 
     public class Camo : Component<CamoData>
     {
-        public override string ComponentType => "camo";
-        public override string ComponentDisplayName => "Camouflage block";
-        public override string ComponentDescription => "Camouflage block can be decorated\ninto another blocks";
+        public override string TypeName => "camo";
+        public override string TypeDefaultDisplayName => "Camouflage block";
+        public override string TypeDefaultDescription => "Camouflage block can be decorated\ninto another blocks";
 
         public override bool HasCustomInterface => true;
 

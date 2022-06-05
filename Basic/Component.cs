@@ -17,7 +17,7 @@ using Terraria.ObjectData;
 
 namespace TerraIntegration.Basic
 {
-    public abstract class Component : ModTile
+    public abstract class Component : ModTile, ITypedObject
     {
         public static HashSet<int> TileTypes = new();
         public static Dictionary<string, Component> ByTypeName = new();
@@ -31,9 +31,15 @@ namespace TerraIntegration.Basic
         public new static TerraIntegration Mod => ModContent.GetInstance<TerraIntegration>();
         public static ComponentWorld World => ModContent.GetInstance<ComponentWorld>();
 
-        public abstract string ComponentType { get; }
-        public virtual string ComponentDisplayName { get; }
-        public virtual string ComponentDescription { get; }
+        public abstract string TypeName { get; }
+        public string TypeDisplayName => Util.GetLangTextOrNull(DisplayNameLocalizationKey) ?? TypeDefaultDisplayName;
+        public string TypeDescription => Util.GetLangTextOrNull(DescriptionLocalizationKey) ?? TypeDefaultDescription;
+
+        public virtual string TypeDefaultDisplayName { get; }
+        public virtual string TypeDefaultDescription { get; }
+
+        public virtual string DescriptionLocalizationKey => "Mods.TerraIntegration.Descriptions.Components." + TypeName;
+        public virtual string DisplayNameLocalizationKey => "Mods.TerraIntegration.Names.Components." + TypeName;
 
         public override string Texture
         {
@@ -64,7 +70,7 @@ namespace TerraIntegration.Basic
             }
         }
 
-        public bool InterfaceVisible => ModContent.GetInstance<ComponentInterface>().InterfaceComponent.Component?.ComponentType == ComponentType;
+        public bool InterfaceVisible => ModContent.GetInstance<ComponentInterface>().InterfaceComponent.Component?.TypeName == TypeName;
         public Point16 InterfacePos => ModContent.GetInstance<ComponentInterface>().InterfaceComponent.Pos;
 
         internal virtual bool HasData => false;
@@ -158,11 +164,11 @@ namespace TerraIntegration.Basic
 
         public virtual bool HasProperties()
         {
-            return ComponentProperty.ByComponentType.ContainsKey(ComponentType);
+            return ComponentProperty.ByComponentType.ContainsKey(TypeName);
         }
         public virtual IEnumerable<ComponentProperty> GetProperties()
         {
-            if (!ComponentProperty.ByComponentType.TryGetValue(ComponentType, out var props))
+            if (!ComponentProperty.ByComponentType.TryGetValue(TypeName, out var props))
                 return null;
 
             return props.Values;
@@ -192,7 +198,7 @@ namespace TerraIntegration.Basic
         }
 
         public virtual bool HandlePacket(Point16 pos, ushort messageType, BinaryReader reader, int whoAmI, ref bool broadcast) { return false; }
-        public ModPacket CreatePacket(Point16 pos, ushort messageType) => Networking.CreateComponentPacket(ComponentType, pos, messageType);
+        public ModPacket CreatePacket(Point16 pos, ushort messageType) => Networking.CreateComponentPacket(TypeName, pos, messageType);
 
         public ComponentData GetData(Point16 pos) => ModContent.GetInstance<ComponentWorld>().GetData(pos, this);
         public ComponentData GetDataOrNull(Point16 pos) => ModContent.GetInstance<ComponentWorld>().GetDataOrNull(pos);
@@ -202,7 +208,7 @@ namespace TerraIntegration.Basic
             if (data is UnloadedComponentData)
                 throw new InvalidDataException("Unloaded data should not be synced");
 
-            writer.Write(ComponentType);
+            writer.Write(TypeName);
             writer.Write((ushort)data.Variables.Values.Count(v => v is not null));
 
             foreach (var kvp in data.Variables)
@@ -255,7 +261,7 @@ namespace TerraIntegration.Basic
         {
             TagCompound tag = new();
 
-            tag["type"] = data is UnloadedComponentData u ? u.ComponentType : ComponentType;
+            tag["type"] = data is UnloadedComponentData u ? u.ComponentType : TypeName;
 
             List<TagCompound> variables = new List<TagCompound>();
 
@@ -349,12 +355,12 @@ namespace TerraIntegration.Basic
 
         public static void Register(Component c)
         {
-            if (c?.ComponentType is null) return;
+            if (c?.TypeName is null) return;
 
             TileTypes.Add(c.Type);
             ByType[c.GetType()] = c;
             ByTileType[c.Type] = c;
-            ByTypeName[c.ComponentType] = c;
+            ByTypeName[c.TypeName] = c;
 
             ComponentProperty.ComponentRegistered();
         }
@@ -540,7 +546,7 @@ namespace TerraIntegration.Basic
     [Autoload(false)]
     public class UnloadedComponent : Component
     {
-        public override string ComponentType => null;
+        public override string TypeName => null;
     }
 
     public class ComponentVariableInfo

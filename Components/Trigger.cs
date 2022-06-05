@@ -23,9 +23,9 @@ namespace TerraIntegration.Components
 {
     public class Trigger : Component<Trigger.TriggerData>
     {
-        public override string ComponentType => "trigger";
-        public override string ComponentDisplayName => "Trigger";
-        public override string ComponentDescription => "Triggers an event by condition";
+        public override string TypeName => "trigger";
+        public override string TypeDefaultDisplayName => "Trigger";
+        public override string TypeDefaultDescription => "Triggers an event by condition";
 
         public override Vector2 InterfaceOffset => new(24, 0);
 

@@ -17,9 +17,9 @@ namespace TerraIntegration.Components
 {
     public class WorldReader : Component
     {
-        public override string ComponentType => "world";
-        public override string ComponentDisplayName => "World reader";
-        public override string ComponentDescription => "Reads information about the world.";
+        public override string TypeName => "world";
+        public override string TypeDefaultDisplayName => "World reader";
+        public override string TypeDefaultDescription => "Reads information about the world.";
 
         public override SpriteSheet DefaultPropertySpriteSheet { get; set; } = new("TerraIntegration/Assets/Types/world", new(32, 32));
 

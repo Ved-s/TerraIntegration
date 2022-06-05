@@ -11,8 +11,8 @@ namespace TerraIntegration.Variables.Bitwise
 {
     public class Not : ReferenceVariable
     {
-        public override string Type => "not";
-        public override string TypeDisplay => "Not";
+        public override string TypeName => "not";
+        public override string TypeDefaultDisplayName => "Not";
 
         public override SpriteSheetPos SpriteSheetPos => new(BooleanSheet, 2, 0);
 

@@ -11,8 +11,8 @@ namespace TerraIntegration.Variables
 {
     public class IsError : ReferenceVariable
     {
-        public override string Type => "iserror";
-        public override string TypeDisplay => "Is Error";
+        public override string TypeName => "iserror";
+        public override string TypeDefaultDisplayName => "Is Error";
 
         public override SpriteSheetPos SpriteSheetPos => new(BasicSheet, 1, 1);
 

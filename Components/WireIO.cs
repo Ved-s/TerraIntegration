@@ -21,9 +21,9 @@ namespace TerraIntegration.Components
         public const string OnSignalVariableSlot = "onsignal";
         public const string DoSignalVariableSlot = "dosignal";
 
-        public override string ComponentType => "wire";
-        public override string ComponentDisplayName => "Wire IO";
-        public override string ComponentDescription => "Wire IO allows to interact with\nTerraria wiring system";
+        public override string TypeName => "wire";
+        public override string TypeDefaultDisplayName => "Wire IO";
+        public override string TypeDefaultDescription => "Wire IO allows to interact with\nTerraria wiring system";
 
         public override bool CanHaveVariables => true;
 

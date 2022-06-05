@@ -15,8 +15,8 @@ namespace TerraIntegration.Variables
 {
     public class Event : Variable, IOwnProgrammerInterface
     {
-        public override string Type => "event";
-        public override string TypeDisplay => "Event";
+        public override string TypeName => "event";
+        public override string TypeDefaultDisplayName => "Event";
 
         public override Type VariableReturnType => null;
 

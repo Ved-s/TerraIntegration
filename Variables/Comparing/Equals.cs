@@ -12,8 +12,8 @@ namespace TerraIntegration.Variables.Comparing
 {
     public class Equals : DoubleReferenceVariableWithConst
     {
-        public override string Type => "equals";
-        public override string TypeDisplay => "Equals";
+        public override string TypeName => "equals";
+        public override string TypeDefaultDisplayName => "Equals";
 
         public override SpriteSheetPos SpriteSheetPos => new(ComparingSheet, 0, 0);
 

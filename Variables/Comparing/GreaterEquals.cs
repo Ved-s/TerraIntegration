@@ -12,8 +12,8 @@ namespace TerraIntegration.Variables.Comparing
 {
     public class GreaterEquals : DoubleReferenceVariableWithConst
     {
-        public override string Type => "greaterEquals";
-        public override string TypeDisplay => "Greater or equals";
+        public override string TypeName => "greaterEquals";
+        public override string TypeDefaultDisplayName => "Greater or equals";
 
         public override SpriteSheetPos SpriteSheetPos => new(ComparingSheet, 2, 0);
 

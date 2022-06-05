@@ -16,8 +16,8 @@ namespace TerraIntegration.Variables.Numeric
 {
     public class Add : DoubleReferenceVariableWithConst
     {
-        public override string Type => "add";
-        public override string TypeDisplay => "Add";
+        public override string TypeName => "add";
+        public override string TypeDefaultDisplayName => "Add";
 
         public override SpriteSheetPos SpriteSheetPos => new(MathSheet, 0, 0);
 

@@ -469,10 +469,10 @@ namespace TerraIntegration.UI
             foreach (Variable v in Variable.ByTypeName.Values)
             {
                 if (v is not IOwnProgrammerInterface interfaceOwner 
-                    || !v.TypeDisplay.ToLower().Contains(VariablesSearch.CurrentString.ToLower())
+                    || !v.TypeDisplayName.ToLower().Contains(VariablesSearch.CurrentString.ToLower())
                     || v is ValueProperty) continue;
 
-                VariablesList.Add(CreateVariableButton(v.TypeDisplay, Color.White, v.VariableReturnType, v.Type, () => VariableClicked(interfaceOwner), iconHoverText: v.TypeDescription));
+                VariablesList.Add(CreateVariableButton(v.TypeDisplayName, Color.White, v.VariableReturnType, v.TypeName, () => VariableClicked(interfaceOwner), iconHoverText: v.TypeDescription));
             }
         }
         static void PopulateProperties()
@@ -489,7 +489,7 @@ namespace TerraIntegration.UI
                     v => v.Item1 == CurrentType && v.Item2 is not ValueConversion,
                     v => v.Item2 is not ValueConversion))
                 {
-                    if (!var.TypeDisplay.ToLower().Contains(PropertiesSearch.CurrentString.ToLower())
+                    if (!var.TypeDisplayName.ToLower().Contains(PropertiesSearch.CurrentString.ToLower())
                         || CurrentValue is not null && var is ValueProperty prop && !prop.AppliesTo(CurrentValue)
                         || var is not IOwnProgrammerInterface owner) continue;
 
@@ -498,7 +498,7 @@ namespace TerraIntegration.UI
                     if (type != CurrentType)
                         headText = $"from {VariableValue.TypeToName(type, true)}";
 
-                    UITextPanel panel = CreateVariableButton(var.TypeDisplay, Color.White, var.VariableReturnType, var.Type, () => PropertyClicked(owner), headText);
+                    UITextPanel panel = CreateVariableButton(var.TypeDisplayName, Color.White, var.VariableReturnType, var.TypeName, () => PropertyClicked(owner), headText);
 
                     PropertiesList.Add(panel);
                 }

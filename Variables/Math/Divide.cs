@@ -16,8 +16,8 @@ namespace TerraIntegration.Variables.Numeric
 {
     public class Divide : DoubleReferenceVariableWithConst
     {
-        public override string Type => "div";
-        public override string TypeDisplay => "Divide";
+        public override string TypeName => "div";
+        public override string TypeDefaultDisplayName => "Divide";
 
         public override SpriteSheetPos SpriteSheetPos => new(MathSheet, 1, 1);
 

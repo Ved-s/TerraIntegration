@@ -17,9 +17,9 @@ namespace TerraIntegration.Components
 {
     public class TileReader : Component
     {
-        public override string ComponentType => "tile";
-        public override string ComponentDisplayName => "Tile reader";
-        public override string ComponentDescription => "Reads information about\nthe tile it facing.";
+        public override string TypeName => "tile";
+        public override string TypeDefaultDisplayName => "Tile reader";
+        public override string TypeDefaultDescription => "Reads information about\nthe tile it facing.";
 
         public override SpriteSheet DefaultPropertySpriteSheet { get; set; } = new("TerraIntegration/Assets/Types/tile", new(32, 32));
 

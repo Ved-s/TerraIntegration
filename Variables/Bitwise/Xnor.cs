@@ -12,8 +12,8 @@ namespace TerraIntegration.Variables.Bitwise
     public class Xnor : DoubleReferenceVariableWithConst
     {
         public override Type[] LeftSlotValueTypes => new[] { typeof(Values.Boolean), typeof(INumeric) };
-        public override string Type => "xnor";
-        public override string TypeDisplay => "Xnor";
+        public override string TypeName => "xnor";
+        public override string TypeDefaultDisplayName => "Xnor";
 
         public override SpriteSheetPos SpriteSheetPos => new(BooleanSheet, 3, 0);
 

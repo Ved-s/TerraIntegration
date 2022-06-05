@@ -17,9 +17,9 @@ namespace TerraIntegration.Components
 {
     public class VarStore : Component
     {
-        public override string ComponentType => "store";
-        public override string ComponentDisplayName => "Variable store";
-        public override string ComponentDescription => "Stores up to 16 variables.";
+        public override string TypeName => "store";
+        public override string TypeDefaultDisplayName => "Variable store";
+        public override string TypeDefaultDescription => "Stores up to 16 variables.";
 
         public override bool CanHaveVariables => true;
 

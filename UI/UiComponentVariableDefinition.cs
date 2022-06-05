@@ -37,7 +37,7 @@ namespace TerraIntegration.UI
             PaddingTop = 0;
             PaddingBottom = 0;
 
-            TextName = new(property.TypeDisplay)
+            TextName = new(property.TypeDisplayName)
             {
                 Left = new(44, 0),
                 Width = new(-82, 1),
@@ -77,9 +77,9 @@ namespace TerraIntegration.UI
             string value = Property.GetProperty(Component, Errors)?.Display(system)?.HoverText;
 
             if (value is null)
-                TextName.Text = Property.TypeDisplay;
+                TextName.Text = Property.TypeDisplayName;
             else 
-                TextName.Text = Property.TypeDisplay + "\n[c/aaaaaa:Value:] " + value.Replace('\n', ' ');
+                TextName.Text = Property.TypeDisplayName + "\n[c/aaaaaa:Value:] " + value.Replace('\n', ' ');
         }
 
         protected override void DrawSelf(SpriteBatch spriteBatch)
@@ -96,7 +96,7 @@ namespace TerraIntegration.UI
             Vector2 pos = new Vector2(8, (dim.Height - size) / 2);
             pos += dim.Position();
 
-            VariableRenderer.DrawVariableOverlay(spriteBatch, true, Property.VariableReturnType, Property.Type, pos, new(size), Color.White, 0f, Vector2.Zero);
+            VariableRenderer.DrawVariableOverlay(spriteBatch, true, Property.VariableReturnType, Property.TypeName, pos, new(size), Color.White, 0f, Vector2.Zero);
 
             Rectangle hitbox = new((int)pos.X, (int)pos.Y, (int)size, (int)size);
             if (hitbox.Contains(Main.MouseScreen.ToPoint())) 
@@ -104,7 +104,7 @@ namespace TerraIntegration.UI
                 string returns = VariableValue.TypeToName(Property.VariableReturnType, true);
 
                 ModContent.GetInstance<ComponentWorld>().HoverText =
-                    $"[c/aaaa00:Type:] {Property.TypeDisplay}" +
+                    $"[c/aaaa00:Type:] {Property.TypeDisplayName}" +
                     (returns is null ? "" : $"\n[c/aaaa00:Returns:] {returns}") +
                     (Property.TypeDescription is null ? "" : "\n" + Property.TypeDescription);
             }

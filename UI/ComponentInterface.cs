@@ -44,7 +44,7 @@ namespace TerraIntegration.UI
                 SetupVariables));
 
             Tabs.Add(new ComponentUITab("Description",
-                () => !InterfaceComponent.Component.ComponentDescription.IsNullEmptyOrWhitespace(),
+                () => !InterfaceComponent.Component.TypeDescription.IsNullEmptyOrWhitespace(),
                 SetupDescription));
 
             Tabs.Add(new ComponentUITab("Config",
@@ -88,11 +88,11 @@ namespace TerraIntegration.UI
 
         private void SetupComponentName()
         {
-            if (InterfaceComponent.Component.ComponentDisplayName is null) return;
+            if (InterfaceComponent.Component.TypeDisplayName is null) return;
 
             UIState s = Interface.CurrentState;
 
-            UIText text = new UIText(InterfaceComponent.Component.ComponentDisplayName)
+            UIText text = new UIText(InterfaceComponent.Component.TypeDisplayName)
             {
                 Left = new(6, 0)
             };
@@ -222,11 +222,12 @@ namespace TerraIntegration.UI
         }
         private void SetupDescription(Vector2 pos) 
         {
-            if (InterfaceComponent.Component.ComponentDescription.IsNullEmptyOrWhitespace()) return;
+            string typeDescription = InterfaceComponent.Component.TypeDescription;
+            if (typeDescription.IsNullEmptyOrWhitespace()) return;
 
-            float height = 32f * (InterfaceComponent.Component.ComponentDescription.Count(c => c == '\n') + 1);
+            float height = 32f * (typeDescription.Count(c => c == '\n') + 1);
 
-            Interface.CurrentState.Append(new UITextPanel<string>(InterfaceComponent.Component.ComponentDescription)
+            Interface.CurrentState.Append(new UITextPanel<string>(typeDescription)
             {
                 MinWidth = new(200, 0),
                 Width = new(0, 1),

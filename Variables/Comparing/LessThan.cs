@@ -12,8 +12,8 @@ namespace TerraIntegration.Variables.Comparing
 {
     public class LessThan : DoubleReferenceVariableWithConst
     {
-        public override string Type => "less";
-        public override string TypeDisplay => "Less than";
+        public override string TypeName => "less";
+        public override string TypeDefaultDisplayName => "Less than";
 
         public override SpriteSheetPos SpriteSheetPos => new(ComparingSheet, 2, 1);
 

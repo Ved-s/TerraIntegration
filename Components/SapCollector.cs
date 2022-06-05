@@ -22,9 +22,9 @@ namespace TerraIntegration.Components
     {
         public override string Texture => "TerraIntegration/Assets/Tiles/SapCollector";
 
-        public override string ComponentType => "sap";
-        public override string ComponentDisplayName => "Sap collector";
-        public override string ComponentDescription => "Collects Crystallized Sap from trees.\nNeeds to be placed in place of\ncutted off branch to function.";
+        public override string TypeName => "sap";
+        public override string TypeDefaultDisplayName => "Sap collector";
+        public override string TypeDefaultDescription => "Collects Crystallized Sap from trees.\nNeeds to be placed in place of\ncutted off branch to function.";
 
         public override bool HasCustomInterface => true;
         public override ushort DefaultUpdateFrequency => 30;

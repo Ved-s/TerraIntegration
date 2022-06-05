@@ -73,7 +73,7 @@ namespace TerraIntegration.UI
 
             Slot.VariableValidator = (var) =>
             {
-                if (VariableTypes is not null && !VariableTypes.Contains(var.Type))
+                if (VariableTypes is not null && !VariableTypes.Contains(var.TypeName))
                     return false;
 
                 if (VariableReturnTypes is not null)
@@ -123,7 +123,7 @@ namespace TerraIntegration.UI
                     {
                         if (Variable.ByTypeName.TryGetValue(t, out Variable var))
                         {
-                            return var.TypeDisplay;
+                            return var.TypeDisplayName;
                         }
                         return $"Unregistered ({t})";
                     })));

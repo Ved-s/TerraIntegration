@@ -12,8 +12,8 @@ namespace TerraIntegration.Variables.Comparing
 {
     public class NotEquals : DoubleReferenceVariableWithConst
     {
-        public override string Type => "notEquals";
-        public override string TypeDisplay => "Not equals";
+        public override string TypeName => "notEquals";
+        public override string TypeDefaultDisplayName => "Not equals";
 
         public override SpriteSheetPos SpriteSheetPos => new(ComparingSheet, 1, 0);
 
