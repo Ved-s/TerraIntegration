@@ -66,6 +66,7 @@ namespace TerraIntegration.Components
 
         public override string ComponentType => "display";
         public override string ComponentDisplayName => "Variable display";
+        public override string ComponentDescription => "Displays display variables.\nAlso they can be connected into bigger\ndisplays of rectangular shape.";
 
         public override bool HasCustomInterface => true;
 

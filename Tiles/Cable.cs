@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TerraIntegration.Basic;
 using Terraria;
 using Terraria.DataStructures;
 using Terraria.Enums;
@@ -49,7 +50,7 @@ namespace TerraIntegration.Tiles
 
 		private bool CanConnectTo(int type)
 		{
-			return ComponentSystem.CableTiles.Contains(type) || Components.Component.TileTypes.Contains(type);
+			return ComponentSystem.CableTiles.Contains(type) || Component.TileTypes.Contains(type);
 		}
     }
 }

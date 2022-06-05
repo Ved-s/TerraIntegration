@@ -15,7 +15,7 @@ using Terraria.ModLoader;
 using Terraria.ModLoader.IO;
 using Terraria.ObjectData;
 
-namespace TerraIntegration.Components
+namespace TerraIntegration.Basic
 {
     public abstract class Component : ModTile
     {

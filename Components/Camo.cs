@@ -27,6 +27,7 @@ namespace TerraIntegration.Components
     {
         public override string ComponentType => "camo";
         public override string ComponentDisplayName => "Camouflage block";
+        public override string ComponentDescription => "Camouflage block can be decorated\ninto another blocks";
 
         public override bool HasCustomInterface => true;
 

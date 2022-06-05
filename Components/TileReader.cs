@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TerraIntegration.Basic;
 using TerraIntegration.DataStructures;
 using Terraria;
 using Terraria.Audio;
@@ -18,6 +19,7 @@ namespace TerraIntegration.Components
     {
         public override string ComponentType => "tile";
         public override string ComponentDisplayName => "Tile reader";
+        public override string ComponentDescription => "Reads information about\nthe tile it facing.";
 
         public override SpriteSheet DefaultPropertySpriteSheet { get; set; } = new("TerraIntegration/Assets/Types/tile", new(32, 32));
 

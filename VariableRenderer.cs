@@ -142,7 +142,7 @@ namespace TerraIntegration
                 }
 
                 if (texture is null && var is ComponentProperty prop 
-                    && Components.Component.ByTypeName.TryGetValue(prop.ComponentType, out Components.Component com))
+                    && Component.ByTypeName.TryGetValue(prop.ComponentType, out Component com))
                 {
                     SpriteSheet sheet = com.DefaultPropertySpriteSheet;
 

@@ -151,7 +151,7 @@ namespace TerraIntegration.UI
             {
                 int height = 0;
 
-                Interface.CurrentState.MinWidth.Set(250, 0);
+                SetMinUISize(250);
 
                 UIList list = new()
                 {
@@ -229,6 +229,7 @@ namespace TerraIntegration.UI
             Interface.CurrentState.Append(new UITextPanel<string>(InterfaceComponent.Component.ComponentDescription)
             {
                 MinWidth = new(200, 0),
+                Width = new(0, 1),
                 Height = new(height, 0),
                 Top = new(pos.Y, 0),
                 Left = new(pos.X, 0),
@@ -318,7 +319,7 @@ namespace TerraIntegration.UI
             }
 
             x -= 4;
-            Interface.CurrentState.MinWidth.Set(x, 0);
+            SetMinUISize(x);
             foreach (var tab in uiTabs)
             {
                 tab.Width = new(0, tab.MinWidth.Pixels / x);
@@ -416,7 +417,15 @@ namespace TerraIntegration.UI
                     minHeight = childFitHeight;
             }
         }
-        
+        private void SetMinUISize(float? width = null, float? height = null)
+        {
+            if (width is not null)
+                Interface.CurrentState.MinWidth = new(Math.Max(width.Value, Interface.CurrentState.MinWidth.Pixels), 0);
+
+            if (height is not null)
+                Interface.CurrentState.MaxHeight = new(Math.Max(height.Value, Interface.CurrentState.MaxHeight.Pixels), 0);
+        }
+
         public void CloseUI()
         {
             InterfaceComponent = default;

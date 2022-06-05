@@ -7,7 +7,7 @@ using TerraIntegration.Basic;
 using TerraIntegration.DataStructures;
 using TerraIntegration.Values;
 
-namespace TerraIntegration.Variables
+namespace TerraIntegration.Basic
 {
     public abstract class ValueConversion : ValueProperty
     {

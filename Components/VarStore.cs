@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TerraIntegration.Basic;
 using TerraIntegration.DataStructures;
 using TerraIntegration.UI;
 using Terraria;
@@ -18,6 +19,7 @@ namespace TerraIntegration.Components
     {
         public override string ComponentType => "store";
         public override string ComponentDisplayName => "Variable store";
+        public override string ComponentDescription => "Stores up to 16 variables.";
 
         public override bool CanHaveVariables => true;
 

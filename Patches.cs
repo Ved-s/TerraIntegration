@@ -4,6 +4,7 @@ using Mono.Cecil.Cil;
 using MonoMod.Cil;
 using System.Collections.Generic;
 using System.Linq;
+using TerraIntegration.Basic;
 using TerraIntegration.DataStructures;
 using Terraria;
 using Terraria.GameContent.Drawing;
@@ -61,15 +62,15 @@ namespace TerraIntegration
 
             int type = Main.tile[i, j].TileType;
             orig(i, j, fail, effectOnly, noItem);
-            if (!Main.tile[i, j].HasTile && Components.Component.TileTypes.Contains(type))
-                Components.Component.ByTileType[type].OnKilled(new(i, j));
+            if (!Main.tile[i, j].HasTile && Component.TileTypes.Contains(type))
+                Component.ByTileType[type].OnKilled(new(i, j));
             if (!Main.tile[i, j].HasTile && ComponentSystem.CableTiles.Contains(type))
                 ComponentSystem.UpdateSystem(new((short)i, (short)j, false), out _);
         }
         private bool TileObject_Place(On.Terraria.TileObject.orig_Place orig, TileObject toBePlaced)
         {
             bool result = orig(toBePlaced);
-            if (Components.Component.ByTileType.TryGetValue(toBePlaced.type, out Components.Component c))
+            if (Component.ByTileType.TryGetValue(toBePlaced.type, out Component c))
                 c.OnPlaced(new(toBePlaced.xCoord, toBePlaced.yCoord));
             if (ComponentSystem.CableTiles.Contains(toBePlaced.type))
                 ComponentSystem.UpdateSystem(new((short)toBePlaced.xCoord, (short)toBePlaced.yCoord, false), out _);
@@ -85,8 +86,8 @@ namespace TerraIntegration
                 {
                     Tile t = Main.tile[x, y];
                     if (!t.HasTile) continue;
-                    if (!Components.Component.TileTypes.Contains(t.TileType)) continue;
-                    Components.Component.ByTileType[t.TileType].OnLoaded(new(x, y));
+                    if (!Component.TileTypes.Contains(t.TileType)) continue;
+                    Component.ByTileType[t.TileType].OnLoaded(new(x, y));
                     if (updated.Contains(new(x, y))) continue;
 
                     ComponentSystem.UpdateSystem(new(x, y, false), out var systems);
