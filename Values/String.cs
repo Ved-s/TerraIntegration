@@ -80,7 +80,7 @@ namespace TerraIntegration.Values
             return null;
         }
 
-        public override bool Equals(object obj)
+        public override bool Equals(VariableValue obj)
         {
             return obj is String @string &&
                    Type == @string.Type &&
@@ -113,11 +113,6 @@ namespace TerraIntegration.Values
         {
             foreach (char c in Value)
                 yield return new Char(c);
-        }
-
-        public bool Equals(VariableValue value)
-        {
-            return (value as String).Value == Value;
         }
     }
 }

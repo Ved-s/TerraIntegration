@@ -64,5 +64,15 @@ namespace TerraIntegration.Values
         {
             WallType = type;
         }
+
+        public override bool Equals(VariableValue obj)
+        {
+            return obj is Wall wall &&
+                   WallType == wall.WallType &&
+                   WallFrameX == wall.WallFrameX &&
+                   WallFrameY == wall.WallFrameY &&
+                   WallFrameNumber == wall.WallFrameNumber &&
+                   Color == wall.Color;
+        }
     }
 }

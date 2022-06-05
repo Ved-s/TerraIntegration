@@ -81,7 +81,7 @@ namespace TerraIntegration.Values
             return Value.ToString();
         }
 
-        public override bool Equals(object obj)
+        public override bool Equals(VariableValue obj)
         {
             return obj is Boolean boolean &&
                    Type == boolean.Type &&
@@ -117,11 +117,6 @@ namespace TerraIntegration.Values
         public Basic.Variable WriteVariable()
         {
             return new Constant(new Boolean(InterfaceValue));
-        }
-
-        public bool Equals(VariableValue value)
-        {
-            return (value as Boolean).Value == Value;
         }
     }
 }

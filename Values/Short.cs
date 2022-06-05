@@ -78,7 +78,7 @@ namespace TerraIntegration.Values
             return Value.ToString();
         }
 
-        public override bool Equals(object obj)
+        public override bool Equals(VariableValue obj)
         {
             return obj is Short @byte &&
                    Type == @byte.Type &&

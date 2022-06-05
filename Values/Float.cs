@@ -76,7 +76,7 @@ namespace TerraIntegration.Values
             return Value.ToString();
         }
 
-        public override bool Equals(object obj)
+        public override bool Equals(VariableValue obj)
         {
             return obj is Float @float &&
                    Type == @float.Type &&

@@ -90,5 +90,24 @@ namespace TerraIntegration.Values
             if (TileType < 0) return null;
             return new TileDisplay((ushort)TileType, new(TileFrameX, TileFrameY), Color, Name);
         }
+
+        public override bool Equals(VariableValue obj)
+        {
+            return obj is Tile tile &&
+                   TileType == tile.TileType &&
+                   TileFrameX == tile.TileFrameX &&
+                   TileFrameY == tile.TileFrameY &&
+                   TileFrameNumber == tile.TileFrameNumber &&
+                   Liquid == tile.Liquid &&
+                   Color == tile.Color &&
+                   Slope == tile.Slope &&
+                   HalfBlock == tile.HalfBlock &&
+                   Actuated == tile.Actuated &&
+                   Actuator == tile.Actuator &&
+                   RedWire == tile.RedWire &&
+                   GreenWire == tile.GreenWire &&
+                   BlueWire == tile.BlueWire &&
+                   YellowWire == tile.YellowWire;
+        }
     }
 }

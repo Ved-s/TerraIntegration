@@ -318,7 +318,7 @@ namespace TerraIntegration.Values
             };
         }
 
-        public bool Equals(VariableValue value)
+        public override bool Equals(VariableValue value)
         {
             foreach (var (First, Second) in (value as List).Values.Zip(Values)) 
             {

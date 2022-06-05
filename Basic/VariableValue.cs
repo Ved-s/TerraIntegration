@@ -94,8 +94,37 @@ namespace TerraIntegration.Basic
         protected virtual void SaveCustomData(BinaryWriter writer) { }
         protected virtual VariableValue LoadCustomData(BinaryReader reader) { return (VariableValue)Activator.CreateInstance(GetType()); }
 
-        public static string TypeToName<T>(bool colored = true)
-            => TypeToName(typeof(T), colored);
+        public bool HasProperties()
+        {
+            Type type = GetType();
+            if (ValueProperty.ByValueType.ContainsKey(type))
+                return true;
+
+            foreach (Type interf in type.GetInterfaces())
+                if (ValueProperty.ByValueType.ContainsKey(interf))
+                    return true;
+
+            return false;
+        }
+
+        public virtual VariableValue Clone() => (VariableValue)MemberwiseClone();
+        public abstract bool Equals(VariableValue value);
+
+        public override bool Equals(object obj)
+        {
+            return obj is VariableValue value
+                && Type == value.Type
+                && Equals(value);
+        }
+
+        public static TValue GetInstance<TValue>() where TValue : VariableValue
+        {
+            if (ByType.TryGetValue(typeof(TValue), out VariableValue v))
+                return v as TValue;
+            return null;
+        }
+
+        public static string TypeToName<T>(bool colored = true) => TypeToName(typeof(T), colored);
         public static string TypeToName(Type type, bool colored)
         {
             if (type is null)
@@ -132,7 +161,7 @@ namespace TerraIntegration.Basic
                 return name;
             }
 
-            if (colored) 
+            if (colored)
                 return Util.ColorTag(new(0xff, 0xaa, 0xaa), $"unregistered type {type.Name}");
             return $"unregistered type {type.Name}";
         }
@@ -142,43 +171,23 @@ namespace TerraIntegration.Basic
 
             if (ByType.TryGetValue(type, out VariableValue val))
                 return "V" + val.Type;
-            
+
             else
                 return "T" + type.FullName;
         }
-        public static Type StringToType(string type) 
+        public static Type StringToType(string type)
         {
             if (type is null) return null;
 
             bool istype = type.StartsWith('T');
             type = type[1..];
 
-            if (istype)     
+            if (istype)
                 return System.Type.GetType(type);
-            
+
             else if (ByTypeName.TryGetValue(type, out VariableValue val))
                 return val.GetType();
-            
-            return null;
-        }
 
-        public bool HasProperties()
-        {
-            Type type = GetType();
-            if (ValueProperty.ByValueType.ContainsKey(type))
-                return true;
-
-            foreach (Type interf in type.GetInterfaces())
-                if (ValueProperty.ByValueType.ContainsKey(interf))
-                    return true;
-
-            return false;
-        }
-
-        public static TValue GetInstance<TValue>() where TValue : VariableValue
-        {
-            if (ByType.TryGetValue(typeof(TValue), out VariableValue v))
-                return v as TValue;
             return null;
         }
 
@@ -196,8 +205,6 @@ namespace TerraIntegration.Basic
             ByTypeName.Clear();
             ByType.Clear();
         }
-
-        public virtual VariableValue Clone() => (VariableValue)MemberwiseClone();
     }
 
     public class UnloadedVariableValue : VariableValue
@@ -217,6 +224,13 @@ namespace TerraIntegration.Basic
         {
             ValueType = type;
             Data = data;
+        }
+
+        public override bool Equals(VariableValue value)
+        {
+            return value is UnloadedVariableValue unloaded
+                && ValueType == unloaded.ValueType
+                && Data == unloaded.Data;
         }
     }
 }

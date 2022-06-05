@@ -100,7 +100,7 @@ namespace TerraIntegration.Values
             return null;
         }
 
-        public override bool Equals(object obj)
+        public override bool Equals(VariableValue obj)
         {
             return obj is Long @long &&
                    Type == @long.Type &&
