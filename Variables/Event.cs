@@ -7,11 +7,13 @@ using System.Threading.Tasks;
 using TerraIntegration.Basic;
 using TerraIntegration.Components;
 using TerraIntegration.DataStructures;
+using TerraIntegration.UI;
 using TerraIntegration.Values;
+using Terraria.GameContent.UI.Elements;
 
 namespace TerraIntegration.Variables
 {
-    public class Event : Variable
+    public class Event : Variable, IOwnProgrammerInterface
     {
         public override string Type => "event";
         public override string TypeDisplay => "Event";
@@ -19,6 +21,9 @@ namespace TerraIntegration.Variables
         public override Type VariableReturnType => null;
 
         public override SpriteSheetPos SpriteSheetPos => new(BasicSheet, 3, 0);
+
+        public UIPanel Interface { get; set; }
+        public bool HasComplexInterface => false;
 
         private static HashSet<Point16> TriggeredPoints = new();
 
@@ -48,6 +53,22 @@ namespace TerraIntegration.Variables
             }
 
             TriggeredPoints.Remove(pos);
+        }
+
+        public void SetupInterface()
+        {
+            Interface.Append(new UITextPanel("No variables needed") 
+            {
+                Width = new(0, 1),
+                Height = new(0, 1),
+                BackgroundColor = Color.Transparent,
+                BorderColor = Color.Transparent,
+            });
+        }
+
+        public Variable WriteVariable()
+        {
+            return new Event();
         }
     }
 }

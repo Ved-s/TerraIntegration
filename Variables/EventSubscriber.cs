@@ -7,12 +7,14 @@ using System.Text;
 using System.Threading.Tasks;
 using TerraIntegration.Basic;
 using TerraIntegration.DataStructures;
+using TerraIntegration.UI;
 using TerraIntegration.Values;
+using Terraria.GameContent.UI.Elements;
 using Terraria.ModLoader;
 
 namespace TerraIntegration.Variables
 {
-    public class EventSubscriber : Variable
+    public class EventSubscriber : Variable, IOwnProgrammerInterface
     {
         public override string Type => "eventsub";
         public override string TypeDisplay => "Event Subscriber";
@@ -23,6 +25,10 @@ namespace TerraIntegration.Variables
 
         public Guid EventId { get; set; }
         public bool Triggered { get; set; }
+
+        public UIPanel Interface { get; set; }
+        public UIVariableSlot EventSlot { get; set; }
+        public bool HasComplexInterface => false;
 
         public EventSubscriber() { }
         public EventSubscriber(Guid eventId) 
@@ -47,30 +53,29 @@ namespace TerraIntegration.Variables
             return new EventSubscriber(new Guid(reader.ReadBytes(16)));
         }
 
-        public override Variable GetFromCommand(CommandCaller caller, List<string> args)
-        {
-            if (args.Count < 1)
-            {
-                caller.Reply("Argument required: event variable id");
-                return null;
-            }
-
-            Guid? id = World.Guids.GetGuid(args[0]);
-
-            if (id is null)
-            {
-                caller.Reply($"Id not found: {args[0]}");
-                return null;
-            }
-            args.RemoveAt(0);
-
-            return new EventSubscriber(id.Value);
-        }
-
         public override void ModifyTooltips(List<TooltipLine> tooltips)
         {
             if (EventId != default)
                 tooltips.Add(new(Mod, "TIEventId", $"[c/aaaa00:Event ID:] {World.Guids.GetShortGuid(EventId)}"));
+        }
+
+        public void SetupInterface()
+        {
+            Interface.Append(EventSlot = new()
+            {
+                Top = new(-21, .5f),
+                Left = new(-21, .5f),
+                DisplayOnly = true,
+
+                VariableValidator = (var) => var is Variables.Event,
+                HoverText = "Event"
+            });
+        }
+
+        public Variable WriteVariable()
+        {
+            if (EventSlot?.Var?.Var is null) return null;
+            return new EventSubscriber(EventSlot.Var.Var.Id);
         }
     }
 }
