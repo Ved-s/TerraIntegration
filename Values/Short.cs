@@ -21,6 +21,7 @@ namespace TerraIntegration.Values
     {
         public override string Type => "short";
         public override string TypeDisplay => "Short";
+        public override string TypeDescription => "16-bit signed integer";
 
         public override Color TypeColor => Color.BlueViolet;
 

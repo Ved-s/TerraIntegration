@@ -22,6 +22,7 @@ namespace TerraIntegration.Values
     {
         public override string Type => "str";
         public override string TypeDisplay => "String";
+        public override string TypeDescription => "Text sequence of characters";
 
         public override Color TypeColor => Color.OrangeRed;
 

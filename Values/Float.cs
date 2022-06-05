@@ -21,6 +21,7 @@ namespace TerraIntegration.Values
     {
         public override string Type => "float";
         public override string TypeDisplay => "Float";
+        public override string TypeDescription => "Single-presition floating point number";
 
         public override Color TypeColor => Color.Green;
 

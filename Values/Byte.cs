@@ -22,6 +22,7 @@ namespace TerraIntegration.Values
     {
         public override string Type => "byte";
         public override string TypeDisplay => "Byte";
+        public override string TypeDescription => "8-bit unsigned integer";
 
         public override Color TypeColor => Color.Blue;
 

@@ -13,6 +13,8 @@ namespace TerraIntegration.Values
     {
         public override string Type => "wall";
         public override string TypeDisplay => "Wall";
+        public override string TypeDescription => "Copy of a wall";
+
         public override Color TypeColor => Microsoft.Xna.Framework.Color.Brown;
         
         public override SpriteSheetPos SpriteSheetPos => new(BasicSheet, 3, 2);

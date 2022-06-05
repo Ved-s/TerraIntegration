@@ -20,6 +20,7 @@ namespace TerraIntegration.Values
     {
         public override string Type => "long";
         public override string TypeDisplay => "Long";
+        public override string TypeDescription => "64-bit signed integer";
 
         public override Color TypeColor => Color.Red;
 

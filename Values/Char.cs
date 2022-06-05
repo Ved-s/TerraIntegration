@@ -21,6 +21,7 @@ namespace TerraIntegration.Values
     {
         public override string Type => "char";
         public override string TypeDisplay => "Char";
+        public override string TypeDescription => "Single character";
 
         public override Color TypeColor => Color.LightPink;
 

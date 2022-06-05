@@ -23,6 +23,7 @@ namespace TerraIntegration.Values
     {
         public override string Type => "bool";
         public override string TypeDisplay => "Boolean";
+        public override string TypeDescription => "Two-state value, either True or False";
 
         public override Color TypeColor => Color.CadetBlue;
 

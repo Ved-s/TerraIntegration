@@ -20,6 +20,7 @@ namespace TerraIntegration.Values
     {
         public override string Type => "int";
         public override string TypeDisplay => "Integer";
+        public override string TypeDescription => "32-bit signed integer";
 
         public override Color TypeColor => Color.Orange;
 

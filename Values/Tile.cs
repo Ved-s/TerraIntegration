@@ -14,6 +14,8 @@ namespace TerraIntegration.Values
     {
         public override string Type => "tile";
         public override string TypeDisplay => "Tile";
+        public override string TypeDescription => "Copy of a tile";
+
         public override Color TypeColor => Microsoft.Xna.Framework.Color.SaddleBrown;
 
         public override SpriteSheetPos SpriteSheetPos => new(BasicSheet, 2, 2);

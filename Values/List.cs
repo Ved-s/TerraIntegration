@@ -22,6 +22,8 @@ namespace TerraIntegration.Values
     {
         public override string Type => "list";
         public override string TypeDisplay => "List";
+        public override string TypeDescription => "List of values";
+
         public override Color TypeColor => new(120, 120, 120);
 
         public override SpriteSheetPos SpriteSheetPos => new(BasicSheet, 0, 2);

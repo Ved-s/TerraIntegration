@@ -449,7 +449,7 @@ namespace TerraIntegration.UI
                 if (!v.TypeDisplay.ToLower().Contains(VariablesSearch.CurrentString.ToLower())
                     || (!v.HasProperties() && v is not IOwnProgrammerInterface)) continue;
 
-                VariablesList.Add(CreateVariableButton(v.TypeDisplay, v.TypeColor, kvp.Key, "const", () => ValueClicked(v)));
+                VariablesList.Add(CreateVariableButton(v.TypeDisplay, v.TypeColor, kvp.Key, "const", () => ValueClicked(v), iconHoverText: v.TypeDescription));
             }
 
             foreach (Type t in ValueProperty.ByValueType.Keys)
@@ -465,7 +465,7 @@ namespace TerraIntegration.UI
                     || !v.TypeDisplay.ToLower().Contains(VariablesSearch.CurrentString.ToLower())
                     || v is ValueProperty) continue;
 
-                VariablesList.Add(CreateVariableButton(v.TypeDisplay, Color.White, v.VariableReturnType, v.Type, () => VariableClicked(interfaceOwner)));
+                VariablesList.Add(CreateVariableButton(v.TypeDisplay, Color.White, v.VariableReturnType, v.Type, () => VariableClicked(interfaceOwner), iconHoverText: v.TypeDescription));
             }
         }
         static void PopulateProperties()
@@ -563,7 +563,7 @@ namespace TerraIntegration.UI
             panel.BackgroundColor = new Color(100, 160, 180);
         }
 
-        static UITextPanel CreateVariableButton(string text, Color color, Type returnValue, string variableType, Action click, string headText = null) 
+        static UITextPanel CreateVariableButton(string text, Color color, Type returnValue, string variableType, Action click, string headText = null, string iconHoverText = null) 
         {
             UITextPanel panel = new UITextPanel(text, color)
             {
@@ -584,7 +584,10 @@ namespace TerraIntegration.UI
             {
                 Top = new(4, 0),
                 Left = new(-34, 0),
-                OnDraw = (e, sb, st) => VariableRenderer.DrawVariableOverlay(sb, true, returnValue, variableType, st.Position(), new(32), Color.White, 0f, Vector2.Zero)
+                Width = new(32, 0),
+                Height = new(32, 0),
+                OnDraw = (e, sb, st) => VariableRenderer.DrawVariableOverlay(sb, true, returnValue, variableType, st.Position(), new(32), Color.White, 0f, Vector2.Zero),
+                HoverText = iconHoverText
             };
             panel.Append(icon);
 
