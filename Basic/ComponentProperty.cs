@@ -19,7 +19,7 @@ namespace TerraIntegration.Basic
         public abstract string ComponentType { get; }
         public abstract string PropertyName { get; }
         public abstract string PropertyDisplay { get; }
-        public virtual string PropertyDescription => "";
+        public virtual string PropertyDescription => null;
 
         public override SpriteSheet DefaultSpriteSheet
         {

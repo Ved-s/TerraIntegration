@@ -303,11 +303,12 @@ namespace TerraIntegration.Components
                 }
             }
 
-            object @internal = null;
+            TagCompound @internal;
             if (tag.ContainsKey("data"))
             {
-                @internal = tag["data"];
+                @internal = tag.GetCompound("data");
             }
+            else @internal = new();
 
             ComponentData data;
             if (!ByTypeName.TryGetValue(component, out Component c))
@@ -338,8 +339,8 @@ namespace TerraIntegration.Components
             writer.Write((ushort)0);
         }
 
-        internal virtual object SaveTagInternal(ComponentData data) => null;
-        internal virtual ComponentData LoadTagInternal(object tag, Point16 pos) => new();
+        internal virtual TagCompound SaveTagInternal(ComponentData data) => null;
+        internal virtual ComponentData LoadTagInternal(TagCompound tag, Point16 pos) => new();
 
         internal virtual void InitData(Point16 pos) 
         {
@@ -452,13 +453,13 @@ namespace TerraIntegration.Components
         public new TDataType GetData(Point16 pos) => ModContent.GetInstance<ComponentWorld>().GetData<TDataType>(pos, this);
         public new TDataType GetDataOrNull(Point16 pos) => ModContent.GetInstance<ComponentWorld>().GetDataOrNull<TDataType>(pos);
 
-        public virtual object SaveCustomDataTag(TDataType data) => null;
-        public virtual TDataType LoadCustomDataTag(object data, Point16 pos) => new();
+        public virtual TagCompound SaveCustomDataTag(TDataType data) => null;
+        public virtual TDataType LoadCustomDataTag(TagCompound data, Point16 pos) => new();
 
         public virtual void SendCustomData(TDataType data, BinaryWriter writer) { }
         public virtual TDataType ReceiveCustomData(BinaryReader reader, Point16 pos) => new();
 
-        internal override object SaveTagInternal(ComponentData data)
+        internal override TagCompound SaveTagInternal(ComponentData data)
         {
             if (data is not TDataType tdata)
             {
@@ -466,7 +467,7 @@ namespace TerraIntegration.Components
             }
             return SaveCustomDataTag(tdata);
         }
-        internal override ComponentData LoadTagInternal(object tag, Point16 pos)
+        internal override ComponentData LoadTagInternal(TagCompound tag, Point16 pos)
         {
             return LoadCustomDataTag(tag, pos);
         }
@@ -522,9 +523,9 @@ namespace TerraIntegration.Components
     public class UnloadedComponentData : ComponentData
     {
         public string ComponentType { get; private set; }
-        public object Data { get; private set; }
+        public TagCompound Data { get; private set; }
 
-        public UnloadedComponentData(string component, object data)
+        public UnloadedComponentData(string component, TagCompound data)
         {
             ComponentType = component;
             Data = data;

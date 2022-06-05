@@ -302,7 +302,7 @@ namespace TerraIntegration.UI
                     PaddingBottom = 0,
 
                 };
-                if (i == CurrentTab) 
+                if (i == CurrentTab)
                     tabpanel.BackgroundColor = new Color(100, 160, 180);
 
                 tabpanel.OnClick += (s, e) =>
@@ -318,9 +318,11 @@ namespace TerraIntegration.UI
             }
 
             x -= 4;
+            Interface.CurrentState.MinWidth.Set(x, 0);
             foreach (var tab in uiTabs)
             {
                 tab.Width = new(0, tab.MinWidth.Pixels / x);
+                tab.Left = new(0, tab.Left.Pixels / x);
             }
         }
 

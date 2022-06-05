@@ -155,7 +155,7 @@ namespace TerraIntegration.Components
             }
         }
 
-        public override object SaveCustomDataTag(CamoData data)
+        public override TagCompound SaveCustomDataTag(CamoData data)
         {
             TagCompound tag = new TagCompound();
 
@@ -165,15 +165,15 @@ namespace TerraIntegration.Components
             return tag;
 
         }
-        public override CamoData LoadCustomDataTag(object data, Point16 pos)
+        public override CamoData LoadCustomDataTag(TagCompound data, Point16 pos)
         {
             CamoData cd = new();
 
-            if (data is not TagCompound tag)
+            if (data is null)
                 return cd;
 
-            if (tag.ContainsKey("item"))
-                cd.CamoTileItem = ItemIO.Load(tag.GetCompound("item"));
+            if (data.ContainsKey("item"))
+                cd.CamoTileItem = ItemIO.Load(data.GetCompound("item"));
 
             return cd;
         }

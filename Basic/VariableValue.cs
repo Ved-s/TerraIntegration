@@ -25,6 +25,7 @@ namespace TerraIntegration.Basic
 
         public abstract string Type { get; }
         public abstract string TypeDisplay { get; }
+        public virtual string TypeDescription => null;
 
         public virtual Color TypeColor => Color.White;
 

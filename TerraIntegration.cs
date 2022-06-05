@@ -8,6 +8,8 @@ using TerraIntegration.DataStructures;
 using TerraIntegration.DisplayedValues;
 using TerraIntegration.Values;
 using TerraIntegration.Variables;
+using Terraria;
+using Terraria.ID;
 using Terraria.ModLoader;
 
 namespace TerraIntegration
@@ -73,6 +75,11 @@ namespace TerraIntegration
         public override void HandlePacket(BinaryReader reader, int whoAmI)
         {
             Networking.HandlePacket(reader, whoAmI);
+        }
+
+        public override void AddRecipeGroups()
+        {
+            RecipeGroup.RegisterGroup("T2Watch", new(() => "Any tier 2 watches", ItemID.SilverWatch, ItemID.TungstenWatch));
         }
     }
 

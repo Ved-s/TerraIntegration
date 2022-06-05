@@ -1,11 +1,6 @@
 ﻿using CustomTreeLib;
 using Microsoft.Xna.Framework;
-using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using TerraIntegration.DataStructures;
 using TerraIntegration.UI;
 using Terraria;
@@ -56,7 +51,7 @@ namespace TerraIntegration.Components
                 {
                     if (data.Item is null)
                         data.Item = Util.CreateModItem<Items.Materials.CrystallizedSap>();
-                    
+
                     else data.Item.Item.stack++;
                 }
             }
@@ -135,20 +130,20 @@ namespace TerraIntegration.Components
 
         public override bool TileFrame(int i, int j, ref bool resetFrame, ref bool noBreak)
         {
-            if (!noBreak && !IsBluewoodAround(i,j))
+            if (!noBreak && !IsBluewoodAround(i, j))
                 WorldGen.KillTile(i, j);
 
             return false;
         }
 
-        public bool IsBluewoodAround(int x, int y) 
+        public bool IsBluewoodAround(int x, int y)
         {
             ushort bluewood = ModContent.GetInstance<Bluewood>().Tile.Type;
 
-            if (Main.tile[x-1, y].TileType == bluewood && TreeTileInfo.GetInfo(x-1, y).IsCenter)
+            if (Main.tile[x - 1, y].TileType == bluewood && TreeTileInfo.GetInfo(x - 1, y).IsCenter)
                 return true;
 
-            if (Main.tile[x+1, y].TileType == bluewood && TreeTileInfo.GetInfo(x+1, y).IsCenter)
+            if (Main.tile[x + 1, y].TileType == bluewood && TreeTileInfo.GetInfo(x + 1, y).IsCenter)
                 return true;
 
             return false;
@@ -161,9 +156,9 @@ namespace TerraIntegration.Components
             EfficiencyText.SetText($"Efficiency:\n{GetEfficiency(InterfacePos) * 100:0.0}%");
         }
 
-        public float GetEfficiency(Point16 pos) 
+        public float GetEfficiency(Point16 pos)
         {
-            if (!IsBluewoodAround(pos.X, pos.Y)) 
+            if (!IsBluewoodAround(pos.X, pos.Y))
                 return 0;
 
             bool left = Framing.GetTileSafely(pos.X - 1, pos.Y).TileType == ModContent.GetInstance<Bluewood>().Tile.Type;
@@ -171,7 +166,7 @@ namespace TerraIntegration.Components
             Point16 tilepos = left ? new(pos.X - 1, pos.Y) : new(pos.X + 1, pos.Y);
             TreeTileInfo info = TreeTileInfo.GetInfo(tilepos.X, tilepos.Y);
 
-            if (!info.WithBranches && !info.WithRoots || info.Side == (left? TreeTileSide.Left : TreeTileSide.Right)) 
+            if (!info.WithBranches && !info.WithRoots || info.Side == (left ? TreeTileSide.Left : TreeTileSide.Right))
                 return 0;
 
             float efficiency = 0f;
@@ -193,7 +188,7 @@ namespace TerraIntegration.Components
             return efficiency;
         }
 
-        private void NotifyItemChange(Items.Materials.CrystallizedSap item, Point16 pos) 
+        private void NotifyItemChange(Items.Materials.CrystallizedSap item, Point16 pos)
         {
             if (Main.netMode == NetmodeID.SinglePlayer) return;
 
@@ -210,9 +205,9 @@ namespace TerraIntegration.Components
 
                 int stack = reader.ReadInt32();
                 if (stack == 0) data.Item = null;
-                else 
+                else
                 {
-                    if (data.Item is null) 
+                    if (data.Item is null)
                         data.Item = Util.CreateModItem<Items.Materials.CrystallizedSap>(stack);
                     else data.Item.Item.stack = stack;
                 }
@@ -244,7 +239,7 @@ namespace TerraIntegration.Components
             return data;
         }
 
-        public override object SaveCustomDataTag(SapCollectorData data)
+        public override TagCompound SaveCustomDataTag(SapCollectorData data)
         {
             TagCompound tag = new();
 
@@ -253,23 +248,24 @@ namespace TerraIntegration.Components
 
             return tag;
         }
-        public override SapCollectorData LoadCustomDataTag(object data, Point16 pos)
+        public override SapCollectorData LoadCustomDataTag(TagCompound data, Point16 pos)
         {
             SapCollectorData sdata = new();
 
-            if (data is TagCompound tag) 
+            if (data is null)
+                return sdata;
+
+            if (data.ContainsKey("stack"))
             {
-                if (tag.ContainsKey("stack"))
+                int stack = data.GetInt("stack");
+                if (stack > 0)
                 {
-                    int stack = tag.GetInt("stack");
-                    if (stack > 0)
-                    {
-                        if (sdata.Item is null)
-                            sdata.Item = Util.CreateModItem<Items.Materials.CrystallizedSap>(stack);
-                        else sdata.Item.Item.stack = stack;
-                    }
+                    if (sdata.Item is null)
+                        sdata.Item = Util.CreateModItem<Items.Materials.CrystallizedSap>(stack);
+                    else sdata.Item.Item.stack = stack;
                 }
             }
+
 
             return sdata;
         }

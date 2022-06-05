@@ -41,7 +41,7 @@ namespace TerraIntegration.Basic
 
         public abstract string PropertyName { get; }
         public abstract string PropertyDisplay { get; }
-        public virtual string PropertyDescription => "";
+        public virtual string PropertyDescription => null;
 
         public sealed override string TypeDescription => PropertyDescription;
         public sealed override string TypeDisplay => PropertyDisplay;

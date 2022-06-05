@@ -1,12 +1,8 @@
 ﻿using Microsoft.Xna.Framework;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using TerraIntegration.Basic;
-using TerraIntegration.Values;
-using TerraIntegration.Variables;
+using TerraIntegration.Components;
 using Terraria;
 using Terraria.ModLoader;
 
@@ -23,7 +19,7 @@ namespace TerraIntegration
 
             if (arg.Count == 0)
             {
-                caller.Reply("Expected subcommand: var, gen, notex, stats");
+                caller.Reply("Expected subcommand: var, gen, todo, stats");
                 return;
             }
             string sub = arg[0];
@@ -36,8 +32,8 @@ namespace TerraIntegration
                 case "gen":
                     ModContent.GetInstance<ComponentWorld>().PostWorldGen();
                     return;
-                case "notex":
-                    MissingTexCommand(caller);
+                case "todo":
+                    ToDoCommand(caller);
                     return;
                 case "stats":
                     Statistics.Visible = !Statistics.Visible;
@@ -48,7 +44,7 @@ namespace TerraIntegration
             return;
         }
 
-        private void VarCommand(CommandCaller caller, List<string> arg) 
+        private void VarCommand(CommandCaller caller, List<string> arg)
         {
             Guid? id = null;
 
@@ -94,39 +90,65 @@ namespace TerraIntegration
 
             Util.DropItemInWorld(i, (int)vec.X, (int)vec.Y);
         }
-        private void MissingTexCommand(CommandCaller caller)
+        private void ToDoCommand(CommandCaller caller)
         {
-            List<string> values = new();
-            List<string> variables = new();
+            List<string> valueTextures = new();
+            List<string> variableTextures = new();
+            List<string> valueDescriptions = new();
+            List<string> variableDescriptions = new();
+            List<string> componentDescriptions = new();
 
-            int allValues = 0, allVariables = 0;
+            int allValues = 0,
+                allVariables = 0,
+                allComponents = 0;
 
             foreach (VariableValue val in VariableValue.ByTypeName.Values)
-                if (val.Type != "any" && val.Type != "unloaded")
+                if (val.Type != "unloaded")
                 {
                     allValues++;
                     if (val.Texture is null && !val.SpriteSheetPos.HasValue)
-                        values.Add(val.Type);
+                        valueTextures.Add(val.Type);
+                    if (val.TypeDescription is null)
+                        valueDescriptions.Add(val.Type);
                 }
 
             foreach (Variable var in Variable.ByTypeName.Values)
-                if (var.Type != "any" && var.Type != "unloaded")
+                if (var.Type != "unloaded")
                 {
                     allVariables++;
                     if (var.Texture is null && !var.SpriteSheetPos.HasValue)
-                        variables.Add(var.Type);
+                        variableTextures.Add(var.Type);
+                    if (var.TypeDescription is null)
+                        variableDescriptions.Add(var.Type);
                 }
 
-            string valstr = values.Count == 0 ?
+            foreach (Component com in Component.ByType.Values)
+                if (com.ComponentType != "unloaded")
+                {
+                    allComponents++;
+                    if (com.ComponentDescription is null)
+                        componentDescriptions.Add(com.ComponentType);
+                }
+
+            caller.Reply(valueTextures.Count == 0 ?
                     $"All values are textured ({allValues})" :
-                    $"Not textured values: ({values.Count} of {allValues})\n    {string.Join(", ", values)}";
+                    $"Not textured values: ({valueTextures.Count} of {allValues})\n    {string.Join(", ", valueTextures)}");
 
-            string varstr = variables.Count == 0 ?
+            caller.Reply(variableTextures.Count == 0 ?
                     $"All variables are textured ({allVariables})" :
-                    $"Not textured variables: ({variables.Count} of {allVariables})\n    {string.Join(", ", variables)}";
+                    $"Not textured variables: ({variableTextures.Count} of {allVariables})\n    {string.Join(", ", variableTextures)}");
 
-            caller.Reply($"{valstr}\n{varstr}");
-            
+            caller.Reply(valueDescriptions.Count == 0 ?
+                    $"All values have descriptions ({allValues})" :
+                    $"Values without description: ({valueDescriptions.Count} of {allValues})\n    {string.Join(", ", valueDescriptions)}");
+
+            caller.Reply(variableDescriptions.Count == 0 ?
+                    $"All variables have descriptions ({allVariables})" :
+                    $"Variables without description: ({variableDescriptions.Count} of {allVariables})\n    {string.Join(", ", variableDescriptions)}");
+
+            caller.Reply(componentDescriptions.Count == 0 ?
+                    $"All components have descriptions ({allComponents})" :
+                    $"Components without description: ({componentDescriptions.Count} of {allComponents})\n    {string.Join(", ", componentDescriptions)}");
         }
     }
 }
