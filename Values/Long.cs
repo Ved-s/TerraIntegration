@@ -18,9 +18,9 @@ namespace TerraIntegration.Values
 {
     public class Long : VariableValue, INumeric, IToString, IOwnProgrammerInterface
     {
-        public override string Type => "long";
-        public override string TypeDisplay => "Long";
-        public override string TypeDescription => "64-bit signed integer";
+        public override string TypeName => "long";
+        public override string TypeDefaultDisplayName => "Long";
+        public override string TypeDefaultDescription => "64-bit signed integer";
 
         public override Color TypeColor => Color.Red;
 
@@ -62,7 +62,7 @@ namespace TerraIntegration.Values
 
         public override int GetHashCode()
         {
-            return HashCode.Combine(Type, Value);
+            return HashCode.Combine(TypeName, Value);
         }
 
         public VariableValue FromNumericChecked(long value, List<Error> errors)
@@ -104,7 +104,7 @@ namespace TerraIntegration.Values
         public override bool Equals(VariableValue obj)
         {
             return obj is Long @long &&
-                   Type == @long.Type &&
+                   TypeName == @long.TypeName &&
                    Value == @long.Value;
         }
     }

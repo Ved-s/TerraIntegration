@@ -19,9 +19,9 @@ namespace TerraIntegration.Values
 {
     public class Float : VariableValue, IToString, IDecimal, IOwnProgrammerInterface
     {
-        public override string Type => "float";
-        public override string TypeDisplay => "Float";
-        public override string TypeDescription => "Single-presition floating point number";
+        public override string TypeName => "float";
+        public override string TypeDefaultDisplayName => "Float";
+        public override string TypeDefaultDescription => "Single-presition floating point number";
 
         public override Color TypeColor => Color.Green;
 
@@ -80,13 +80,13 @@ namespace TerraIntegration.Values
         public override bool Equals(VariableValue obj)
         {
             return obj is Float @float &&
-                   Type == @float.Type &&
+                   TypeName == @float.TypeName &&
                    Value == @float.Value;
         }
 
         public override int GetHashCode()
         {
-            return HashCode.Combine(Type, Value);
+            return HashCode.Combine(TypeName, Value);
         }
 
         public void SetupInterface()

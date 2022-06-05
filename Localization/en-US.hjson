@@ -1,7 +1,5 @@
-﻿Mods: {
-	TerraIntegration: {
-		Errors: {
-			VariableNotFound: "Variable {0} doesn't exist in current system"
-		}
+﻿Mods.TerraIntegration: {
+	Errors: {
+		VariableNotFound: "Variable {0} doesn't exist in current system"
 	}
 }

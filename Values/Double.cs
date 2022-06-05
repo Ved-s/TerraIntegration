@@ -20,9 +20,9 @@ namespace TerraIntegration.Values
 {
     public class Double : VariableValue, IToString, IDecimal, IOwnProgrammerInterface
     {
-        public override string Type => "double";
-        public override string TypeDisplay => "Double";
-        public override string TypeDescription => "Double-presition floating point number";
+        public override string TypeName => "double";
+        public override string TypeDefaultDisplayName => "Double";
+        public override string TypeDefaultDescription => "Double-presition floating point number";
 
         public override SpriteSheetPos SpriteSheetPos => new(BasicSheet, 0, 1);
 
@@ -81,13 +81,13 @@ namespace TerraIntegration.Values
         public override bool Equals(VariableValue obj)
         {
             return obj is Double @double &&
-                   Type == @double.Type &&
+                   TypeName == @double.TypeName &&
                    Value == @double.Value;
         }
 
         public override int GetHashCode()
         {
-            return HashCode.Combine(Type, Value);
+            return HashCode.Combine(TypeName, Value);
         }
 
         public void SetupInterface()

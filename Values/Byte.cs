@@ -20,9 +20,9 @@ namespace TerraIntegration.Values
 {
     public class Byte : VariableValue, INumeric, IToString, IOwnProgrammerInterface
     {
-        public override string Type => "byte";
-        public override string TypeDisplay => "Byte";
-        public override string TypeDescription => "8-bit unsigned integer";
+        public override string TypeName => "byte";
+        public override string TypeDefaultDisplayName => "Byte";
+        public override string TypeDefaultDescription => "8-bit unsigned integer";
 
         public override Color TypeColor => Color.Blue;
 
@@ -83,13 +83,13 @@ namespace TerraIntegration.Values
         public override bool Equals(VariableValue obj)
         {
             return obj is Byte @byte &&
-                   Type == @byte.Type &&
+                   TypeName == @byte.TypeName &&
                    Value == @byte.Value;
         }
 
         public override int GetHashCode()
         {
-            return HashCode.Combine(Type, Value);
+            return HashCode.Combine(TypeName, Value);
         }
 
         public VariableValue FromNumericChecked(long value, List<Error> errors)

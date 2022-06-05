@@ -19,9 +19,9 @@ namespace TerraIntegration.Values
 {
     public class Char : VariableValue, IToString, IOwnProgrammerInterface
     {
-        public override string Type => "char";
-        public override string TypeDisplay => "Char";
-        public override string TypeDescription => "Single character";
+        public override string TypeName => "char";
+        public override string TypeDefaultDisplayName => "Char";
+        public override string TypeDefaultDescription => "Single character";
 
         public override Color TypeColor => Color.LightPink;
 
@@ -74,13 +74,13 @@ namespace TerraIntegration.Values
         public override bool Equals(VariableValue obj)
         {
             return obj is Char @char &&
-                   Type == @char.Type &&
+                   TypeName == @char.TypeName &&
                    Value == @char.Value;
         }
 
         public override int GetHashCode()
         {
-            return HashCode.Combine(Type, Value);
+            return HashCode.Combine(TypeName, Value);
         }
 
         public void SetupInterface()

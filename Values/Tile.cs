@@ -12,9 +12,9 @@ namespace TerraIntegration.Values
 {
     public class Tile : VariableValue, INamed, ITyped
     {
-        public override string Type => "tile";
-        public override string TypeDisplay => "Tile";
-        public override string TypeDescription => "Copy of a tile";
+        public override string TypeName => "tile";
+        public override string TypeDefaultDisplayName => "Tile";
+        public override string TypeDefaultDescription => "Copy of a tile";
 
         public override Color TypeColor => Microsoft.Xna.Framework.Color.SaddleBrown;
 

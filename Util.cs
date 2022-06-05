@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Terraria;
 using Terraria.ID;
+using Terraria.Localization;
 using Terraria.ModLoader;
 
 namespace TerraIntegration
@@ -149,5 +150,7 @@ namespace TerraIntegration
 			using MemoryStream ms = new MemoryStream(array);
 			return func(new(ms));
 		}
+
+		public static string GetLangTextOrNull(string key) => Language.Exists(key) ? Language.GetTextValue(key) : null;
 	}
 }

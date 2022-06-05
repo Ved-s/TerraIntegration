@@ -11,9 +11,9 @@ namespace TerraIntegration.Values
 {
     public class Wall : VariableValue, INamed, ITyped
     {
-        public override string Type => "wall";
-        public override string TypeDisplay => "Wall";
-        public override string TypeDescription => "Copy of a wall";
+        public override string TypeName => "wall";
+        public override string TypeDefaultDisplayName => "Wall";
+        public override string TypeDefaultDescription => "Copy of a wall";
 
         public override Color TypeColor => Microsoft.Xna.Framework.Color.Brown;
         

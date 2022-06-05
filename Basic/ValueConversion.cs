@@ -27,7 +27,7 @@ namespace TerraIntegration.Basic
                 if (ConvertTo is null || !VariableValue.ByType.TryGetValue(ConvertTo, out VariableValue to)) 
                     return null;
 
-                return $"conv.{to.Type}";
+                return $"conv.{to.TypeName}";
             }
         }
         public override string PropertyDisplay => string.Format(DisplayName, VariableValue.TypeToName(ConvertTo, true));

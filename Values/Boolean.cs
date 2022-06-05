@@ -21,9 +21,9 @@ namespace TerraIntegration.Values
 {
     public class Boolean : VariableValue, IToString, IEquatable, IOwnProgrammerInterface
     {
-        public override string Type => "bool";
-        public override string TypeDisplay => "Boolean";
-        public override string TypeDescription => "Two-state value, either True or False";
+        public override string TypeName => "bool";
+        public override string TypeDefaultDisplayName => "Boolean";
+        public override string TypeDefaultDescription => "Two-state value, either True or False";
 
         public override Color TypeColor => Color.CadetBlue;
 
@@ -48,33 +48,9 @@ namespace TerraIntegration.Values
         {
             return new Boolean(reader.ReadBoolean());
         }
-
         protected override void SaveCustomData(BinaryWriter writer)
         {
             writer.Write(Value);
-        }
-
-        public override VariableValue GetFromCommand(CommandCaller caller, List<string> args)
-        {
-            if (args.Count < 1)
-            {
-                caller.Reply("Argument required: true/false value");
-                return null;
-            }
-
-            bool v;
-            string arg = args[0].ToLower();
-
-            if (TrueValues.Contains(arg)) v = true;
-            else if (FalseValues.Contains(arg)) v = false;
-            else 
-            {
-                caller.Reply($"Value is not a boolean: {args[0]}");
-                return null;
-            }
-            args.RemoveAt(0);
-
-            return new Boolean(v);
         }
 
         public override string ToString()
@@ -85,13 +61,12 @@ namespace TerraIntegration.Values
         public override bool Equals(VariableValue obj)
         {
             return obj is Boolean boolean &&
-                   Type == boolean.Type &&
+                   TypeName == boolean.TypeName &&
                    Value == boolean.Value;
         }
-
         public override int GetHashCode()
         {
-            return HashCode.Combine(Type, Value);
+            return HashCode.Combine(TypeName, Value);
         }
 
         public void SetupInterface()
@@ -114,7 +89,6 @@ namespace TerraIntegration.Values
                 InterfaceInput.SetText(InterfaceValue.ToString());
             };
         }
-
         public Basic.Variable WriteVariable()
         {
             return new Constant(new Boolean(InterfaceValue));

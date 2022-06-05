@@ -10,7 +10,7 @@ using Terraria.ModLoader;
 
 namespace TerraIntegration.Basic
 {
-    public abstract class VariableValue
+    public abstract class VariableValue : ITypedObject
     {
         public readonly static SpriteSheet BasicSheet = new("TerraIntegration/Assets/Values/basic", new(32, 32));
 
@@ -23,11 +23,17 @@ namespace TerraIntegration.Basic
         public virtual SpriteSheet DefaultSpriteSheet => null;
         public virtual SpriteSheetPos SpriteSheetPos => default;
 
-        public abstract string Type { get; }
-        public abstract string TypeDisplay { get; }
-        public virtual string TypeDescription => null;
-
         public virtual Color TypeColor => Color.White;
+
+        public abstract string TypeName { get; }
+        public string TypeDisplayName => Util.GetLangTextOrNull(DisplayNameLocalizationKey) ?? TypeDefaultDisplayName;
+        public string TypeDescription => Util.GetLangTextOrNull(DescriptionLocalizationKey) ?? TypeDefaultDescription;
+
+        public abstract string TypeDefaultDisplayName { get; }
+        public virtual string TypeDefaultDescription { get; }
+
+        public virtual string DescriptionLocalizationKey => "Mods.TerraIntegration.Descriptions.Values." + TypeName;
+        public virtual string DisplayNameLocalizationKey => "Mods.TerraIntegration.Names.Values." + TypeName;
 
         public virtual DisplayedValue Display(ComponentSystem system) => null;
 
@@ -47,7 +53,7 @@ namespace TerraIntegration.Basic
                 return;
             }
 
-            writer.Write(value.Type);
+            writer.Write(value.TypeName);
 
             long lenPos = writer.BaseStream.Position;
             writer.Write((ushort)0);
@@ -113,7 +119,7 @@ namespace TerraIntegration.Basic
         public override bool Equals(object obj)
         {
             return obj is VariableValue value
-                && Type == value.Type
+                && TypeName == value.TypeName
                 && Equals(value);
         }
 
@@ -136,9 +142,9 @@ namespace TerraIntegration.Basic
             if (ByType.TryGetValue(type, out VariableValue val))
             {
                 if (colored)
-                    return Util.ColorTag(val.TypeColor, val.TypeDisplay);
+                    return Util.ColorTag(val.TypeColor, val.TypeDefaultDisplayName);
 
-                return val.TypeDisplay;
+                return val.TypeDefaultDisplayName;
             }
             if (type.IsInterface)
             {
@@ -170,7 +176,7 @@ namespace TerraIntegration.Basic
             if (type is null) return null;
 
             if (ByType.TryGetValue(type, out VariableValue val))
-                return "V" + val.Type;
+                return "V" + val.TypeName;
 
             else
                 return "T" + type.FullName;
@@ -193,9 +199,9 @@ namespace TerraIntegration.Basic
 
         public static void Register(VariableValue v)
         {
-            if (v?.Type is null) return;
+            if (v?.TypeName is null) return;
 
-            ByTypeName[v.Type] = v;
+            ByTypeName[v.TypeName] = v;
             ByType[v.GetType()] = v;
 
             ValueProperty.ValueRegistered();
@@ -209,8 +215,8 @@ namespace TerraIntegration.Basic
 
     public class UnloadedVariableValue : VariableValue
     {
-        public override string Type => "unloaded";
-        public override string TypeDisplay => $"Unloaded value" + (ValueType.IsNullEmptyOrWhitespace() ? null : $" ({ValueType})");
+        public override string TypeName => "unloaded";
+        public override string TypeDefaultDisplayName => $"Unloaded value" + (ValueType.IsNullEmptyOrWhitespace() ? null : $" ({ValueType})");
 
         public override Color TypeColor => Color.Red;
         public override DisplayedValue Display(ComponentSystem system) => new ColorTextDisplay("Unloaded", TypeColor);

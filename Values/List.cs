@@ -20,9 +20,9 @@ namespace TerraIntegration.Values
 {
     public class List : VariableValue, ICollection, IEquatable, IOwnProgrammerInterface
     {
-        public override string Type => "list";
-        public override string TypeDisplay => "List";
-        public override string TypeDescription => "List of values";
+        public override string TypeName => "list";
+        public override string TypeDefaultDisplayName => "List";
+        public override string TypeDefaultDescription => "List of values";
 
         public override Color TypeColor => new(120, 120, 120);
 

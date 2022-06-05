@@ -9,6 +9,7 @@ using Terraria;
 using Terraria.Audio;
 using Terraria.GameContent.UI.Elements;
 using Terraria.ID;
+using Terraria.Localization;
 using Terraria.UI;
 
 namespace TerraIntegration.UI
@@ -446,10 +447,16 @@ namespace TerraIntegration.UI
             foreach (var kvp in VariableValue.ByType)
             {
                 VariableValue v = kvp.Value;
-                if (!v.TypeDisplay.ToLower().Contains(VariablesSearch.CurrentString.ToLower())
+                if (!v.TypeName.ToLower().Contains(VariablesSearch.CurrentString.ToLower())
                     || (!v.HasProperties() && v is not IOwnProgrammerInterface)) continue;
 
-                VariablesList.Add(CreateVariableButton(v.TypeDisplay, v.TypeColor, kvp.Key, "const", () => ValueClicked(v), iconHoverText: v.TypeDescription));
+                VariablesList.Add(CreateVariableButton(
+                    v.TypeDefaultDisplayName,
+                    v.TypeColor,
+                    kvp.Key,
+                    "const",
+                    () => ValueClicked(v),
+                    iconHoverText: v.TypeDescription));
             }
 
             foreach (Type t in ValueProperty.ByValueType.Keys)

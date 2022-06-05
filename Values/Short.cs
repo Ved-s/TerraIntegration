@@ -19,9 +19,9 @@ namespace TerraIntegration.Values
 {
     public class Short : VariableValue, INumeric, IToString, IOwnProgrammerInterface
     {
-        public override string Type => "short";
-        public override string TypeDisplay => "Short";
-        public override string TypeDescription => "16-bit signed integer";
+        public override string TypeName => "short";
+        public override string TypeDefaultDisplayName => "Short";
+        public override string TypeDefaultDescription => "16-bit signed integer";
 
         public override Color TypeColor => Color.BlueViolet;
 
@@ -82,13 +82,13 @@ namespace TerraIntegration.Values
         public override bool Equals(VariableValue obj)
         {
             return obj is Short @byte &&
-                   Type == @byte.Type &&
+                   TypeName == @byte.TypeName &&
                    Value == @byte.Value;
         }
 
         public override int GetHashCode()
         {
-            return HashCode.Combine(Type, Value);
+            return HashCode.Combine(TypeName, Value);
         }
 
         public VariableValue FromNumericChecked(long value, List<Error> errors)

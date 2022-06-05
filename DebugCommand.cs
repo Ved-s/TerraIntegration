@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using TerraIntegration.Basic;
 using TerraIntegration.Components;
 using Terraria;
+using Terraria.Localization;
 using Terraria.ModLoader;
 
 namespace TerraIntegration
@@ -103,13 +104,13 @@ namespace TerraIntegration
                 allComponents = 0;
 
             foreach (VariableValue val in VariableValue.ByTypeName.Values)
-                if (val.Type != "unloaded")
+                if (val.TypeName != "unloaded")
                 {
                     allValues++;
                     if (val.Texture is null && !val.SpriteSheetPos.HasValue)
-                        valueTextures.Add(val.Type);
-                    if (val.TypeDescription is null)
-                        valueDescriptions.Add(val.Type);
+                        valueTextures.Add(val.TypeName);
+                    if (!Language.Exists(val.DescriptionLocalizationKey))
+                        valueDescriptions.Add(val.TypeName);
                 }
 
             foreach (Variable var in Variable.ByTypeName.Values)

@@ -20,9 +20,9 @@ namespace TerraIntegration.Values
 {
     public class String : VariableValue, IToString, IAddable, Interfaces.ICollection<Char>, IEquatable, IOwnProgrammerInterface
     {
-        public override string Type => "str";
-        public override string TypeDisplay => "String";
-        public override string TypeDescription => "Text sequence of characters";
+        public override string TypeName => "str";
+        public override string TypeDefaultDisplayName => "String";
+        public override string TypeDefaultDescription => "Text sequence of characters";
 
         public override Color TypeColor => Color.OrangeRed;
 
@@ -84,13 +84,13 @@ namespace TerraIntegration.Values
         public override bool Equals(VariableValue obj)
         {
             return obj is String @string &&
-                   Type == @string.Type &&
+                   TypeName == @string.TypeName &&
                    Value == @string.Value;
         }
 
         public override int GetHashCode()
         {
-            return HashCode.Combine(Type, Value);
+            return HashCode.Combine(TypeName, Value);
         }
 
         public void SetupInterface()

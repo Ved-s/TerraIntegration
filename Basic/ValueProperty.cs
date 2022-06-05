@@ -26,7 +26,7 @@ namespace TerraIntegration.Basic
                 if (ValueTypes is null || ValueTypes.Length != 1) return null;
 
                 if (VariableValue.ByType.TryGetValue(ValueTypes[0], out VariableValue val))
-                    return val.Type;
+                    return val.TypeName;
 
                 if (ValueTypes[0].IsInterface) 
                 {

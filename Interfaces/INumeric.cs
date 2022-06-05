@@ -27,7 +27,7 @@ namespace TerraIntegration.Interfaces
         }
         public bool CheckNumericValue(long value, List<Error> errors)
         {
-            string type = (this as VariableValue)?.TypeDisplay;
+            string type = (this as VariableValue)?.TypeDefaultDisplayName;
 
             if (value > NumericMax)
             {

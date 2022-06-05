@@ -18,9 +18,9 @@ namespace TerraIntegration.Values
 {
     public class Integer : VariableValue, INumeric, IToString, IOwnProgrammerInterface
     {
-        public override string Type => "int";
-        public override string TypeDisplay => "Integer";
-        public override string TypeDescription => "32-bit signed integer";
+        public override string TypeName => "int";
+        public override string TypeDefaultDisplayName => "Integer";
+        public override string TypeDefaultDescription => "32-bit signed integer";
 
         public override Color TypeColor => Color.Orange;
 
@@ -81,13 +81,13 @@ namespace TerraIntegration.Values
         public override bool Equals(VariableValue obj)
         {
             return obj is Integer integer &&
-                   Type == integer.Type &&
+                   TypeName == integer.TypeName &&
                    Value == integer.Value;
         }
 
         public override int GetHashCode()
         {
-            return HashCode.Combine(Type, Value);
+            return HashCode.Combine(TypeName, Value);
         }
 
         public VariableValue FromNumericChecked(long value, List<Error> errors)
