@@ -60,7 +60,7 @@ namespace TerraIntegration.Basic
 
         public bool HasInterface => HasCustomInterface || VariableInfo?.Length is not null and > 0 || HasProperties();
         public virtual bool HasCustomInterface => false;
-        public virtual Vector2 InterfaceOffset { get; protected set; }
+        public virtual Vector2 InterfaceOffset { get; protected set; } = new(24, 0);
         public UIPanel Interface
         {
             get

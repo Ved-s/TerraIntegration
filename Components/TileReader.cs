@@ -23,8 +23,6 @@ namespace TerraIntegration.Components
 
         public override SpriteSheet DefaultPropertySpriteSheet { get; set; } = new("TerraIntegration/Assets/Types/tile", new(32, 32));
 
-        public override Vector2 InterfaceOffset => new(24, 0);
-
         public override void SetStaticDefaults()
         {
             SetupNewTile();

@@ -30,8 +30,6 @@ namespace TerraIntegration.Components
         public override ushort DefaultUpdateFrequency => 30;
         public override bool ConfigurableFrequency => false;
 
-        public override Vector2 InterfaceOffset => new Vector2(24, 0);
-
         public const int SlotCap = 32;
 
         public UIText EfficiencyText;

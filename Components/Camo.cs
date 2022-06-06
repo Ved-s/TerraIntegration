@@ -36,8 +36,6 @@ namespace TerraIntegration.Components
 
         public override bool CanHaveVariables => true;
 
-        public override Vector2 InterfaceOffset => new(24, 0);
-
         List<Error> Errors = new();
 
         public Camo() 

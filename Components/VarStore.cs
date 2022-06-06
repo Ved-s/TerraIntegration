@@ -25,8 +25,6 @@ namespace TerraIntegration.Components
 
         public override bool HasCustomInterface => true;
 
-        public override Vector2 InterfaceOffset => new(24, 0);
-
         public const string SlotNames = "0123456789abcdef";
 
         public UIComponentVariable[] Slots = new UIComponentVariable[16];
