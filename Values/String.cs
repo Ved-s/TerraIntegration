@@ -77,7 +77,7 @@ namespace TerraIntegration.Values
             if (value is IToString toString)
                 return new String(Value + toString.ToString());
             
-            errors.Add(new(ErrorType.ExpectedValue, TypeToName(typeof(IToString), false)));
+            errors.Add(Errors.ExpectedValue(typeof(IToString)));
             return null;
         }
 

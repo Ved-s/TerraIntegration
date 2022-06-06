@@ -36,13 +36,16 @@ namespace TerraIntegration.Basic
         public abstract string TypeName { get; }
         public string TypeDisplayName => Util.GetLangTextOrNull(DisplayNameLocalizationKey) ?? TypeDefaultDisplayName;
         public string TypeDescription => Util.GetLangTextOrNull(DescriptionLocalizationKey) ?? TypeDefaultDescription;
+        public string ItemName => Name ?? Util.GetLangTextOrNull(ItemNameLocalizationKey) ?? DefaultItemName;
 
-        public virtual string TypeDefaultDisplayName { get; }
+        public virtual string DefaultItemName => "Variable";
+        public abstract string TypeDefaultDisplayName { get; }
         public virtual string TypeDefaultDescription { get; }
 
         public virtual string DescriptionLocalizationKey => "Mods.TerraIntegration.Descriptions.Variables." + TypeName;
         public virtual string DisplayNameLocalizationKey => "Mods.TerraIntegration.Names.Variables." + TypeName;
-
+        public virtual string ItemNameLocalizationKey => "Mods.TerraIntegration.ItemNames.Variable";
+        
         public virtual Type VariableReturnType
         {
             get
@@ -53,6 +56,7 @@ namespace TerraIntegration.Basic
         }
 
         public virtual Type[] RelatedTypes => null;
+        public virtual bool VisibleInProgrammerVariables => true;
 
         public string ReturnTypeCacheName;
         public Type ReturnTypeCacheType;
@@ -362,10 +366,10 @@ namespace TerraIntegration.Basic
             return null;
         }
 
-        public static IEnumerable<(Type, Variable)> GetRelated(Type type)
+        public static IEnumerable<(Type, Variable)> GetRelated(IEnumerable<Type> types)
         {
-            HashSet<Type> allTypes = new() { type };
-            allTypes.UnionWith(type.GetInterfaces().Where(i => i.GetInterfaces().Any(t => t == typeof(IValueInterface))));
+            HashSet<Type> allTypes = new(types);
+            allTypes.UnionWith(types.SelectMany(t => t.GetInterfaces().Where(i => i.GetInterfaces().Any(t => t == typeof(IValueInterface)))));
 
             foreach (Variable var in ByType.Values)
             {
@@ -394,7 +398,7 @@ namespace TerraIntegration.Basic
 
             if (value is null || !value.GetType().IsAssignableTo(type))
             {
-                errors.Add(Error.ExpectedValue(type, Id));
+                errors.Add(Errors.ExpectedValue(type, Id));
                 return false;
             }
 

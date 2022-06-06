@@ -48,6 +48,7 @@ namespace TerraIntegration.Basic
 
         public override Type[] ReferenceReturnTypes => ValueTypes;
         public override Type[] RelatedTypes => ValueTypes;
+        public override bool VisibleInProgrammerVariables => false;
 
         public abstract VariableValue GetProperty(ComponentSystem system, VariableValue value, List<Error> errors);
 
@@ -55,7 +56,7 @@ namespace TerraIntegration.Basic
         {
             if (!ValueTypes.Any(t => t.IsAssignableFrom(value.GetType())))
             {
-                errors.Add(new(ErrorType.ExpectedValues, string.Join(", ", ValueTypes.Select(t => VariableValue.TypeToName(t, false)))));
+                errors.Add(Errors.ExpectedValues(ValueTypes, Id));
                 return null;
             }
 

@@ -108,10 +108,7 @@ namespace TerraIntegration.Basic
             {
                 if (LeftSlotValueTypes is not null && !LeftSlotValueTypes.Any(t => t.IsAssignableFrom(leftType)))
                 {
-                    errors.Add(new(
-                        ErrorType.ExpectedValuesWithId,
-                        string.Join(", ", LeftSlotValueTypes.Select(t => VariableValue.TypeToName(t, true))),
-                        World.Guids.GetShortGuid(Id)));
+                    errors.Add(Errors.ExpectedValues(LeftSlotValueTypes, Id));
                     return null;
                 }
 
@@ -123,10 +120,7 @@ namespace TerraIntegration.Basic
 
                 if (validRightTypes is not null && !validRightTypes.Any(t => t.IsAssignableFrom(rightType)))
                 {
-                    errors.Add(new(
-                        ErrorType.ExpectedValuesWithId,
-                        string.Join(", ", validRightTypes.Select(t => VariableValue.TypeToName(t, true))),
-                        World.Guids.GetShortGuid(Id)));
+                    errors.Add(Errors.ExpectedValues(validRightTypes, Id));
                     return null;
                 }
 

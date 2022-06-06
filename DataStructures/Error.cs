@@ -11,10 +11,10 @@ namespace TerraIntegration.DataStructures
 {
     public class Error
     {
-        public ErrorType Type { get; set; }
+        public string Type { get; set; }
         public string[] Args { get; set; }
 
-        public Error(ErrorType type, params object[] args)
+        public Error(string type, params object[] args)
         {
             Type = type;
             Args = args.Select(o => o.ToString()).ToArray();
@@ -43,54 +43,58 @@ namespace TerraIntegration.DataStructures
 
             return $"{Type}: {string.Join(", ", Args)}";
         }
-
-        public static Error ExpectedValue(Type valueType, Guid? variableId)
-        {
-            if (variableId is null)
-                return new(ErrorType.ExpectedValue, VariableValue.TypeToName(valueType, false) ?? "null");
-            return new(ErrorType.ExpectedValueWithId, VariableValue.TypeToName(valueType, false) ?? "null", ComponentWorld.Instance.Guids.GetShortGuid(variableId.Value));
-        }
     }
 
-    public enum ErrorType
+    public static class Errors 
     {
-        // variable id
-        VariableNotFound,
+        public static Error VariableNotFound(Guid varId) => new("VariableNotFound", ComponentWorld.Instance.Guids.GetShortGuid(varId));
+        public static Error RecursiveReference(Guid varId) => new("RecursiveReference", ComponentWorld.Instance.Guids.GetShortGuid(varId));
+        public static Error MultipleVariablesSameID(Guid varId) => new("MultipleVariablesSameID", ComponentWorld.Instance.Guids.GetShortGuid(varId));
 
-        // variable id
-        RecursiveReference,
+        public static Error ValueUnloaded(Guid varId) => new("ValueUnloaded", ComponentWorld.Instance.Guids.GetShortGuid(varId));
+        public static Error VariableUnloaded(Guid varId) => new("VariableUnloaded", ComponentWorld.Instance.Guids.GetShortGuid(varId));
 
-        // variable id
-        MultipleVariablesSameID,
+        public static Error WrongComponentAtPos(Point16 pos, string expectedType, string foundType)
+            => new("WrongComponentAtPos", pos.X, pos.Y, expectedType, foundType);
+        public static Error NoComponentAtPos(Point16 pos, string type)
+            => new("NoComponentAtPos", pos.X, pos.Y, type);
 
-        // variable id
-        ValueUnloaded,
+        public static Error ExpectedValue(Type valueType, Guid? variableId = null)
+        {
+            if (variableId is null)
+                return new("ExpectedValue", VariableValue.TypeToName(valueType, false) ?? "null");
+            return new("ExpectedValueWithId", VariableValue.TypeToName(valueType, false) ?? "null", ComponentWorld.Instance.Guids.GetShortGuid(variableId.Value));
+        }
+        public static Error ExpectedValues(IEnumerable<Type> valueTypes, Guid? variableId = null)
+        {
+            if (valueTypes is null) throw new ArgumentNullException(nameof(valueTypes));
 
-        // variable id
-        VariableUnloaded,
+            if (variableId is null)
+                return new("ExpectedValues", string.Join(", ", valueTypes.Select(t => VariableValue.TypeToName(t, false))));
+            return new("ExpectedValuesWithId", 
+                string.Join(", ", valueTypes.Select(t => VariableValue.TypeToName(t, false))), 
+                ComponentWorld.Instance.Guids.GetShortGuid(variableId.Value));
+        }
+        public static Error ExpectedVariable(Type variableType, Guid? variableId = null)
+        {
+            string varName = Variable.ByType.TryGetValue(variableType, out Variable var) ?
+                var.TypeDisplayName : variableType.Name;
 
-        // X, Y, expected type, found type
-        WrongComponentAtPos,
+            if (variableId is null)
+                return new("ExpectedVariable", varName);
+            return new("ExpectedVariableWithId", varName, ComponentWorld.Instance.Guids.GetShortGuid(variableId.Value));
+        }
+        public static Error ExpectedVariables(string variableTypes, Guid? variableId = null)
+        {
+            if (variableId is null)
+                return new("ExpectedVariables", variableTypes);
+            return new("ExpectedVariablesWithId", variableTypes, ComponentWorld.Instance.Guids.GetShortGuid(variableId.Value));
+        }
 
-        // X, Y, type
-        NoComponentAtPos,
-
-        // value type name
-        ExpectedValue,
-
-        // value type name, variable id
-        ExpectedValueWithId,
-
-        // value type names
-        ExpectedValues,
-
-        // value type names, variable id
-        ExpectedValuesWithId,
-
-        // value, type
-        ValueTooBigForType,
-
-        // value, type
-        ValueTooSmallForType,
+        public static Error ValueTooBigForType(object value, VariableValue valueType)
+            => new("ValueTooBigForType", value, valueType?.TypeDisplayName ?? "null");
+        
+        public static Error ValueTooSmallForType(object value, VariableValue valueType)
+            => new("ValueTooSmallForType", value, valueType?.TypeDisplayName ?? "null");
     }
 }

@@ -470,7 +470,7 @@ namespace TerraIntegration.UI
             {
                 if (v is not IOwnProgrammerInterface interfaceOwner 
                     || !v.TypeDisplayName.ToLower().Contains(VariablesSearch.CurrentString.ToLower())
-                    || v is ValueProperty) continue;
+                    || !v.VisibleInProgrammerVariables) continue;
 
                 VariablesList.Add(CreateVariableButton(v.TypeDisplayName, Color.White, v.VariableReturnType, v.TypeName, () => VariableClicked(interfaceOwner), iconHoverText: v.TypeDescription));
             }
@@ -481,10 +481,16 @@ namespace TerraIntegration.UI
 
             if (CurrentType is not null)
             {
+                List<Type> related = new() { CurrentType };
+
+                if (CurrentType is not null)
+                    related.Add(typeof(Constant));
+
                 foreach (var (type, var) in Variable
-                    .GetRelated(CurrentType)
+                    .GetRelated(related)
                     .OrderBy(
                     v => v.Item1 == CurrentType && v.Item2 is ValueProperty,
+                    v => v.Item1.IsSubclassOf(typeof(Variable)),
                     v => v.Item2 is ValueProperty && v.Item2 is not ValueConversion,
                     v => v.Item1 == CurrentType && v.Item2 is not ValueConversion,
                     v => v.Item2 is not ValueConversion))
@@ -495,7 +501,7 @@ namespace TerraIntegration.UI
 
                     string headText = null;
 
-                    if (type != CurrentType)
+                    if (type != CurrentType && !type.IsSubclassOf(typeof(Variable)))
                         headText = $"from {VariableValue.TypeToName(type, true)}";
 
                     UITextPanel panel = CreateVariableButton(var.TypeDisplayName, Color.White, var.VariableReturnType, var.TypeName, () => PropertyClicked(owner), headText);
@@ -522,7 +528,7 @@ namespace TerraIntegration.UI
         static void VariableClicked(IOwnProgrammerInterface var)
         {
             CurrentValue = null;
-            CurrentType = null;
+            CurrentType = var.GetType();
             SetInterface(var);
             PopulateProperties();
         }

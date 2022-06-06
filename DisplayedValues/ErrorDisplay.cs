@@ -29,7 +29,7 @@ namespace TerraIntegration.DisplayedValues
             writer.Write(Errors.Length);
             foreach (Error error in Errors)
             {
-                writer.Write((int)error.Type);
+                writer.Write(error.Type);
                 writer.Write(error.Args.Length);
                 foreach (string arg in error.Args)
                     writer.Write(arg);
@@ -41,7 +41,7 @@ namespace TerraIntegration.DisplayedValues
             Error[] errors = new Error[reader.ReadInt32()];
             for (int i = 0; i < errors.Length; i++)
             {
-                ErrorType errorType = (ErrorType)reader.ReadInt32();
+                string errorType = reader.ReadString();
                 string[] args = new string[reader.ReadInt32()];
 
                 for (int j = 0; j < args.Length; j++)

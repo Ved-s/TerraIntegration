@@ -27,16 +27,14 @@ namespace TerraIntegration.Interfaces
         }
         public bool CheckNumericValue(long value, List<Error> errors)
         {
-            string type = (this as VariableValue)?.TypeDefaultDisplayName;
-
             if (value > NumericMax)
             {
-                errors?.Add(new(ErrorType.ValueTooBigForType, value, type));
+                errors?.Add(Errors.ValueTooBigForType(value, this as VariableValue));
                 return false;
             }
             if (value < NumericMin)
             {
-                errors?.Add(new(ErrorType.ValueTooSmallForType, value, type));
+                errors?.Add(Errors.ValueTooSmallForType(value, this as VariableValue));
                 return false;
             }
             return true;

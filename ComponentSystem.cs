@@ -168,7 +168,7 @@ namespace TerraIntegration
         {
             if (GetVariableSet.Contains(varId))
             {
-                errors.Add(new(ErrorType.RecursiveReference, World.Guids.GetShortGuid(varId)));
+                errors.Add(Errors.RecursiveReference(varId));
                 return null;
             }
             GetVariableSet.Add(varId);
@@ -182,7 +182,7 @@ namespace TerraIntegration
 
                 if (val is UnloadedVariableValue)
                 {
-                    errors.Add(new(ErrorType.ValueUnloaded, World.Guids.GetShortGuid(varId)));
+                    errors.Add(Errors.ValueUnloaded(varId));
                     return null;
                 }
 
@@ -213,12 +213,12 @@ namespace TerraIntegration
                             {
                                 if (var.Var is UnloadedVariable)
                                 {
-                                    errors.Add(new(ErrorType.VariableUnloaded, World.Guids.GetShortGuid(varId)));
+                                    errors.Add(Errors.VariableUnloaded(varId));
                                     return null;
                                 }
                                 if (found)
                                 {
-                                    errors.Add(new(ErrorType.MultipleVariablesSameID, World.Guids.GetShortGuid(varId)));
+                                    errors.Add(Errors.MultipleVariablesSameID(varId));
                                     return null;
                                 }
                                 found = true;
@@ -228,7 +228,7 @@ namespace TerraIntegration
                 if (result is not null)
                     return result;
 
-                errors.Add(new(ErrorType.VariableNotFound, World.Guids.GetShortGuid(varId)));
+                errors.Add(Errors.VariableNotFound(varId));
                 return null;
             }
             finally
@@ -246,13 +246,13 @@ namespace TerraIntegration
                 {
                     if (type is not null && c.TypeName != type)
                     {
-                        errors.Add(new(ErrorType.WrongComponentAtPos, pos.X, pos.Y, c.TypeName, type));
+                        errors.Add(Errors.WrongComponentAtPos(pos, c.TypeName, type));
                         return null;
                     }
                     return c;
                 }
 
-                errors.Add(new(ErrorType.NoComponentAtPos, pos.X, pos.Y, type));
+                errors.Add(Errors.NoComponentAtPos(pos, type));
 
                 return null;
             }
@@ -260,6 +260,19 @@ namespace TerraIntegration
             {
                 Statistics.Stop(Statistics.UpdateTime.ComponentRequests);
             }
+        }
+
+        public TVariable GetVariable<TVariable>(Guid varId, List<Error> errors) where TVariable : Variable
+        {
+            Variable var = GetVariable(varId, errors);
+            if (var is null) return null;
+
+            if (var is not TVariable tv)
+            {
+                errors.Add(Errors.ExpectedVariable(typeof(TVariable)));
+                return null;
+            }
+            return tv;
         }
     }
 }

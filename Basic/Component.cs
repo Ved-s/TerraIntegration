@@ -35,7 +35,7 @@ namespace TerraIntegration.Basic
         public string TypeDisplayName => Util.GetLangTextOrNull(DisplayNameLocalizationKey) ?? TypeDefaultDisplayName;
         public string TypeDescription => Util.GetLangTextOrNull(DescriptionLocalizationKey) ?? TypeDefaultDescription;
 
-        public virtual string TypeDefaultDisplayName { get; }
+        public abstract string TypeDefaultDisplayName { get; }
         public virtual string TypeDefaultDescription { get; }
 
         public virtual string DescriptionLocalizationKey => "Mods.TerraIntegration.Descriptions.Components." + TypeName;
@@ -547,6 +547,7 @@ namespace TerraIntegration.Basic
     public class UnloadedComponent : Component
     {
         public override string TypeName => null;
+        public override string TypeDefaultDisplayName => "Unloaded";
     }
 
     public class ComponentVariableInfo

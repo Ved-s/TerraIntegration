@@ -23,16 +23,14 @@ namespace TerraIntegration.Interfaces
         }
         public bool CheckDecimalValue(double value, List<Error> errors)
         {
-            string type = (this as VariableValue)?.TypeDefaultDisplayName;
-
             if (value > DecimalMax)
             {
-                errors?.Add(new(ErrorType.ValueTooBigForType, value, type));
+                errors?.Add(Errors.ValueTooBigForType(value, this as VariableValue));
                 return false;
             }
             if (value < DecimalMin)
             {
-                errors?.Add(new(ErrorType.ValueTooSmallForType, value, type));
+                errors?.Add(Errors.ValueTooSmallForType(value, this as VariableValue));
                 return false;
             }
             return true;

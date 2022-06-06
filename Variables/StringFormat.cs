@@ -45,10 +45,7 @@ namespace TerraIntegration.Variables
                 }
                 if (val is not IToString toString)
                 {
-                    errors.Add(new(
-                        ErrorType.ExpectedValueWithId,
-                        VariableValue.TypeToName(typeof(IToString), false),
-                        World.Guids.GetShortGuid(Id)));
+                    errors.Add(Errors.ExpectedValue(typeof(IToString), Id));
                     success = false;
                     continue;
                 }

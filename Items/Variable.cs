@@ -44,7 +44,8 @@ namespace TerraIntegration.Items
 
         public override void ModifyTooltips(List<TooltipLine> tooltips)
         {
-            if (Var?.Name is not null)
+            string itemName = Var?.ItemName;
+            if (itemName is not null)
             {
                 TooltipLine line = tooltips.FirstOrDefault(t => t.Name == "ItemName");
                 if (line is not null)
@@ -53,7 +54,7 @@ namespace TerraIntegration.Items
                     if (Item.stack > 1)
                         stack = $" ({Item.stack})";
 
-                    line.Text = Var.Name + stack;
+                    line.Text = itemName + stack;
                 }
             }
 
