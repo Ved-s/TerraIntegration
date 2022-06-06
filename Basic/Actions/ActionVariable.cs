@@ -29,7 +29,7 @@ namespace TerraIntegration.Basic.Actions
         public override Type[] RelatedTypes => Variables.ToTypeArray();
         public override bool VisibleInProgrammerVariables => false;
 
-        public void Execute(ComponentSystem system, List<Error> errors)
+        public void Execute(Point16 pos, ComponentSystem system, List<Error> errors)
         {
             Variable var = system.GetVariable(ActionVarId, errors);
             if (var is null) return;
@@ -41,9 +41,9 @@ namespace TerraIntegration.Basic.Actions
                 errors.Add(Errors.ExpectedVariables(match.ToTypeNameString(), Id));
                 return;
             }
-            Execute(var, system, errors);
+            Execute(pos, var, system, errors);
         }
-        public abstract void Execute(Variable var, ComponentSystem system, List<Error> errors);
+        public abstract void Execute(Point16 pos, Variable var, ComponentSystem system, List<Error> errors);
         public virtual void SetupActionInterface() { }
         public virtual ActionVariable WriteActionvariable() => this.NewInstance();
 

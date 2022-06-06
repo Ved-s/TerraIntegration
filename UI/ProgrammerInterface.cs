@@ -336,7 +336,6 @@ namespace TerraIntegration.UI
                 VariableName.SetText(var.Var.Name);
             }
         }
-
         private static void WriteButton_OnClick(UIMouseEvent evt, UIElement listeningElement)
         {
             if (ResultSlot?.Var is null) return;
@@ -485,7 +484,7 @@ namespace TerraIntegration.UI
             {
                 List<Type> related = new() { CurrentType };
 
-                if (CurrentType is not null)
+                if (CurrentValue is not null)
                     related.Add(typeof(Constant));
 
                 foreach (var (type, var) in Variable

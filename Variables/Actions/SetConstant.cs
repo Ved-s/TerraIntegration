@@ -17,7 +17,7 @@ namespace TerraIntegration.Variables.Actions
         public override string TypeName => "setconst";
         public override string TypeDefaultDisplayName => "Set Constant";
 
-        public override void Execute(Basic.Variable var, VariableValue refValue, ComponentSystem system, List<Error> errors)
+        public override void Execute(Point16 pos, Basic.Variable var, VariableValue refValue, ComponentSystem system, List<Error> errors)
         {
             if (var is not Constant @const) return;
 

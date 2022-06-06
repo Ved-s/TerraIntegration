@@ -50,7 +50,8 @@ namespace TerraIntegration.DataStructures
 
         public bool Match(Variable var)
         {
-            return Names.Contains(var.TypeName) || Types.Contains(var.GetType());
+            Type varType = var.GetType();
+            return Names.Contains(var.TypeName) || Types.Any(t => varType.IsAssignableTo(t));
         }
         public IEnumerable<Variable> Matches(IEnumerable<Variable> variables)
         {

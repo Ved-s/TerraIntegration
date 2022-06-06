@@ -16,6 +16,8 @@ namespace TerraIntegration.Basic.Actions
         public ValueOrRef RightValue { get; set; }
         public override bool NeedsSaveTag => true;
 
+        public override bool HasComplexInterface => true;
+
         public UIConstantOrReference RightSlot { get; set; }
 
         public virtual UIDrawing CenterDrawing => new UIDrawing()
@@ -115,12 +117,12 @@ namespace TerraIntegration.Basic.Actions
                 tooltips.Add(new(Mod, "TIActRefIds", $"[c/aaaa00:Variables:] Ref {World.Guids.GetShortGuid(ActionVarId)}, {RightValue}"));
         }
 
-        public override void Execute(Basic.Variable var, ComponentSystem system, List<Error> errors)
+        public override void Execute(Point16 pos, Basic.Variable var, ComponentSystem system, List<Error> errors)
         {
             VariableValue value = RightValue?.GetValue(system, errors);
             if (value is null) return;
 
-            Execute(var, value, system, errors);
+            Execute(pos, var, value, system, errors);
         }
 
         public virtual ActionWithReferenceConst CreateVariable(ValueOrRef right) => this.NewInstance();
@@ -129,6 +131,6 @@ namespace TerraIntegration.Basic.Actions
         public virtual Type[] GetValidRightConstantSlotTypes(Type leftSlotType) => GetValidRightSlotTypes(leftSlotType);
         public virtual Type[] GetValidRightSlotTypes(Type leftSlotType) => null;
 
-        public abstract void Execute(Basic.Variable var, VariableValue refValue, ComponentSystem system, List<Error> errors);
+        public abstract void Execute(Point16 pos, Basic.Variable var, VariableValue refValue, ComponentSystem system, List<Error> errors);
     }
 }

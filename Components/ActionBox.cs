@@ -97,7 +97,7 @@ namespace TerraIntegration.Components
                     if (data.TryGetVariable(sid, out Variable var) && var is ActionVariable action)
                     {
                         Errors.Clear();
-                        action.Execute(data.System, Errors);
+                        action.Execute(pos, data.System, Errors);
                     }
                 }
             }
