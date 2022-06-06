@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using TerraIntegration.Basic;
+using TerraIntegration.Basic.References;
 using TerraIntegration.Values;
 using TerraIntegration.Variables;
 using Terraria;
@@ -433,6 +434,7 @@ namespace TerraIntegration.UI
             {
                 State.Deactivate();
                 Active = false;
+                Main.blockInput = false;
             }
             else Show();
         }

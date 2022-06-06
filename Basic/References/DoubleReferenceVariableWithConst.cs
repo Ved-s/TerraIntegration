@@ -3,26 +3,20 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using TerraIntegration.DataStructures;
 using TerraIntegration.UI;
-using TerraIntegration.Values;
 using Terraria.GameContent.UI.Elements;
 using Terraria.ModLoader;
 using Terraria.ModLoader.IO;
 
-namespace TerraIntegration.Basic
+namespace TerraIntegration.Basic.References
 {
-    public abstract class DoubleReferenceVariable : Variable, IOwnProgrammerInterface
+    public abstract class DoubleReferenceVariableWithConst : Variable, IOwnProgrammerInterface
     {
         public UIPanel Interface { get; set; }
 
         public UIVariableSlot LeftSlot { get; set; }
-        public UIVariableSlot RightSlot { get; set; }
-
-        public virtual string LeftSlotDescription => null;
-        public virtual string RightSlotDescription => null;
+        public UIConstantOrReference RightSlot { get; set; }
 
         public abstract Type[] LeftSlotValueTypes { get; }
         public virtual UIDrawing CenterDrawing => new UIDrawing()
@@ -33,16 +27,15 @@ namespace TerraIntegration.Basic
             }
         };
 
-        public Guid LeftId { get; set; }
-        public Guid RightId { get; set; }
-        public bool HasComplexInterface => false;
+        public Guid Left { get; set; }
+        public ValueOrRef Right { get; set; }
+        public bool HasComplexInterface => true;
 
         public override Type[] RelatedTypes => LeftSlotValueTypes;
 
-        private Type[] ValidRightTypes;
         private Dictionary<Type, Type[]> ValidTypesCache = new();
         private HashSet<(Type, Type)> ValidTypePairs = new();
-        
+
         public void SetupInterface()
         {
             Interface.Append(LeftSlot = new()
@@ -52,30 +45,19 @@ namespace TerraIntegration.Basic
 
                 DisplayOnly = true,
                 VariableValidator = (var) => LeftSlotValueTypes is not null && LeftSlotValueTypes.Any(t => t.IsAssignableFrom(var.VariableReturnType)),
-                HoverText = TypeListWithDescription(LeftSlotValueTypes, LeftSlotDescription),
+                HoverText = LeftSlotValueTypes is null ? null : string.Join(", ", LeftSlotValueTypes.Select(t => VariableValue.TypeToName(t, true))),
 
                 VariableChanged = (var) =>
                 {
                     if (var?.Var.VariableReturnType is null)
                     {
-                        ValidRightTypes = null;
-                        RightSlot.HoverText = null;
+                        RightSlot.ValidConstTypes = null;
+                        RightSlot.ValidRefTypes = null;
                         return;
                     }
 
-                    ValidRightTypes = GetValidRightSlotTypes(var.Var.VariableReturnType);
-                    if (ValidRightTypes is null)
-                    {
-                        ValidRightTypes = null;
-                        RightSlot.HoverText = RightSlotDescription;
-                        RightSlot.Var = null;
-                        return;
-                    }
-
-                    if (RightSlot.Var is not null && !ValidRightTypes.Any(t => t.IsAssignableFrom(RightSlot.Var.Var.VariableReturnType)))
-                        RightSlot.Var = null;
-
-                    RightSlot.HoverText = TypeListWithDescription(ValidRightTypes, RightSlotDescription);
+                    RightSlot.ValidConstTypes = GetValidRightConstantSlotTypes(var.Var.VariableReturnType);
+                    RightSlot.ValidRefTypes = GetValidRightReferenceSlotTypes(var.Var.VariableReturnType);
                 }
             });
 
@@ -90,45 +72,33 @@ namespace TerraIntegration.Basic
 
             Interface.Append(RightSlot = new()
             {
-                Top = new(-21, .5f),
+                Top = new(-59, .5f),
                 Left = new(30, .5f),
-
-                DisplayOnly = true,
-                VariableValidator = (var) => ValidRightTypes is not null && ValidRightTypes.Any(t => t.IsAssignableFrom(var.VariableReturnType)),
-                HoverText = RightSlotDescription
+                BackgroundColor = Color.Transparent,
+                BorderColor = Color.Transparent,
             });
         }
 
         public Variable WriteVariable()
         {
-            if (LeftSlot?.Var?.Var is null || RightSlot?.Var?.Var is null) return null;
+            ValueOrRef rightValue = RightSlot?.GetValue();
 
-            DoubleReferenceVariable doubleRef = CreateVariable(LeftSlot.Var.Var, RightSlot.Var.Var);
+            if (LeftSlot?.Var?.Var is null || rightValue is null) return null;
+
+            DoubleReferenceVariableWithConst doubleRef = CreateVariable(LeftSlot.Var.Var, rightValue);
 
             if (doubleRef is null) return null;
 
-            doubleRef.LeftId = LeftSlot.Var.Var.Id;
-            doubleRef.RightId = RightSlot.Var.Var.Id;
+            doubleRef.Left = LeftSlot.Var.Var.Id;
+            doubleRef.Right = rightValue;
 
             return doubleRef;
         }
 
-        public string TypeListWithDescription(IEnumerable<Type> types, string description)
-        {
-            if (types is null) return description;
-
-            string result = string.Join(", ", string.Join(", ", types.Select(t => VariableValue.TypeToName(t, true))));
-
-            if (description is not null)
-                result += "\n" + description;
-
-            return result;
-        }
-
         public override VariableValue GetValue(ComponentSystem system, List<Error> errors)
         {
-            VariableValue left = system.GetVariableValue(LeftId, errors);
-            VariableValue right = system.GetVariableValue(RightId, errors);
+            VariableValue left = system.GetVariableValue(Left, errors);
+            VariableValue right = Right.GetValue(system, errors);
 
             if (left is null || right is null) return null;
             Type leftType = left.GetType();
@@ -159,52 +129,65 @@ namespace TerraIntegration.Basic
 
             return GetValue(system, left, right, errors);
         }
-
         protected override void SaveCustomData(BinaryWriter writer)
         {
-            writer.Write(LeftId.ToByteArray());
-            writer.Write(RightId.ToByteArray());
+            writer.Write(Left.ToByteArray());
+            Right.SaveData(writer);
         }
         protected override Variable LoadCustomData(BinaryReader reader)
         {
-            DoubleReferenceVariable doubleRef = (DoubleReferenceVariable)Activator.CreateInstance(GetType());
+            var doubleRef = (DoubleReferenceVariableWithConst)Activator.CreateInstance(GetType());
 
-            doubleRef.LeftId = new(reader.ReadBytes(16));
-            doubleRef.RightId = new(reader.ReadBytes(16));
+            doubleRef.Left = new(reader.ReadBytes(16));
+            doubleRef.Right = ValueOrRef.LoadData(reader);
 
             return doubleRef;
         }
 
         protected override TagCompound SaveCustomTag()
         {
-            return new()
+            TagCompound tag = new()
             {
-                ["rid"] = RightId.ToByteArray(),
-                ["lid"] = LeftId.ToByteArray(),
+                ["lid"] = Left.ToByteArray()
             };
+
+            if (Right is not null)
+            {
+                if (Right.IsRef)
+                    tag["rid"] = Right.RefId.ToByteArray();
+                else
+                    tag["rv"] = Util.WriteToByteArray(w => VariableValue.SaveData(Right.Value, w));
+            }
+
+            return tag;
         }
         protected override Variable LoadCustomTag(TagCompound data)
         {
-            DoubleReferenceVariable doubleRef = this.NewInstance();
-
-            if (data.ContainsKey("rid"))
-                doubleRef.RightId = new(data.GetByteArray("rid"));
+            DoubleReferenceVariableWithConst var = this.NewInstance();
 
             if (data.ContainsKey("lid"))
-                doubleRef.LeftId = new(data.GetByteArray("lid"));
+                var.Left = new(data.GetByteArray("lid"));
 
-            return doubleRef;
+            if (data.ContainsKey("rid"))
+                var.Right = new(new Guid(data.GetByteArray("rid")));
+            else if (data.ContainsKey("rv"))
+                var.Right = new(Util.ReadFromByteArray(data.GetByteArray("rv"), VariableValue.LoadData));
+
+            return var;
         }
 
         public override void ModifyTooltips(List<TooltipLine> tooltips)
         {
-            if (LeftId != default && RightId != default)
-                tooltips.Add(new(Mod, "TIDRefIds", $"[c/aaaa00:Referenced IDs:] {World.Guids.GetShortGuid(LeftId)}, {World.Guids.GetShortGuid(RightId)}"));
+            if (Left != default && Right is not null)
+                tooltips.Add(new(Mod, "TIDVars", $"[c/aaaa00:Values:] Ref {World.Guids.GetShortGuid(Left)}, {Right}"));
         }
 
         public abstract VariableValue GetValue(ComponentSystem system, VariableValue left, VariableValue right, List<Error> errors);
-        public abstract Type[] GetValidRightSlotTypes(Type leftSlotType);
+        public virtual Type[] GetValidRightReferenceSlotTypes(Type leftSlotType) => GetValidRightSlotTypes(leftSlotType);
+        public virtual Type[] GetValidRightConstantSlotTypes(Type leftSlotType) => GetValidRightSlotTypes(leftSlotType);
+        public virtual Type[] GetValidRightSlotTypes(Type leftSlotType) => null;
 
-        public virtual DoubleReferenceVariable CreateVariable(Variable left, Variable right) => (DoubleReferenceVariable)Activator.CreateInstance(GetType());
+        public virtual DoubleReferenceVariableWithConst CreateVariable(Variable left, ValueOrRef right)
+            => (DoubleReferenceVariableWithConst)Activator.CreateInstance(GetType());
     }
 }

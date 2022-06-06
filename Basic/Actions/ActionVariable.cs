@@ -9,7 +9,7 @@ using TerraIntegration.UI;
 using Terraria.GameContent.UI.Elements;
 using Terraria.ModLoader.IO;
 
-namespace TerraIntegration.Basic
+namespace TerraIntegration.Basic.Actions
 {
     public abstract class ActionVariable : Variable, IOwnProgrammerInterface
     {
@@ -55,7 +55,7 @@ namespace TerraIntegration.Basic
 
         public sealed override VariableValue GetValue(ComponentSystem system, List<Error> errors) => null;
 
-        protected sealed override void SaveCustomData(BinaryWriter writer)
+        protected override void SaveCustomData(BinaryWriter writer)
         {
             writer.Write(ActionVarId.ToByteArray());
             SaveActionData(writer);
@@ -72,8 +72,8 @@ namespace TerraIntegration.Basic
         protected override TagCompound SaveCustomTag()
         {
             if (!NeedsSaveTag) return null;
-            TagCompound tag = SaveCustomTag() ?? new();
-            tag["acvid"] = ActionVarId;
+            TagCompound tag = SaveActionTag() ?? new();
+            tag["acvid"] = ActionVarId.ToByteArray();
             return tag;
         }
         protected override Variable LoadCustomTag(TagCompound data)
@@ -81,7 +81,7 @@ namespace TerraIntegration.Basic
             ActionVariable var = LoadActionTag(data);
             if (var is null) return null;
 
-            if (data.ContainsKey("avcid"))
+            if (data.ContainsKey("acvid"))
                 var.ActionVarId = new(data.GetByteArray("acvid"));
 
             return var;

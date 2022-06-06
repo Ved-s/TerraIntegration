@@ -10,7 +10,7 @@ using Terraria.GameContent.UI.Elements;
 using Terraria.ModLoader;
 using Terraria.ModLoader.IO;
 
-namespace TerraIntegration.Basic
+namespace TerraIntegration.Basic.References
 {
     public abstract class ReferenceVariable : Variable, IOwnProgrammerInterface
     {
