@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using TerraIntegration.Basic.References;
 using TerraIntegration.DataStructures;
 using TerraIntegration.Interfaces;
+using TerraIntegration.Templates;
 using Terraria.ModLoader;
 using Terraria.ModLoader.IO;
 
@@ -31,6 +31,8 @@ namespace TerraIntegration.Basic
 
         public string Name { get; set; }
         public Guid Id { get; set; } = Guid.NewGuid();
+
+        public TypeIdentity TypeIdentity => TypeIdentity.Variable(this);
 
         public string ShortId => ModContent.GetInstance<ComponentWorld>().Guids.GetShortGuid(Id);
 
@@ -399,7 +401,7 @@ namespace TerraIntegration.Basic
 
             if (value is null || !value.GetType().IsAssignableTo(type))
             {
-                errors.Add(Errors.ExpectedValue(type, Id));
+                errors.Add(Errors.ExpectedValue(type, TypeIdentity));
                 return false;
             }
 

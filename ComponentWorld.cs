@@ -4,6 +4,7 @@ using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using TerraIntegration.Basic;
 using TerraIntegration.Components;
@@ -148,19 +149,28 @@ namespace TerraIntegration
         {
             Statistics.ResetUpdates();
             Statistics.Start(Statistics.UpdateTime.FullUpdate);
-            Statistics.Start(Statistics.UpdateTime.Components);
+
+            Stopwatch watch = new();
+
             foreach (KeyValuePair<Point16, Component> kvp in ComponentUpdates)
             {
                 ComponentData data = GetData(kvp.Key, kvp.Value);
                 if (data.UpdateFrequency == 0) continue;
                 if (UpdateCounter % data.UpdateFrequency == 0)
                 {
+                    Statistics.StartComponent(kvp.Value.TypeName);
+
+                    //DateTime updateStart = DateTime.Now;
+                    watch.Restart();
                     kvp.Value.OnUpdate(kvp.Key);
+                    watch.Stop();
+                    data.LastUpdateTime = watch.Elapsed;
                     Statistics.UpdatedComponents++;
+
+                    Statistics.StopComponent(kvp.Value.TypeName);
                 }
                 
             }
-            Statistics.Stop(Statistics.UpdateTime.Components);
 
             if (Main.netMode != NetmodeID.Server && !Main.LocalPlayer.mouseInterface)
             {

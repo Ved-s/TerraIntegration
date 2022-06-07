@@ -9,7 +9,7 @@ using TerraIntegration.UI;
 using Terraria.ModLoader;
 using Terraria.ModLoader.IO;
 
-namespace TerraIntegration.Basic.Actions
+namespace TerraIntegration.Templates
 {
     public abstract class ActionWithReferenceConst : ActionVariable
     {
@@ -73,7 +73,7 @@ namespace TerraIntegration.Basic.Actions
                     RightSlot.ValidRefTypes = null;
                     RightSlot.ValidConstTypes = null;
                 }
-                else 
+                else
                 {
                     RightSlot.ValidRefTypes = GetValidRightReferenceSlotTypes(var.Var.VariableReturnType);
                     RightSlot.ValidConstTypes = GetValidRightConstantSlotTypes(var.Var.VariableReturnType);
@@ -117,7 +117,7 @@ namespace TerraIntegration.Basic.Actions
                 tooltips.Add(new(Mod, "TIActRefIds", $"[c/aaaa00:Variables:] Ref {World.Guids.GetShortGuid(ActionVarId)}, {RightValue}"));
         }
 
-        public override void Execute(Point16 pos, Basic.Variable var, ComponentSystem system, List<Error> errors)
+        public override void Execute(Point16 pos, Variable var, ComponentSystem system, List<Error> errors)
         {
             VariableValue value = RightValue?.GetValue(system, errors);
             if (value is null) return;
@@ -131,6 +131,6 @@ namespace TerraIntegration.Basic.Actions
         public virtual Type[] GetValidRightConstantSlotTypes(Type leftSlotType) => GetValidRightSlotTypes(leftSlotType);
         public virtual Type[] GetValidRightSlotTypes(Type leftSlotType) => null;
 
-        public abstract void Execute(Point16 pos, Basic.Variable var, VariableValue refValue, ComponentSystem system, List<Error> errors);
+        public abstract void Execute(Point16 pos, Variable var, VariableValue refValue, ComponentSystem system, List<Error> errors);
     }
 }

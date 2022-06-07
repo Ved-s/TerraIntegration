@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using TerraIntegration.Basic;
-using TerraIntegration.Basic.References;
 using TerraIntegration.DataStructures;
 using TerraIntegration.Interfaces;
+using TerraIntegration.Templates;
 
 namespace TerraIntegration.Variables.Bitwise
 {

@@ -43,7 +43,7 @@ namespace TerraIntegration.Interfaces
         protected VariableValue FromNumericChecked(long value, List<Error> errors);
 
         [NoJIT]
-        VariableValue IAddable.Add(VariableValue value, List<Error> errors)
+        VariableValue IAddable.Add(VariableValue value, List<Error> errors, TypeIdentity id)
         {
             long val;
 
@@ -58,7 +58,7 @@ namespace TerraIntegration.Interfaces
         }
 
         [NoJIT]
-        VariableValue ISubtractable.Subtract(VariableValue value, List<Error> errors) 
+        VariableValue ISubtractable.Subtract(VariableValue value, List<Error> errors, TypeIdentity id) 
         {
             long val;
 
@@ -73,7 +73,7 @@ namespace TerraIntegration.Interfaces
         }
 
         [NoJIT]
-        VariableValue IMultipliable.Multiply(VariableValue value, List<Error> errors)
+        VariableValue IMultipliable.Multiply(VariableValue value, List<Error> errors, TypeIdentity id)
         {
             long val;
 
@@ -88,7 +88,7 @@ namespace TerraIntegration.Interfaces
         }
 
         [NoJIT]
-        VariableValue IDivisible.Divide(VariableValue value, List<Error> errors)
+        VariableValue IDivisible.Divide(VariableValue value, List<Error> errors, TypeIdentity id)
         {
             long val;
 
@@ -103,7 +103,7 @@ namespace TerraIntegration.Interfaces
         }
 
         [NoJIT]
-        VariableValue IModulable.Modulo(VariableValue value, List<Error> errors)
+        VariableValue IModulable.Modulo(VariableValue value, List<Error> errors, TypeIdentity id)
         {
             long val;
 

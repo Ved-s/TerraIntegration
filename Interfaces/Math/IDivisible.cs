@@ -12,6 +12,6 @@ namespace TerraIntegration.Interfaces.Math
     public interface IDivisible : IValueInterface
     {
         public Type[] ValidDivideTypes { get; }
-        public VariableValue Divide(VariableValue value, List<Error> errors);
+        public VariableValue Divide(VariableValue value, List<Error> errors, TypeIdentity id);
     }
 }

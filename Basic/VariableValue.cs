@@ -3,9 +3,9 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using TerraIntegration.Basic.References;
 using TerraIntegration.DataStructures;
 using TerraIntegration.DisplayedValues;
+using TerraIntegration.Templates;
 using TerraIntegration.Variables;
 using Terraria.ModLoader;
 

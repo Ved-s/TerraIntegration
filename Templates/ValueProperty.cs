@@ -3,12 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TerraIntegration.Basic;
 using TerraIntegration.Components;
 using TerraIntegration.DataStructures;
+using TerraIntegration.Templates;
 using TerraIntegration.Values;
 using TerraIntegration.Variables;
 
-namespace TerraIntegration.Basic.References
+namespace TerraIntegration.Templates
 {
     public abstract class ValueProperty : ReferenceVariable
     {
@@ -28,7 +30,7 @@ namespace TerraIntegration.Basic.References
                 if (VariableValue.ByType.TryGetValue(ValueTypes[0], out VariableValue val))
                     return val.TypeName;
 
-                if (ValueTypes[0].IsInterface) 
+                if (ValueTypes[0].IsInterface)
                 {
                     string name = ValueTypes[0].Name;
                     if (name.StartsWith('I')) return name[1..];
@@ -56,7 +58,7 @@ namespace TerraIntegration.Basic.References
         {
             if (!ValueTypes.Any(t => t.IsAssignableFrom(value.GetType())))
             {
-                errors.Add(Errors.ExpectedValues(ValueTypes, Id));
+                errors.Add(Errors.ExpectedValues(ValueTypes, TypeIdentity));
                 return null;
             }
 
@@ -67,9 +69,9 @@ namespace TerraIntegration.Basic.References
         {
             List<ValueProperty> success = new();
 
-            foreach (ValueProperty prop in WaitingValue) 
+            foreach (ValueProperty prop in WaitingValue)
             {
-                if (prop.ValueTypes is null) 
+                if (prop.ValueTypes is null)
                     continue;
 
                 Register(prop);
@@ -102,7 +104,7 @@ namespace TerraIntegration.Basic.References
             Register(property, true);
         }
 
-        public new static void Unregister() 
+        public new static void Unregister()
         {
             ByValueType.Clear();
             AllProperties.Clear();
@@ -110,7 +112,10 @@ namespace TerraIntegration.Basic.References
 
         public virtual bool AppliesTo(VariableValue value) => true;
     }
+}
 
+namespace TerraIntegration.Basic.References
+{
     public abstract class ValueProperty<TValue> : ValueProperty where TValue : VariableValue
     {
         public sealed override Type[] ValueTypes => new[] { typeof(TValue) };

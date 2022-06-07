@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using TerraIntegration.Basic;
-using TerraIntegration.Basic.References;
 using TerraIntegration.DataStructures;
+using TerraIntegration.Templates;
 using TerraIntegration.Values;
 
 namespace TerraIntegration.ValueProperties.Tile

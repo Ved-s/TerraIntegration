@@ -9,16 +9,25 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TerraIntegration.Basic;
+using TerraIntegration.DataStructures;
 using Terraria;
 using Terraria.GameContent;
 using Terraria.ModLoader;
+using Terraria.UI.Chat;
 
 namespace TerraIntegration
 {
     public static class Statistics
     {
-        public static Stopwatch[] Updates = new Stopwatch[4];
-        public static TimeSpan[] MaxUpdates = new TimeSpan[4];
+        const int UpdateTypes = 4;
+        public static Stopwatch[] Updates = new Stopwatch[UpdateTypes];
+        public static Dictionary<string, Stopwatch> ComponentUpdates = new();
+
+        const int MeanCap = 200;
+        public static RingArray<TimeSpan>[] UpdateHistory = new RingArray<TimeSpan>[UpdateTypes];
+        public static Dictionary<string, RingArray<TimeSpan>> ComponentUpdateHistory = new();
+
         public static bool Visible;
         public static RingArray<string> Log = new(15);
 
@@ -27,73 +36,109 @@ namespace TerraIntegration
             VariableRequests = 0,
             ComponentRequests = 0;
 
-        public static int Counter = 0;
-
         public static void ResetUpdates()
         {
-            for (int i = 0; i < Updates.Length; i++)
-            {
-                if (Updates[i] is null) 
-                    Updates[i] = new Stopwatch();
-                else Updates[i].Reset();
-            }
-
             UpdatedComponents = 0;
             VariableRequests = 0;
             ComponentRequests = 0;
 
-            Counter++;
-            if (Counter % 60 == 0)
+            for (int i = 0; i < UpdateHistory.Length; i++)
             {
-                Counter = 0;
-                for (int i = 0; i < MaxUpdates.Length; i++)
-                    MaxUpdates[i] = default;
+                RingArray<TimeSpan> updates = UpdateHistory[i];
+                if (updates is null)
+                    UpdateHistory[i] = updates = new(MeanCap);
+
+                if (Updates[i] is not null)
+                    updates.Push(Updates[i].Elapsed);
             }
+
+            foreach (var kvp in ComponentUpdates)
+            {
+                if (!ComponentUpdateHistory.TryGetValue(kvp.Key, out var com))
+                    ComponentUpdateHistory[kvp.Key] = com = new(MeanCap);
+                com.Push(kvp.Value.Elapsed);
+            }
+
+            for (int i = 0; i < Updates.Length; i++)
+            {
+                if (Updates[i] is null)
+                    Updates[i] = new Stopwatch();
+                else Updates[i].Reset();
+            }
+
+            foreach (Stopwatch watch in ComponentUpdates.Values)
+                watch.Reset();
         }
 
         public static void LogMessage(string message)
         {
             if (Networking.Server) return;
-            Log.Push($"[{DateTime.Now:HH:mm:ss}] {message}");
+            Log.Push($"[c/aaaaaa:{DateTime.Now:HH:mm:ss}] {message}");
         }
 
         public static string Get(UpdateTime time)
         {
             int timei = (int)time;
 
-            if (Updates[timei] is null) return null;
+            RingArray<TimeSpan> updates = UpdateHistory[timei];
 
-            TimeSpan ts = Updates[timei].Elapsed;
+            if (Updates[timei] is null || updates is null)
+                return null;
 
-            if (MaxUpdates[timei] < ts)
-                MaxUpdates[timei] = ts;
-            else ts = MaxUpdates[timei];
-            
+            TimeSpan mean = updates.Enumerate().Aggregate((a, b) => a + b) / MeanCap;
+            TimeSpan max = updates.Enumerate().Aggregate((a, b) => a > b ? a : b);
 
-            double micro = ts.TotalMilliseconds * 1000;
-
-            if (micro < 1000) return $"{micro:0.0}us max";
-
-            if (ts.TotalMilliseconds < 10) return $"{ts.TotalMilliseconds:0.000}ms max";
-            if (ts.TotalMilliseconds < 100) return $"{ts.TotalMilliseconds:0.00}ms max";
-            if (ts.TotalMilliseconds < 1000) return $"{ts.TotalMilliseconds:0.0}ms max";
-
-            if (ts.TotalSeconds < 10) return $"{ts.TotalSeconds:0.000}s max";
-            if (ts.TotalSeconds < 100) return $"{ts.TotalSeconds:0.00}s max";
-            if (ts.TotalSeconds < 1000) return $"{ts.TotalSeconds:0.0}s max";
-
-            return ts.ToString();
-
+            return $"{FormatTime(mean)} mean, {FormatTime(max)} max";
         }
-
-        public static void Start(UpdateTime time) 
+        public static void Start(UpdateTime time)
         {
             Updates[(int)time].Start();
         }
-
         public static void Stop(UpdateTime time)
         {
             Updates[(int)time].Stop();
+        }
+
+        public static void StartComponent(string type)
+        {
+            if (!ComponentUpdates.TryGetValue(type, out Stopwatch watch))
+                ComponentUpdates.Add(type, watch = new());
+            Start(UpdateTime.Components);
+            watch.Start();
+        }
+        public static void StopComponent(string type)
+        {
+            Stop(UpdateTime.Components);
+            if (!ComponentUpdates.TryGetValue(type, out Stopwatch watch))
+                return;
+            watch.Stop();
+        }
+        public static string GetComponent(string type) 
+        {
+            if (!ComponentUpdateHistory.TryGetValue(type, out var hist))
+                return null;
+
+            TimeSpan mean = hist.Enumerate().Aggregate((a, b) => a + b) / MeanCap;
+            TimeSpan max = hist.Enumerate().Aggregate((a, b) => a > b ? a : b);
+
+            return $"  {type}: {FormatTime(mean)} mean, {FormatTime(max)} max";
+        }
+
+        public static string FormatTime(TimeSpan ts)
+        {
+            double micro = ts.TotalMilliseconds * 1000;
+
+            if (micro < 1000) return $"{micro:0.0}us";
+
+            if (ts.TotalMilliseconds < 10) return $"{ts.TotalMilliseconds:0.000}ms";
+            if (ts.TotalMilliseconds < 100) return $"{ts.TotalMilliseconds:0.00}ms";
+            if (ts.TotalMilliseconds < 1000) return $"{ts.TotalMilliseconds:0.0}ms";
+
+            if (ts.TotalSeconds < 10) return $"{ts.TotalSeconds:0.000}s";
+            if (ts.TotalSeconds < 100) return $"{ts.TotalSeconds:0.00}s";
+            if (ts.TotalSeconds < 1000) return $"{ts.TotalSeconds:0.0}s";
+
+            return ts.ToString();
         }
 
         public static void Draw()
@@ -106,18 +151,24 @@ namespace TerraIntegration
             int width = 800;
             int height = 600;
 
-            Rectangle rect = new((Main.screenWidth - width) / 2, (Main.screenHeight - height) / 2, width, height);
-            Main.spriteBatch.Draw(TextureAssets.MagicPixel.Value, rect, Color.DarkSlateBlue * .7f);
 
-            string text = $"TerraIntegration stats:\n" +
+            string text = $"TerraIntegration stats ({MeanCap} ticks sample):\n" +
                 $"Full update: {Get(UpdateTime.FullUpdate)}\n" +
-                $"Components: {UpdatedComponents} in {Get(UpdateTime.Components)}\n" +
-                $"Component requests: {ComponentRequests} in {Get(UpdateTime.ComponentRequests)}\n" +
-                $"Variable requests: {VariableRequests} in {Get(UpdateTime.VariableRequests)}";
+                $"Component requests: {ComponentRequests}\n  total: {Get(UpdateTime.ComponentRequests)}\n" +
+                $"Variable requests: {VariableRequests}\n  total: {Get(UpdateTime.VariableRequests)}\n" + 
+                $"Component updates: {UpdatedComponents}\n  total: {Get(UpdateTime.Components)}\n" +
+                    $"{string.Join('\n', ComponentUpdateHistory.Keys.Select(t => GetComponent(t)))}\n\n" +
+                $"Log:\n{string.Join("\n", Log.EnumerateBackwards())}";
 
-            Main.spriteBatch.DrawString(FontAssets.MouseText.Value, text, new Vector2(rect.X + 20, rect.Y + 20), Color.White);
+            ChatManager.DrawColorCodedStringWithShadow(Main.spriteBatch, FontAssets.MouseText.Value, text, new Vector2(20, 150), Color.White, 0f, Vector2.Zero, new(.8f));
 
-            Main.spriteBatch.DrawString(FontAssets.MouseText.Value, $"Log:\n{string.Join("\n", Log.EnumerateBackwards())}", new Vector2(rect.X + 20, rect.Y + 180), Color.White, 0f, Vector2.Zero, .8f, SpriteEffects.None, 0f);
+            Point16 tile = (Point16)(Main.MouseWorld / 16);
+            ComponentData data = ComponentWorld.Instance.GetDataOrNull(tile);
+            if (data is not null)
+            {
+                if (data.UpdateFrequency > 0)
+                    ComponentWorld.Instance.HoverText = $"{data.Component?.TypeName}\nFreq: {data.UpdateFrequency}\nUpdate: {FormatTime(data.LastUpdateTime)}";
+            }
         }
 
         public enum UpdateTime 

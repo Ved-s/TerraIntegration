@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using TerraIntegration.Basic;
 using TerraIntegration.DataStructures;
 using TerraIntegration.UI;
 using TerraIntegration.Values;
@@ -10,7 +11,7 @@ using Terraria.GameContent.UI.Elements;
 using Terraria.ModLoader;
 using Terraria.ModLoader.IO;
 
-namespace TerraIntegration.Basic.References
+namespace TerraIntegration.Templates
 {
     public abstract class ReferenceVariable : Variable, IOwnProgrammerInterface
     {
@@ -39,7 +40,7 @@ namespace TerraIntegration.Basic.References
 
             Interface.Append(InterfaceSlot);
         }
-        public Basic.Variable WriteVariable()
+        public Variable WriteVariable()
         {
             if (InterfaceSlot.Var is not null)
             {

@@ -37,16 +37,18 @@ namespace TerraIntegration.Variables
             if (TriggeredPoints.Contains(pos)) return;
             TriggeredPoints.Add(pos);
 
-            foreach (PositionedComponent c in system.ComponentsWithVariables) 
+            foreach (var com in system.ComponentsWithVariables) 
             {
-                if (c.Pos == pos) continue;
+                if (com.Key == pos) continue;
 
-                ComponentData data = c.GetData();
+                ComponentData data = com.Value?.GetDataOrNull(com.Key);
+                if (data is null) continue;
+
                 foreach (var kvp in data.Variables)
                 {
                     if (kvp.Value?.Var is EventSubscriber sub && sub.EventId == Id)
                     {
-                        c.Component.OnEvent(c.Pos, kvp.Key);
+                        com.Value.OnEvent(com.Key, kvp.Key);
                         sub.Triggered = true;
                     }
                 }

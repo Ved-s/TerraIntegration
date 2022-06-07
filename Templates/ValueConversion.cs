@@ -7,7 +7,7 @@ using TerraIntegration.Basic;
 using TerraIntegration.DataStructures;
 using TerraIntegration.Values;
 
-namespace TerraIntegration.Basic.References
+namespace TerraIntegration.Templates
 {
     public abstract class ValueConversion : ValueProperty
     {
@@ -20,11 +20,11 @@ namespace TerraIntegration.Basic.References
 
         public override Type VariableReturnType => ConvertTo;
         public override Type[] ValueTypes => ConvertFrom;
-        public override string PropertyName 
+        public override string PropertyName
         {
-            get 
+            get
             {
-                if (ConvertTo is null || !VariableValue.ByType.TryGetValue(ConvertTo, out VariableValue to)) 
+                if (ConvertTo is null || !VariableValue.ByType.TryGetValue(ConvertTo, out VariableValue to))
                     return null;
 
                 return $"conv.{to.TypeName}";

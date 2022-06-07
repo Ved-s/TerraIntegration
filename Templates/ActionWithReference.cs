@@ -9,7 +9,7 @@ using TerraIntegration.UI;
 using Terraria.ModLoader;
 using Terraria.ModLoader.IO;
 
-namespace TerraIntegration.Basic.Actions
+namespace TerraIntegration.Templates
 {
     public abstract class ActionWithReference : ActionVariable
     {
@@ -69,7 +69,7 @@ namespace TerraIntegration.Basic.Actions
                     ReferenceSlot.VariableValidator = (var) => false;
                     ReferenceSlot.HoverText = null;
                 }
-                else 
+                else
                 {
                     Type[] types = GetValidReferenceSlotTypes(var.Var.VariableReturnType);
 
@@ -116,7 +116,7 @@ namespace TerraIntegration.Basic.Actions
                 tooltips.Add(new(Mod, "TIActRefIds", $"[c/aaaa00:Variable IDs:] {World.Guids.GetShortGuid(ActionVarId)}, {World.Guids.GetShortGuid(ReferenceId)}"));
         }
 
-        public override void Execute(Point16 pos, Basic.Variable var, ComponentSystem system, List<Error> errors)
+        public override void Execute(Point16 pos, Variable var, ComponentSystem system, List<Error> errors)
         {
             VariableValue value = system.GetVariableValue(ReferenceId, errors);
             if (value is null) return;
@@ -124,9 +124,9 @@ namespace TerraIntegration.Basic.Actions
             Execute(pos, var, value, system, errors);
         }
 
-        public virtual ActionWithReference CreateVariable(Basic.Variable refVar) => this.NewInstance();
+        public virtual ActionWithReference CreateVariable(Variable refVar) => this.NewInstance();
 
         public abstract Type[] GetValidReferenceSlotTypes(Type leftSlotType);
-        public abstract void Execute(Point16 pos, Basic.Variable var, VariableValue refValue, ComponentSystem system, List<Error> errors);
+        public abstract void Execute(Point16 pos, Variable var, VariableValue refValue, ComponentSystem system, List<Error> errors);
     }
 }

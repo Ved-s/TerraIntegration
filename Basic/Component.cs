@@ -190,7 +190,7 @@ namespace TerraIntegration.Basic
             ComponentData data = GetData(pos);
             data.UpdateFrequency = rate;
 
-            Statistics.LogMessage($"Set updates to {rate} at {pos} for {data.Component?.Type}");
+            Statistics.LogMessage($"Set updates to {rate} at {pos} for {data.Component?.TypeName}");
 
             Networking.SendComponentFrequency(pos);
 
@@ -380,6 +380,8 @@ namespace TerraIntegration.Basic
         public Point16 Position { get; internal set; }
 
         public ushort UpdateFrequency { get; set; } = 1;
+        public TimeSpan LastUpdateTime { get; set; } = default;
+
         public Dictionary<string, Items.Variable> Variables { get; internal set; }
 
         public void CopyTo(ComponentData data)

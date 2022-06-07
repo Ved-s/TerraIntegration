@@ -1,5 +1,17 @@
 ﻿Mods.TerraIntegration: {
 	Errors: {
-		VariableNotFound: "Variable {0} doesn't exist in current system"
+		VariableNotFound:			"Variable {0} doesn't exist in current system",
+		RecursiveReference:			"Variable {0} references itself",
+		MultipleVariablesSameID:	"Multiple variables have been found with id {0}",
+		ValueUnloaded:				"Variable {0} got an unloaded value",
+		VariableUnloaded:			"Variable {0} is unloaded",
+		WrongComponentAtPos:		"Expected component {3} at {0} {1}, got {2}",
+		NoComponentAtPos:			"Expected component {2} at {0} {1}",
+		ExpectedValue:				"{0} expected a {1} value",
+		ExpectedValues:				"{0} expected {1} values",
+		ExpectedVariable:			"{0} expected variable {1}",
+		ExpectedVariables:			"{0} expected variables {1}",
+		ValueTooBigForType:			"{0} is too big for {1}",
+		ValueTooSmallForType:		"{0} is too small for {1}"
 	}
 }

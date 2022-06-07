@@ -21,10 +21,12 @@ namespace TerraIntegration
         public static HashSet<int> CableWalls = new();
 
         public HashSet<WorldPoint> AllPoints { get; } = new();
-        public HashSet<PositionedComponent> AllComponents { get; } = new();
-        public HashSet<PositionedComponent> ComponentsWithVariables { get; } = new();
-        public Dictionary<string, HashSet<PositionedComponent>> ComponentsByType { get; } = new();
+        public Dictionary<Point16, Component> AllComponents { get; } = new();
+        public Dictionary<Point16, Component> ComponentsWithVariables { get; } = new();
+        public Dictionary<string, Dictionary<Point16, Component>> ComponentsByType { get; } = new();
         public Dictionary<Point16, Component> ComponentsByPos { get; } = new();
+
+        public Dictionary<Guid, (Point16 pos, string slot)> VariableCache { get; } = new();
 
         private HashSet<Guid> GetVariableSet = new();
 
@@ -58,8 +60,8 @@ namespace TerraIntegration
                     system.Add(p);
                 }
 
-                foreach (PositionedComponent component in system.AllComponents)
-                    component.Component.OnSystemUpdate(component.Pos);
+                foreach (var component in system.AllComponents)
+                    component.Value?.OnSystemUpdate(component.Key);
 
                 systems.Add(system);
             }
@@ -143,12 +145,12 @@ namespace TerraIntegration
             Terraria.Tile t = Framing.GetTileSafely(point.ToPoint());
             if (!point.Wall && Component.ByTileType.TryGetValue(t.TileType, out Component component))
             {
-                PositionedComponent positioned = new(point.ToPoint16(), component);
+                Point16 pos = point.ToPoint16();
 
-                AllComponents.Add(positioned);
+                AllComponents.Add(pos, component);
 
                 if (component.CanHaveVariables)
-                    ComponentsWithVariables.Add(positioned);
+                    ComponentsWithVariables.Add(pos, component);
 
                 string type = component.TypeName;
                 if (!ComponentsByType.TryGetValue(type, out var componentsByType))
@@ -156,11 +158,11 @@ namespace TerraIntegration
                     componentsByType = new();
                     ComponentsByType[type] = componentsByType;
                 }
-                componentsByType.Add(positioned);
+                componentsByType.Add(pos, component);
 
-                ComponentsByPos[positioned.Pos] = component;
+                ComponentsByPos[pos] = component;
 
-                positioned.GetData().System = this;
+                component.GetData(pos).System = this;
             }
         }
 
@@ -201,17 +203,33 @@ namespace TerraIntegration
 
             try
             {
+                if (VariableCache.TryGetValue(varId, out var varCache)
+                    && ComponentsWithVariables.ContainsKey(varCache.pos))
+                {
+                    ComponentData data = World.GetDataOrNull(varCache.pos);
+                    if (data is not null)
+                    {
+                        Variable var = data.GetVariable(varCache.slot);
+                        if (var is not null)
+                            return var;
+                    }
+                }
+
                 bool found = false;
                 Variable result = null;
+                Point16 foundPos = default;
+                string foundSlot = null;
 
-                foreach (PositionedComponent c in ComponentsWithVariables)
+                foreach (var com in ComponentsWithVariables)
                 {
-                    ComponentData d = c.GetData();
-                    foreach (Items.Variable var in d.Variables.Values)
-                        if (var is not null)
-                            if (var.Var?.Id == varId)
+                    ComponentData d = com.Value?.GetDataOrNull(com.Key);
+                    if (d is null) continue;
+
+                    foreach (var var in d.Variables)
+                        if (var.Value is not null)
+                            if (var.Value.Var?.Id == varId)
                             {
-                                if (var.Var is UnloadedVariable)
+                                if (var.Value.Var is UnloadedVariable)
                                 {
                                     errors.Add(Errors.VariableUnloaded(varId));
                                     return null;
@@ -222,11 +240,19 @@ namespace TerraIntegration
                                     return null;
                                 }
                                 found = true;
-                                result = var.Var;
+                                foundPos = com.Key;
+                                foundSlot = var.Key;
+                                result = var.Value.Var;
+ 
                             }
                 }
                 if (result is not null)
+                {
+                    if (foundPos != default && foundSlot is not null)
+                        VariableCache[varId] = (foundPos, foundSlot);
+
                     return result;
+                }
 
                 errors.Add(Errors.VariableNotFound(varId));
                 return null;
@@ -262,14 +288,14 @@ namespace TerraIntegration
             }
         }
 
-        public TVariable GetVariable<TVariable>(Guid varId, List<Error> errors) where TVariable : Variable
+        public TVariable GetVariable<TVariable>(Guid varId, List<Error> errors, TypeIdentity id) where TVariable : Variable
         {
             Variable var = GetVariable(varId, errors);
             if (var is null) return null;
 
             if (var is not TVariable tv)
             {
-                errors.Add(Errors.ExpectedVariable(typeof(TVariable)));
+                errors.Add(Errors.ExpectedVariable(typeof(TVariable), id));
                 return null;
             }
             return tv;

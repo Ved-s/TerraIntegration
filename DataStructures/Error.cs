@@ -59,37 +59,25 @@ namespace TerraIntegration.DataStructures
         public static Error NoComponentAtPos(Point16 pos, string type)
             => new("NoComponentAtPos", pos.X, pos.Y, type);
 
-        public static Error ExpectedValue(Type valueType, Guid? variableId = null)
-        {
-            if (variableId is null)
-                return new("ExpectedValue", VariableValue.TypeToName(valueType, false) ?? "null");
-            return new("ExpectedValueWithId", VariableValue.TypeToName(valueType, false) ?? "null", ComponentWorld.Instance.Guids.GetShortGuid(variableId.Value));
-        }
-        public static Error ExpectedValues(IEnumerable<Type> valueTypes, Guid? variableId = null)
+        public static Error ExpectedValue(Type valueType, TypeIdentity id)
+            => new("ExpectedValue", id.ToString(), VariableValue.TypeToName(valueType, false) ?? "null");
+
+        public static Error ExpectedValues(IEnumerable<Type> valueTypes, TypeIdentity id)
         {
             if (valueTypes is null) throw new ArgumentNullException(nameof(valueTypes));
 
-            if (variableId is null)
-                return new("ExpectedValues", string.Join(", ", valueTypes.Select(t => VariableValue.TypeToName(t, false))));
-            return new("ExpectedValuesWithId", 
-                string.Join(", ", valueTypes.Select(t => VariableValue.TypeToName(t, false))), 
-                ComponentWorld.Instance.Guids.GetShortGuid(variableId.Value));
+            return new("ExpectedValues", id.ToString(),
+                string.Join(", ", valueTypes.Select(t => VariableValue.TypeToName(t, false))));
         }
-        public static Error ExpectedVariable(Type variableType, Guid? variableId = null)
+        public static Error ExpectedVariable(Type variableType, TypeIdentity id)
         {
             string varName = Variable.ByType.TryGetValue(variableType, out Variable var) ?
                 var.TypeDisplayName : variableType.Name;
 
-            if (variableId is null)
-                return new("ExpectedVariable", varName);
-            return new("ExpectedVariableWithId", varName, ComponentWorld.Instance.Guids.GetShortGuid(variableId.Value));
+            return new("ExpectedVariable", id.ToString(), varName);
         }
-        public static Error ExpectedVariables(string variableTypes, Guid? variableId = null)
-        {
-            if (variableId is null)
-                return new("ExpectedVariables", variableTypes);
-            return new("ExpectedVariablesWithId", variableTypes, ComponentWorld.Instance.Guids.GetShortGuid(variableId.Value));
-        }
+        public static Error ExpectedVariables(string variableTypes, TypeIdentity id)
+            => new("ExpectedVariables", id.ToString(), variableTypes);
 
         public static Error ValueTooBigForType(object value, VariableValue valueType)
             => new("ValueTooBigForType", value, valueType?.TypeDisplayName ?? "null");

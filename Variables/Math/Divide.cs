@@ -4,10 +4,10 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using TerraIntegration.Basic;
-using TerraIntegration.Basic.References;
 using TerraIntegration.DataStructures;
 using TerraIntegration.Interfaces;
 using TerraIntegration.Interfaces.Math;
+using TerraIntegration.Templates;
 using TerraIntegration.UI;
 using TerraIntegration.Values;
 using Terraria.GameContent.UI.Elements;
@@ -36,7 +36,7 @@ namespace TerraIntegration.Variables.Numeric
         {
             IDivisible divisible = (IDivisible)left;
 
-            VariableValue result = divisible.Divide(right, errors);
+            VariableValue result = divisible.Divide(right, errors, TypeIdentity);
 
             if (result is not null)
                 SetReturnTypeCache(result.GetType());

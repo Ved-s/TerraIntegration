@@ -3,13 +3,14 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using TerraIntegration.Basic;
 using TerraIntegration.DataStructures;
 using TerraIntegration.UI;
 using Terraria.GameContent.UI.Elements;
 using Terraria.ModLoader;
 using Terraria.ModLoader.IO;
 
-namespace TerraIntegration.Basic.References
+namespace TerraIntegration.Templates
 {
     public abstract class DoubleReferenceVariableWithConst : Variable, IOwnProgrammerInterface
     {
@@ -108,7 +109,7 @@ namespace TerraIntegration.Basic.References
             {
                 if (LeftSlotValueTypes is not null && !LeftSlotValueTypes.Any(t => t.IsAssignableFrom(leftType)))
                 {
-                    errors.Add(Errors.ExpectedValues(LeftSlotValueTypes, Id));
+                    errors.Add(Errors.ExpectedValues(LeftSlotValueTypes, TypeIdentity));
                     return null;
                 }
 
@@ -120,7 +121,7 @@ namespace TerraIntegration.Basic.References
 
                 if (validRightTypes is not null && !validRightTypes.Any(t => t.IsAssignableFrom(rightType)))
                 {
-                    errors.Add(Errors.ExpectedValues(validRightTypes, Id));
+                    errors.Add(Errors.ExpectedValues(validRightTypes, TypeIdentity));
                     return null;
                 }
 

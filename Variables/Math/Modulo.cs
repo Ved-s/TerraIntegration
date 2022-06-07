@@ -4,10 +4,10 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using TerraIntegration.Basic;
-using TerraIntegration.Basic.References;
 using TerraIntegration.DataStructures;
 using TerraIntegration.Interfaces;
 using TerraIntegration.Interfaces.Math;
+using TerraIntegration.Templates;
 using TerraIntegration.UI;
 using TerraIntegration.Values;
 using Terraria.GameContent.UI.Elements;
@@ -36,7 +36,7 @@ namespace TerraIntegration.Variables.Numeric
         {
             IModulable modulable = (IModulable)left;
 
-            VariableValue result = modulable.Modulo(right, errors);
+            VariableValue result = modulable.Modulo(right, errors, TypeIdentity);
 
             if (result is not null)
                 SetReturnTypeCache(result.GetType());

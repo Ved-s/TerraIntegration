@@ -72,12 +72,12 @@ namespace TerraIntegration.Values
             return Value;
         }
 
-        public VariableValue Add(VariableValue value, List<Error> errors)
+        public VariableValue Add(VariableValue value, List<Error> errors, TypeIdentity id)
         {
             if (value is IToString toString)
                 return new String(Value + toString.ToString());
             
-            errors.Add(Errors.ExpectedValue(typeof(IToString)));
+            errors.Add(Errors.ExpectedValue(typeof(IToString), id));
             return null;
         }
 

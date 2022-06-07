@@ -9,7 +9,7 @@ using TerraIntegration.UI;
 using Terraria.GameContent.UI.Elements;
 using Terraria.ModLoader.IO;
 
-namespace TerraIntegration.Basic.Actions
+namespace TerraIntegration.Basic
 {
     public abstract class ActionVariable : Variable, IOwnProgrammerInterface
     {
@@ -38,7 +38,7 @@ namespace TerraIntegration.Basic.Actions
 
             if (!match.Match(var))
             {
-                errors.Add(Errors.ExpectedVariables(match.ToTypeNameString(), Id));
+                errors.Add(Errors.ExpectedVariables(match.ToTypeNameString(), TypeIdentity));
                 return;
             }
             Execute(pos, var, system, errors);
@@ -102,7 +102,7 @@ namespace TerraIntegration.Basic.Actions
         }
         public Variable WriteVariable()
         {
-            if (ActionVarSlot?.Var?.Var is null) 
+            if (ActionVarSlot?.Var?.Var is null)
                 return null;
 
             ActionVariable var = WriteActionvariable();
