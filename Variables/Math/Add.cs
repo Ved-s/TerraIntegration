@@ -19,6 +19,7 @@ namespace TerraIntegration.Variables.Numeric
     {
         public override string TypeName => "add";
         public override string TypeDefaultDisplayName => "Add";
+        public override string TypeDefaultDescription => "Adds two values together";
 
         public override SpriteSheetPos SpriteSheetPos => new(MathSheet, 0, 0);
 

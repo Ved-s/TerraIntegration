@@ -15,6 +15,7 @@ namespace TerraIntegration.Variables.Comparing
     {
         public override string TypeName => "greaterEquals";
         public override string TypeDefaultDisplayName => "Greater or equals";
+        public override string TypeDefaultDescription => "Returns True if left value is\ngreater or eqal to right value";
 
         public override SpriteSheetPos SpriteSheetPos => new(ComparingSheet, 2, 0);
 

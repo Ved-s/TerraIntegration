@@ -15,6 +15,7 @@ namespace TerraIntegration.Variables.Actions
 
         public override string TypeName => "condExec";
         public override string TypeDefaultDisplayName => "Conditional exec";
+        public override string TypeDefaultDescription => "Executes action if the condition is met";
 
         public override SpriteSheetPos SpriteSheetPos => new(ActionsSheet, 0, 0);
 

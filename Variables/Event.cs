@@ -17,6 +17,7 @@ namespace TerraIntegration.Variables
     {
         public override string TypeName => "event";
         public override string TypeDefaultDisplayName => "Event";
+        public override string TypeDefaultDescription => "An event that will trigger all\nsubscribers for this event in system";
 
         public override Type VariableReturnType => null;
 

@@ -27,11 +27,14 @@ namespace TerraIntegration.Basic
         public virtual Color TypeColor => Color.White;
 
         public abstract string TypeName { get; }
-        public string TypeDisplayName => Util.GetLangTextOrNull(DisplayNameLocalizationKey) ?? TypeDefaultDisplayName;
-        public string TypeDescription => Util.GetLangTextOrNull(DescriptionLocalizationKey) ?? TypeDefaultDescription;
+        public string TypeDisplayName => Util.GetLangText(DisplayNameLocalizationKey, TypeDefaultDisplayName, DisplayNameFormatters);
+        public string TypeDescription => Util.GetLangText(DescriptionLocalizationKey, TypeDefaultDescription, DescriptionFormatters);
 
         public abstract string TypeDefaultDisplayName { get; }
         public virtual string TypeDefaultDescription { get; }
+
+        public virtual object[] DisplayNameFormatters { get; }
+        public virtual object[] DescriptionFormatters { get; }
 
         public virtual string DescriptionLocalizationKey => "Mods.TerraIntegration.Descriptions.Values." + TypeName;
         public virtual string DisplayNameLocalizationKey => "Mods.TerraIntegration.Names.Values." + TypeName;

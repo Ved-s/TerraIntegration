@@ -15,6 +15,7 @@ namespace TerraIntegration.Variables.Comparing
     {
         public override string TypeName => "lessEquals";
         public override string TypeDefaultDisplayName => "Less or equals";
+        public override string TypeDefaultDescription => "Returns True if left value is\nless or equals to right value";
 
         public override SpriteSheetPos SpriteSheetPos => new(ComparingSheet, 0, 1);
 

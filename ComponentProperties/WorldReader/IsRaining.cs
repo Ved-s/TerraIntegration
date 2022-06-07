@@ -13,6 +13,7 @@ namespace TerraIntegration.ComponentProperties.WorldReader
     {
         public override string PropertyName => "raining";
         public override string PropertyDisplay => "Is Raining";
+        public override string TypeDefaultDescription => "Returns True during rain";
 
         public override SpriteSheetPos SpriteSheetPos => new(3, 0);
 

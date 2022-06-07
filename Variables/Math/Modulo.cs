@@ -19,6 +19,7 @@ namespace TerraIntegration.Variables.Numeric
     {
         public override string TypeName => "mod";
         public override string TypeDefaultDisplayName => "Modulo";
+        public override string TypeDefaultDescription => "Modulus left value by right value";
 
         public override SpriteSheetPos SpriteSheetPos => new(MathSheet, 2, 1);
 

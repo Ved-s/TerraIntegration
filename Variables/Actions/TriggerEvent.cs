@@ -16,6 +16,7 @@ namespace TerraIntegration.Variables.Actions
 
         public override string TypeName => "trigEvt";
         public override string TypeDefaultDisplayName => "Trigger event";
+        public override string TypeDefaultDescription => "Triggers an event on execution";
 
         public override SpriteSheetPos SpriteSheetPos => new(ActionsSheet, 2, 0);
 

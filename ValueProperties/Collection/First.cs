@@ -17,6 +17,7 @@ namespace TerraIntegration.ValueProperties.Collection
         public override Type[] ValueTypes => new[] { typeof(ICollection) };
         public override string PropertyName => "first";
         public override string PropertyDisplay => "First";
+        public override string PropertyDescription => "Retutns first element of the collection";
 
         public override SpriteSheetPos SpriteSheetPos => new(CollectionSheet, 0, 0);
 
@@ -36,7 +37,11 @@ namespace TerraIntegration.ValueProperties.Collection
         public override VariableValue GetProperty(ComponentSystem system, VariableValue value, List<Error> errors)
         {
             ICollection collection = (ICollection)value;
-            return collection.Enumerate(system, errors).FirstOrDefault();
+            VariableValue val = collection.Enumerate(system, errors).FirstOrDefault();
+
+            SetReturnTypeCache(val?.GetType());
+
+            return val;
         }
     }
 }

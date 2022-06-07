@@ -32,11 +32,14 @@ namespace TerraIntegration.Basic
         public static ComponentWorld World => ModContent.GetInstance<ComponentWorld>();
 
         public abstract string TypeName { get; }
-        public string TypeDisplayName => Util.GetLangTextOrNull(DisplayNameLocalizationKey) ?? TypeDefaultDisplayName;
-        public string TypeDescription => Util.GetLangTextOrNull(DescriptionLocalizationKey) ?? TypeDefaultDescription;
+        public string TypeDisplayName => Util.GetLangText(DisplayNameLocalizationKey, TypeDefaultDisplayName, DisplayNameFormatters);
+        public string TypeDescription => Util.GetLangText(DescriptionLocalizationKey, TypeDefaultDescription, DescriptionFormatters);
 
         public abstract string TypeDefaultDisplayName { get; }
         public virtual string TypeDefaultDescription { get; }
+
+        public virtual object[] DisplayNameFormatters { get; }
+        public virtual object[] DescriptionFormatters { get; }
 
         public virtual string DescriptionLocalizationKey => "Mods.TerraIntegration.Descriptions.Components." + TypeName;
         public virtual string DisplayNameLocalizationKey => "Mods.TerraIntegration.Names.Components." + TypeName;

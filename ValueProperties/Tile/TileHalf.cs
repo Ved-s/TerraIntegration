@@ -11,6 +11,8 @@ namespace TerraIntegration.ValueProperties.Tile
         public override string PropertyName => "half";
         public override string PropertyDisplay => "Is half block";
 
+        public override string PropertyDescription => "Returns whether this tile is a half block";
+
         public override SpriteSheetPos SpriteSheetPos => new(TileSheet, 0, 3);
 
         public override Type VariableReturnType => typeof(Values.Boolean);

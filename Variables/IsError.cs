@@ -14,6 +14,7 @@ namespace TerraIntegration.Variables
     {
         public override string TypeName => "iserror";
         public override string TypeDefaultDisplayName => "Is Error";
+        public override string TypeDefaultDescription => "Returns True if variable it's\nbind to returns an error";
 
         public override SpriteSheetPos SpriteSheetPos => new(BasicSheet, 1, 1);
 

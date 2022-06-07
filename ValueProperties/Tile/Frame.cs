@@ -12,6 +12,7 @@ namespace TerraIntegration.ValueProperties.Tile
         public override Type[] ValueTypes => new[] { typeof(Values.Tile), typeof(Wall) };
         public override string PropertyName => "frameX";
         public override string PropertyDisplay => "Frame X";
+        public override string PropertyDescription => "Gets X component of tile frame position";
 
         public override SpriteSheetPos SpriteSheetPos => new(TileSheet, 3, 0);
 
@@ -32,6 +33,7 @@ namespace TerraIntegration.ValueProperties.Tile
         public override Type[] ValueTypes => new[] { typeof(Values.Tile), typeof(Wall) };
         public override string PropertyName => "frameY";
         public override string PropertyDisplay => "Frame Y";
+        public override string PropertyDescription => "Gets Y component of tile frame position";
 
         public override SpriteSheetPos SpriteSheetPos => new(TileSheet, 0, 1);
 
@@ -52,6 +54,7 @@ namespace TerraIntegration.ValueProperties.Tile
         public override Type[] ValueTypes => new[] { typeof(Values.Tile), typeof(Wall) };
         public override string PropertyName => "frameNum";
         public override string PropertyDisplay => "Frame Number";
+        public override string PropertyDescription => "Gets tile frame number";
 
         public override SpriteSheetPos SpriteSheetPos => new(TileSheet, 1, 1);
 

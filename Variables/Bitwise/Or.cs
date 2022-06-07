@@ -15,6 +15,7 @@ namespace TerraIntegration.Variables.Bitwise
         public override Type[] LeftSlotValueTypes => new[] { typeof(Values.Boolean), typeof(INumeric) };
         public override string TypeName => "or";
         public override string TypeDefaultDisplayName => "Or";
+        public override string TypeDefaultDescription => "Boolean or bitwise Or operator";
 
         public override SpriteSheetPos SpriteSheetPos => new(BooleanSheet, 1, 0);
 

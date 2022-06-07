@@ -17,6 +17,7 @@ namespace TerraIntegration.ValueProperties.Collection
         public override Type[] ValueTypes => new[] { typeof(ICollection) };
         public override string PropertyName => "len";
         public override string PropertyDisplay => "Length";
+        public override string PropertyDescription => "Retutns length of the collection";
 
         public override Type VariableReturnType => typeof(Integer);
 

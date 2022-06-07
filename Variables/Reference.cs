@@ -17,6 +17,7 @@ namespace TerraIntegration.Variables
     {
         public override string TypeName => "ref";
         public override string TypeDefaultDisplayName => "Reference";
+        public override string TypeDefaultDescription => "Returns referenced variable's value";
 
         public override SpriteSheetPos SpriteSheetPos => new(BasicSheet, 1, 0);
 

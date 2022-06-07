@@ -19,6 +19,7 @@ namespace TerraIntegration.Variables.Numeric
     {
         public override string TypeName => "abs";
         public override string TypeDefaultDisplayName => "Absolute";
+        public override string TypeDefaultDescription => "Returns absolute value";
 
         public override SpriteSheetPos SpriteSheetPos => new(MathSheet, 3, 1);
 

@@ -37,16 +37,19 @@ namespace TerraIntegration.Basic
         public string ShortId => ModContent.GetInstance<ComponentWorld>().Guids.GetShortGuid(Id);
 
         public abstract string TypeName { get; }
-        public string TypeDisplayName => Util.GetLangTextOrNull(DisplayNameLocalizationKey) ?? TypeDefaultDisplayName;
-        public string TypeDescription => Util.GetLangTextOrNull(DescriptionLocalizationKey) ?? TypeDefaultDescription;
-        public string ItemName => Name ?? Util.GetLangTextOrNull(ItemNameLocalizationKey) ?? DefaultItemName;
+        public string TypeDisplayName => Util.GetLangText(DisplayNameLocalizationKey, TypeDefaultDisplayName, DisplayNameFormatters);
+        public string TypeDescription => Util.GetLangText(DescriptionLocalizationKey, TypeDefaultDescription, DescriptionFormatters);
+        public string ItemName => Name ?? Util.GetLangText(ItemNameLocalizationKey, DefaultItemName, null);
 
         public virtual string DefaultItemName => "Variable";
         public abstract string TypeDefaultDisplayName { get; }
         public virtual string TypeDefaultDescription { get; }
 
-        public virtual string DescriptionLocalizationKey => "Mods.TerraIntegration.Descriptions.Variables." + TypeName;
-        public virtual string DisplayNameLocalizationKey => "Mods.TerraIntegration.Names.Variables." + TypeName;
+        public virtual object[] DisplayNameFormatters { get; }
+        public virtual object[] DescriptionFormatters { get; }
+
+        public virtual string DescriptionLocalizationKey => "Mods.TerraIntegration.Descriptions.Variables." + TypeName?.Replace('.', '_');
+        public virtual string DisplayNameLocalizationKey => "Mods.TerraIntegration.Names.Variables." + TypeName?.Replace('.', '_');
         public virtual string ItemNameLocalizationKey => "Mods.TerraIntegration.ItemNames.Variable";
 
         public virtual Type VariableReturnType
@@ -109,7 +112,6 @@ namespace TerraIntegration.Basic
                 return currentLocation.Value;
             } 
         }
-
         public string ReturnTypeCacheName;
         public Type ReturnTypeCacheType;
         public VariableValue LastValue;

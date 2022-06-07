@@ -19,6 +19,7 @@ namespace TerraIntegration.Variables.Numeric
     {
         public override string TypeName => "sub";
         public override string TypeDefaultDisplayName => "Subtract";
+        public override string TypeDefaultDescription => "Subtracts right value from left value";
 
         public override SpriteSheetPos SpriteSheetPos => new(MathSheet, 3, 0);
 

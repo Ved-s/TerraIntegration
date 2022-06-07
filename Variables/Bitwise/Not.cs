@@ -16,6 +16,7 @@ namespace TerraIntegration.Variables.Bitwise
         public override string TypeDefaultDisplayName => "Not";
 
         public override SpriteSheetPos SpriteSheetPos => new(BooleanSheet, 2, 0);
+        public override string TypeDefaultDescription => "Boolean or bitwise Not operator";
 
         public override Type[] ReferenceReturnTypes => new[] { typeof(Values.Boolean), typeof(INumeric) };
 

@@ -15,6 +15,7 @@ namespace TerraIntegration.Variables.Comparing
     {
         public override string TypeName => "notEquals";
         public override string TypeDefaultDisplayName => "Not equals";
+        public override string TypeDefaultDescription => "Returns True if values are not equal";
 
         public override SpriteSheetPos SpriteSheetPos => new(ComparingSheet, 1, 0);
 

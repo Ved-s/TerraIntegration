@@ -17,6 +17,7 @@ namespace TerraIntegration.Variables
     {
         public override string TypeName => "tern";
         public override string TypeDefaultDisplayName => "Ternary operator";
+        public override string TypeDefaultDescription => "Returns one of two values based\non the condition value";
 
         public override SpriteSheetPos SpriteSheetPos => new(BasicSheet, 3, 2);
 

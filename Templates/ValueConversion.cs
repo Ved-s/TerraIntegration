@@ -16,7 +16,11 @@ namespace TerraIntegration.Templates
         public abstract Type[] ConvertFrom { get; }
         public abstract Type ConvertTo { get; }
 
-        public virtual string DisplayName => "To {0}";
+        public override string PropertyDisplay => "To {0}";
+        public override string PropertyDescription => "Converts value to {0}";
+
+        public override object[] DisplayNameFormatters => new[] { VariableValue.TypeToName(ConvertTo, true) };
+        public override object[] DescriptionFormatters => new[] { VariableValue.TypeToName(ConvertTo, true) };
 
         public override Type VariableReturnType => ConvertTo;
         public override Type[] ValueTypes => ConvertFrom;
@@ -30,6 +34,5 @@ namespace TerraIntegration.Templates
                 return $"conv.{to.TypeName}";
             }
         }
-        public override string PropertyDisplay => string.Format(DisplayName, VariableValue.TypeToName(ConvertTo, true));
     }
 }

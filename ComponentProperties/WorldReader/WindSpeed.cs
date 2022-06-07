@@ -13,6 +13,7 @@ namespace TerraIntegration.ComponentProperties.WorldReader
     {
         public override string PropertyName => "windSpeed";
         public override string PropertyDisplay => "Wind speed";
+        public override string TypeDefaultDescription => "Returns wind speed as float value.\nRanges from -0.8 to 0.8";
 
         public override SpriteSheetPos SpriteSheetPos => new(1, 1);
 

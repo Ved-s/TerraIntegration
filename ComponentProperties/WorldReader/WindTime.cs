@@ -13,6 +13,7 @@ namespace TerraIntegration.ComponentProperties.WorldReader
     {
         public override string PropertyName => "windTime";
         public override string PropertyDisplay => "Wind time";
+        public override string TypeDefaultDescription => "Returns amount of ticks until wind changes";
 
         public override SpriteSheetPos SpriteSheetPos => new(2, 1);
 

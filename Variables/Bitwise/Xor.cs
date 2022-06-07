@@ -15,6 +15,7 @@ namespace TerraIntegration.Variables.Bitwise
         public override Type[] LeftSlotValueTypes => new[] { typeof(Values.Boolean), typeof(INumeric) };
         public override string TypeName => "xor";
         public override string TypeDefaultDisplayName => "Xor";
+        public override string TypeDefaultDescription => "Boolean or bitwise Xor operator";
 
         public override SpriteSheetPos SpriteSheetPos => new(BooleanSheet, 0, 1);
 

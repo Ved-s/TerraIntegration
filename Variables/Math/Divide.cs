@@ -19,6 +19,7 @@ namespace TerraIntegration.Variables.Numeric
     {
         public override string TypeName => "div";
         public override string TypeDefaultDisplayName => "Divide";
+        public override string TypeDefaultDescription => "Divides left value by right value";
 
         public override SpriteSheetPos SpriteSheetPos => new(MathSheet, 1, 1);
 

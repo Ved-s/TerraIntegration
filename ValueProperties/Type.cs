@@ -16,6 +16,7 @@ namespace TerraIntegration.ValueProperties
         public override System.Type[] ValueTypes => new[] { typeof(ITyped) };
         public override string PropertyName => "type";
         public override string PropertyDisplay => "Type";
+        public override string PropertyDescription => "Returns value numeric type";
 
         public override SpriteSheetPos SpriteSheetPos => new(BasicSheet, 1, 2);
 

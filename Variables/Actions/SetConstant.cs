@@ -16,6 +16,7 @@ namespace TerraIntegration.Variables.Actions
 
         public override string TypeName => "setconst";
         public override string TypeDefaultDisplayName => "Set Constant";
+        public override string TypeDefaultDescription => "Copies value into constant";
 
         public override SpriteSheetPos SpriteSheetPos => new(ActionsSheet, 1, 0);
 

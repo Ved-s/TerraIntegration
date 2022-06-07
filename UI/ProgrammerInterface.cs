@@ -505,7 +505,13 @@ namespace TerraIntegration.UI
                     if (type != CurrentType && !type.IsSubclassOf(typeof(Variable)))
                         headText = $"from {VariableValue.TypeToName(type, true)}";
 
-                    UITextPanel panel = CreateVariableButton(var.TypeDisplayName, Color.White, var.VariableReturnType, var.TypeName, () => PropertyClicked(owner), headText);
+                    UITextPanel panel = CreateVariableButton(var.TypeDisplayName,
+                                                             Color.White,
+                                                             var.VariableReturnType,
+                                                             var.TypeName,
+                                                             () => PropertyClicked(owner),
+                                                             headText,
+                                                             var.TypeDescription);
 
                     PropertiesList.Add(panel);
                 }

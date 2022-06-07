@@ -13,6 +13,7 @@ namespace TerraIntegration.ComponentProperties.WorldReader
     {
         public override string PropertyName => "bloodMoon";
         public override string PropertyDisplay => "Is Blood Moon";
+        public override string TypeDefaultDescription => "Returns True during Blood Moon";
 
         public override SpriteSheetPos SpriteSheetPos => new(0, 0);
 

@@ -16,6 +16,9 @@ namespace TerraIntegration.Variables
     {
         public override string TypeName => "strJoin";
         public override string TypeDefaultDisplayName => "Join";
+        public override string TypeDefaultDescription => "Joins collection of {0}s using\ndelimeter into one string";
+
+        public override object[] DescriptionFormatters => new[] { VariableValue.TypeToName<IToString>() };
 
         public override Type[] LeftSlotValueTypes => new[] { typeof(Values.String) };
         List<string> Strings = new();

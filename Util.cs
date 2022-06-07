@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -162,6 +163,13 @@ namespace TerraIntegration
 			return func(new(ms));
 		}
 
-		public static string GetLangTextOrNull(string key) => Language.Exists(key) ? Language.GetTextValue(key) : null;
-	}
+        public static string GetLangText(string key, string @default, object[] formatters)
+        {
+			string text = Language.Exists(key) ? Language.GetTextValue(key) : @default;
+			if (text is not null && formatters is not null)
+				text = string.Format(text, formatters);
+
+			return text ?? "";
+        }
+    }
 }

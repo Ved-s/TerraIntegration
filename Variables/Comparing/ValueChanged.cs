@@ -13,6 +13,7 @@ namespace TerraIntegration.Variables.Comparing
     {
         public override string TypeName => "changed";
         public override string TypeDefaultDisplayName => "Value Changed";
+        public override string TypeDefaultDescription => "Returns True once value changes";
 
         public override SpriteSheetPos SpriteSheetPos => new(BasicSheet, 0, 3);
 

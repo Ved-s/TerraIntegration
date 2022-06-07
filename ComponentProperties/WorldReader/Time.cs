@@ -13,6 +13,7 @@ namespace TerraIntegration.ComponentProperties.WorldReader
     {
         public override string PropertyName => "time";
         public override string PropertyDisplay => "Time";
+        public override string TypeDefaultDescription => "Returns current day/night time in ticks";
 
         public override SpriteSheetPos SpriteSheetPos => new(3, 1);
 

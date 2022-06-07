@@ -15,6 +15,9 @@ namespace TerraIntegration.Basic
         string TypeDefaultDisplayName { get; }
         string TypeDefaultDescription { get; }
 
+        object[] DisplayNameFormatters { get; }
+        object[] DescriptionFormatters { get; }
+
         string DescriptionLocalizationKey { get; }
         string DisplayNameLocalizationKey { get; }
     }

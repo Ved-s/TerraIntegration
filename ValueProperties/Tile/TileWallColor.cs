@@ -16,6 +16,8 @@ namespace TerraIntegration.ValueProperties.Tile
         public override string PropertyName => "tileWallColor";
         public override string PropertyDisplay => "Color";
 
+        public override string PropertyDescription => "Returns color id of this tile or wall";
+
         public override SpriteSheetPos SpriteSheetPos => new(TileSheet, 3, 3);
 
         public override Type VariableReturnType => typeof(Values.Byte);

@@ -15,6 +15,7 @@ namespace TerraIntegration.Variables.Comparing
     {
         public override string TypeName => "greater";
         public override string TypeDefaultDisplayName => "Greater than";
+        public override string TypeDefaultDescription => "Returns True if left value is\ngreater than right value";
 
         public override SpriteSheetPos SpriteSheetPos => new(ComparingSheet, 1, 1);
 

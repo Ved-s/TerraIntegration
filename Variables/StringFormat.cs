@@ -16,6 +16,9 @@ namespace TerraIntegration.Variables
     {
         public override string TypeName => "strFormat";
         public override string TypeDefaultDisplayName => "Format";
+        public override string TypeDefaultDescription => "Format the string with given list of {0}s.";
+
+        public override object[] DescriptionFormatters => new[] { VariableValue.TypeToName<IToString>() };
 
         public override SpriteSheetPos SpriteSheetPos => new(BasicSheet, 2, 2);
 

@@ -18,6 +18,7 @@ namespace TerraIntegration.ValueProperties.Numeric
         public override Type[] ValueTypes => new[] { typeof(INumeric) };
         public override string PropertyName => "dec";
         public override string PropertyDisplay => "Decrement";
+        public override string PropertyDescription => "Decrements value by one";
 
         public override SpriteSheetPos SpriteSheetPos => new(MathSheet, 2, 0);
 

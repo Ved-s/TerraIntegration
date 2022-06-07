@@ -15,6 +15,7 @@ namespace TerraIntegration.ComponentProperties.TileReader
     {
         public override string PropertyName => "hasTile";
         public override string PropertyDisplay => "Has Tile";
+        public override string TypeDefaultDescription => "Returns True if tile in front of\nTile Reader exists";
 
         public override SpriteSheetPos SpriteSheetPos => new(0, 0);
 

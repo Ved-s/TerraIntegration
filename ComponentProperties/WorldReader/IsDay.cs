@@ -13,6 +13,7 @@ namespace TerraIntegration.ComponentProperties.WorldReader
     {
         public override string PropertyName => "day";
         public override string PropertyDisplay => "Is Daytime";
+        public override string TypeDefaultDescription => "Returns True during daytime";
 
         public override SpriteSheetPos SpriteSheetPos => new(1, 0);
 

@@ -13,6 +13,7 @@ namespace TerraIntegration.ComponentProperties.WorldReader
     {
         public override string PropertyName => "eclipse";
         public override string PropertyDisplay => "Is Eclipse";
+        public override string TypeDefaultDescription => "Returns True during eclipse";
 
         public override SpriteSheetPos SpriteSheetPos => new(2, 0);
 

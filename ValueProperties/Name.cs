@@ -17,6 +17,7 @@ namespace TerraIntegration.ComponentProperties.TileReader
     {
         public override string PropertyName => "name";
         public override string PropertyDisplay => "Name";
+        public override string PropertyDescription => "Returns value name";
 
         public override SpriteSheetPos SpriteSheetPos => new(BasicSheet, 0, 2);
 

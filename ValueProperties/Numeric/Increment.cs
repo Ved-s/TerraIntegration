@@ -18,6 +18,7 @@ namespace TerraIntegration.ValueProperties.Numeric
         public override Type[] ValueTypes => new[] { typeof(INumeric) };
         public override string PropertyName => "inc";
         public override string PropertyDisplay => "Increment";
+        public override string PropertyDescription => "Increments value by one";
 
         public override SpriteSheetPos SpriteSheetPos => new(MathSheet, 1, 0);
 

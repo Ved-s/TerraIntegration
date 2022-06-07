@@ -19,6 +19,7 @@ namespace TerraIntegration.Variables.Numeric
     {
         public override string TypeName => "mul";
         public override string TypeDefaultDisplayName => "Multiply";
+        public override string TypeDefaultDescription => "Multiplies left value by right value";
 
         public override SpriteSheetPos SpriteSheetPos => new(MathSheet, 0, 1);
 
