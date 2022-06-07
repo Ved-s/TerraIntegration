@@ -20,6 +20,7 @@ namespace TerraIntegration.Variables
         public override string TypeDefaultDisplayName => "Event Subscriber";
 
         public override Type VariableReturnType => typeof(Values.Boolean);
+        public override bool ShowLastValue => false;
 
         public override SpriteSheetPos SpriteSheetPos => new(BasicSheet, 0, 1);
 

@@ -139,6 +139,7 @@ namespace TerraIntegration.Components
             {
                 Errors.Clear();
                 Values.Tile tile = var.GetValue(data.System, Errors) as Values.Tile;
+                var.SetLastValue(tile, data.System);
 
                 TileMimic mimic = null;
 

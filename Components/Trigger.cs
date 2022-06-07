@@ -55,6 +55,7 @@ namespace TerraIntegration.Components
 
             Errors.Clear();
             VariableValue value = trig.GetValue(td.System, Errors);
+            trig.SetLastValue(value, td.System);
             if (value is not Values.Boolean @bool || Errors.Count > 0)
             {
                 td.Value = null;

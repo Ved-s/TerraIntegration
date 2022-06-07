@@ -142,7 +142,11 @@ namespace TerraIntegration.Components
             base.OnUpdate(pos);
             DisplayData data = GetData(pos);
 
-            if (data.Master is null) return;
+            if (data.Master is null)
+            {
+                SetUpdates(pos, false);
+                return;
+            }
             if (!data.HasVariable(DisplayVariableSlot))
             {
                 data.Master.DisplayValue = null;
@@ -153,7 +157,10 @@ namespace TerraIntegration.Components
 
             if (Main.netMode != NetmodeID.MultiplayerClient)
             {
-                VariableValue value = data.GetVariable(DisplayVariableSlot)?.GetValue(data.System, Errors);
+                Variable var = data.GetVariable(DisplayVariableSlot);
+                VariableValue value = var?.GetValue(data.System, Errors);
+                var?.SetLastValue(value, data.System);
+
                 if (Errors.Count > 0)
                 {
                     data.Master.DisplayValue = new ErrorDisplay(Errors.ToArray());

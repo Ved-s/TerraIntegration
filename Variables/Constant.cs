@@ -22,6 +22,8 @@ namespace TerraIntegration.Variables
 
         public override Type VariableReturnType => Value.GetType();
 
+        public override bool ShowLastValue => false;
+
         public override SpriteSheetPos SpriteSheetPos => new(BasicSheet, 2, 0);
 
         Regex LineBreaksWithPadding = new(@"\r?\n[ \t]*", RegexOptions.Compiled);

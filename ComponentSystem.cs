@@ -180,6 +180,7 @@ namespace TerraIntegration
                 if (var is null) return null;
 
                 VariableValue val = var.GetValue(this, errors);
+                var.SetLastValue(val, this);
                 if (val is null) return null;
 
                 if (val is UnloadedVariableValue)
@@ -189,7 +190,6 @@ namespace TerraIntegration
                 }
 
                 return val;
-
             }
             finally
             {

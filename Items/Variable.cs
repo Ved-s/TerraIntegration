@@ -73,6 +73,10 @@ namespace TerraIntegration.Items
             {
                 tooltips.Add(new(Mod, "TIVarDescription", Var.TypeDescription));
             }
+            if (Var.ShowLastValue && Var.LastValue is not null && Var.LastSystem is not null)
+            {
+                tooltips.Add(new(Mod, "TIVarLastVal", "[c/aaaa00:Last Value:] " + Var.LastValue.Display(Var.LastSystem).HoverText.Replace('\n', ' ')));
+            }
         }
 
         public override bool CanStack(Item item2)

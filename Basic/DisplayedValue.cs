@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace TerraIntegration.DisplayedValues
+namespace TerraIntegration.Basic
 {
     public abstract class DisplayedValue
     {
@@ -58,7 +58,7 @@ namespace TerraIntegration.DisplayedValues
         {
             ByType[value.Type] = value;
         }
-        internal static void Unregister() 
+        internal static void Unregister()
         {
             ByType.Clear();
         }

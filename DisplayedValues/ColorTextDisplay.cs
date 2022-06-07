@@ -7,6 +7,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TerraIntegration.Basic;
 using Terraria;
 using Terraria.GameContent;
 using Terraria.UI.Chat;

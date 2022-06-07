@@ -60,9 +60,12 @@ namespace TerraIntegration.Basic
 
         public virtual Type[] RelatedTypes => null;
         public virtual bool VisibleInProgrammerVariables => true;
+        public virtual bool ShowLastValue => true;
 
         public string ReturnTypeCacheName;
         public Type ReturnTypeCacheType;
+        public VariableValue LastValue;
+        public ComponentSystem LastSystem;
 
         public abstract VariableValue GetValue(ComponentSystem system, List<Error> errors);
         public virtual Variable GetFromCommand(CommandCaller caller, List<string> args) => (Variable)Activator.CreateInstance(GetType());
@@ -313,6 +316,13 @@ namespace TerraIntegration.Basic
 
             ReturnTypeCacheType = VariableValue.StringToType(ReturnTypeCacheName);
             return ReturnTypeCacheType;
+        }
+
+        public void SetLastValue(VariableValue value, ComponentSystem system)
+        {
+            if (!ShowLastValue) return;
+            LastValue = value;
+            LastSystem = system;
         }
 
         public static TVariable GetInstance<TVariable>() where TVariable : Variable

@@ -160,7 +160,7 @@ namespace TerraIntegration
 
             Point16 tile = (Point16)(Main.MouseWorld / 16);
             ComponentData data = ComponentWorld.Instance.GetDataOrNull(tile);
-            if (data is not null && data.UpdateFrequency > 0)
+            if (data is not null && data.UpdateFrequency > 0 && ComponentWorld.Instance.ComponentUpdates.ContainsKey(tile))
             {
                 string comtext = $"{data.Component?.TypeName}\nFreq: {data.UpdateFrequency}\nUpdate: {FormatTime(data.LastUpdateTime)}";
 
