@@ -72,7 +72,7 @@ namespace TerraIntegration
 
         public static void LogMessage(string message)
         {
-            if (Networking.Server) return;
+            if (Networking.Server || !TerraIntegration.DebugMode) return;
             Log.Push($"[c/aaaaaa:{DateTime.Now:HH:mm:ss}] {message}");
         }
 
@@ -148,26 +148,26 @@ namespace TerraIntegration
 
             if (!Visible) return;
 
-            int width = 800;
-            int height = 600;
-
-
             string text = $"TerraIntegration stats ({MeanCap} ticks sample):\n" +
                 $"Full update: {Get(UpdateTime.FullUpdate)}\n" +
                 $"Component requests: {ComponentRequests}\n  total: {Get(UpdateTime.ComponentRequests)}\n" +
                 $"Variable requests: {VariableRequests}\n  total: {Get(UpdateTime.VariableRequests)}\n" + 
                 $"Component updates: {UpdatedComponents}\n  total: {Get(UpdateTime.Components)}\n" +
-                    $"{string.Join('\n', ComponentUpdateHistory.Keys.Select(t => GetComponent(t)))}\n\n" +
-                $"Log:\n{string.Join("\n", Log.EnumerateBackwards())}";
+                    $"{string.Join('\n', ComponentUpdateHistory.Keys.Select(t => GetComponent(t)))}" +
+                (TerraIntegration.DebugMode ? $"\n\nLog:\n{string.Join("\n", Log.EnumerateBackwards())}" : "");
 
             ChatManager.DrawColorCodedStringWithShadow(Main.spriteBatch, FontAssets.MouseText.Value, text, new Vector2(20, 150), Color.White, 0f, Vector2.Zero, new(.8f));
 
             Point16 tile = (Point16)(Main.MouseWorld / 16);
             ComponentData data = ComponentWorld.Instance.GetDataOrNull(tile);
-            if (data is not null)
+            if (data is not null && data.UpdateFrequency > 0)
             {
-                if (data.UpdateFrequency > 0)
-                    ComponentWorld.Instance.HoverText = $"{data.Component?.TypeName}\nFreq: {data.UpdateFrequency}\nUpdate: {FormatTime(data.LastUpdateTime)}";
+                string comtext = $"{data.Component?.TypeName}\nFreq: {data.UpdateFrequency}\nUpdate: {FormatTime(data.LastUpdateTime)}";
+
+                if (!ComponentWorld.Instance.HoverText.IsNullEmptyOrWhitespace())
+                    comtext = ComponentWorld.Instance.HoverText + "\n" + comtext;
+
+                ComponentWorld.Instance.HoverText = comtext;
             }
         }
 

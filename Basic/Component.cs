@@ -190,7 +190,8 @@ namespace TerraIntegration.Basic
             ComponentData data = GetData(pos);
             data.UpdateFrequency = rate;
 
-            Statistics.LogMessage($"Set updates to {rate} at {pos} for {data.Component?.TypeName}");
+            if (TerraIntegration.DebugMode)
+                Statistics.LogMessage($"Set updates to {rate} at {pos} for {data.Component?.TypeName}");
 
             Networking.SendComponentFrequency(pos);
 

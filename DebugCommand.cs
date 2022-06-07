@@ -18,6 +18,12 @@ namespace TerraIntegration
         {
             List<string> arg = new(args);
 
+            if (!TerraIntegration.DebugMode)
+            {
+                NonDebugAction(caller, arg);
+                return;
+            }
+
             if (arg.Count == 0)
             {
                 caller.Reply("Expected subcommand: var, gen, todo, stats");
@@ -43,6 +49,11 @@ namespace TerraIntegration
 
             caller.Reply("Unknown subcommand");
             return;
+        }
+
+        public void NonDebugAction(CommandCaller caller, List<string> arg)
+        {
+            Statistics.Visible = !Statistics.Visible;
         }
 
         private void VarCommand(CommandCaller caller, List<string> arg)

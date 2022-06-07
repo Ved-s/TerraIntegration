@@ -94,8 +94,9 @@ namespace TerraIntegration.Components
         {
             UIPanel panel = new()
             {
-                MinWidth = new(200, 0),
-                MinHeight = new(60, 0)
+                Width = new(0, 1),
+                MinWidth = new(180, 0),
+                MinHeight = new(60, 0),
             };
             panel.SetPadding(0);
 
