@@ -408,7 +408,7 @@ namespace TerraIntegration.UI
                 Back.Recalculate();
             }
 
-            if (TerraIntegration.DebugMode)
+            if (TerraIntegration.DebugMode && Reload is not null)
             {
                 Reload.Top = new(back.Y - Reload.Height.Pixels - 5, 0);
                 Reload.Left = new(back.X + back.Width - Reload.Width.Pixels, 0);

@@ -59,7 +59,7 @@ namespace TerraIntegration.Components
             {
                 panel.Append(Slots[i] = new()
                 {
-                    Left = new(totWidth / 2 - x - 42, .5f),
+                    Left = new(totWidth / 2 - (totWidth - x), .5f),
 
                     VariableValidator = var => var is ActionVariable,
                     VariableSlot = SlotIds[i].ToString()

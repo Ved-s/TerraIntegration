@@ -21,7 +21,7 @@ namespace TerraIntegration.Variables.Actions
         {
             if (var is not Constant @const) return;
 
-            @const.Value = refValue;
+            @const.Value = refValue.Clone();
         }
         public override Type[] GetValidRightSlotTypes(Type leftSlotType) => new[] { leftSlotType };
     }
