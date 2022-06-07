@@ -48,7 +48,7 @@ namespace TerraIntegration.Basic
         public virtual string DescriptionLocalizationKey => "Mods.TerraIntegration.Descriptions.Variables." + TypeName;
         public virtual string DisplayNameLocalizationKey => "Mods.TerraIntegration.Names.Variables." + TypeName;
         public virtual string ItemNameLocalizationKey => "Mods.TerraIntegration.ItemNames.Variable";
-        
+
         public virtual Type VariableReturnType
         {
             get
@@ -62,10 +62,60 @@ namespace TerraIntegration.Basic
         public virtual bool VisibleInProgrammerVariables => true;
         public virtual bool ShowLastValue => true;
 
+        public VariableLocation? CurrentLocation
+        {
+            get
+            {
+                ComponentData data = null;
+                Point16 foundPos = default;
+                string foundSlot = null;
+
+                if (currentLocation is not null)
+                {
+                    data = World.GetDataOrNull(currentLocation.Value.ComponentPos);
+                    foundPos = currentLocation.Value.ComponentPos;
+                    foundSlot = currentLocation.Value.Slot;
+                    if (foundSlot is null || !data.TryGetVariable(foundSlot, out Variable var) || !ReferenceEquals(this, var))
+                        foundSlot = data.Variables.FirstOrDefault(kvp => Id == kvp.Value.Var?.Id).Key;
+                }
+                if (data is null || foundSlot is null)
+                {
+                    currentLocation = null;
+
+                    foreach (KeyValuePair<Point16, ComponentData> kvp in World.ComponentData)
+                    {
+                        foundSlot = kvp.Value.Variables.FirstOrDefault(v => Id == v.Value?.Var?.Id).Key;
+                        if (foundSlot is not null)
+                        {
+                            data = kvp.Value;
+                            foundPos = kvp.Key;
+                            break;
+                        }
+                    }
+                    if (foundSlot is null)
+                        return null;
+                }
+
+
+                if (currentLocation is not null)
+                {
+                    VariableLocation loc = currentLocation.Value;
+                    if (loc.ComponentPos != foundPos || loc.Slot != foundSlot || loc.ComponentData?.Component?.TypeName != data.Component?.TypeName)
+                        currentLocation = new() { Slot = foundSlot, ComponentPos = foundPos, ComponentData = data };
+                } 
+                else 
+                    currentLocation = new() { Slot = foundSlot, ComponentPos = foundPos, ComponentData = data };
+
+                return currentLocation.Value;
+            } 
+        }
+
         public string ReturnTypeCacheName;
         public Type ReturnTypeCacheType;
         public VariableValue LastValue;
         public ComponentSystem LastSystem;
+
+        private VariableLocation? currentLocation;
 
         public abstract VariableValue GetValue(ComponentSystem system, List<Error> errors);
         public virtual Variable GetFromCommand(CommandCaller caller, List<string> args) => (Variable)Activator.CreateInstance(GetType());

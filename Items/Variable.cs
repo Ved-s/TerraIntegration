@@ -9,6 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using TerraIntegration.Basic;
+using TerraIntegration.DataStructures;
 using TerraIntegration.Values;
 using Terraria;
 using Terraria.GameContent;
@@ -73,6 +74,7 @@ namespace TerraIntegration.Items
             {
                 tooltips.Add(new(Mod, "TIVarDescription", Var.TypeDescription));
             }
+
             if (Var.ShowLastValue && Var.LastValue is not null && Var.LastSystem is not null)
             {
                 tooltips.Add(new(Mod, "TIVarLastVal", "[c/aaaa00:Last Value:] " + Var.LastValue.Display(Var.LastSystem).HoverText.Replace('\n', ' ')));

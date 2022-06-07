@@ -20,6 +20,8 @@ namespace TerraIntegration.Variables.Numeric
         public override string TypeName => "abs";
         public override string TypeDefaultDisplayName => "Absolute";
 
+        public override SpriteSheetPos SpriteSheetPos => new(MathSheet, 3, 1);
+
         public override Type[] ReferenceReturnTypes => new[] { typeof(INumeric), typeof(IDecimal) };
 
         public override VariableValue GetValue(VariableValue value, ComponentSystem system, List<Error> errors)

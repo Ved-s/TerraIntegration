@@ -120,7 +120,7 @@ namespace TerraIntegration
                     allValues++;
                     if (val.Texture is null && !val.SpriteSheetPos.HasValue)
                         valueTextures.Add(val.TypeName);
-                    if (!Language.Exists(val.DescriptionLocalizationKey))
+                    if (val.TypeDescription is null)
                         valueDescriptions.Add(val.TypeName);
                 }
 

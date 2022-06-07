@@ -20,8 +20,13 @@ namespace TerraIntegration.Variables.Actions
         public override void Execute(Point16 pos, Basic.Variable var, VariableValue refValue, ComponentSystem system, List<Error> errors)
         {
             if (var is not Constant @const) return;
-
             @const.Value = refValue.Clone();
+
+            VariableLocation? loc = var.CurrentLocation;
+            if (loc.HasValue)
+            {
+                loc.Value.ComponentData.Component?.OnVariableChanged(loc.Value.ComponentPos, loc.Value.Slot);
+            }
         }
         public override Type[] GetValidRightSlotTypes(Type leftSlotType) => new[] { leftSlotType };
     }
