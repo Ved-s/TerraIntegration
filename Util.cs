@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Terraria;
 using Terraria.ID;
@@ -14,7 +15,9 @@ namespace TerraIntegration
 {
     public static class Util
     {
-        public static void DropItemInWorld(Item item, int x, int y)
+		static Regex NotTagText = new(@"(?<=^|\[[^\]]+\])([\s\S]*?)(?=$|\[[^\]]+\])", RegexOptions.Compiled);
+
+		public static void DropItemInWorld(Item item, int x, int y)
         {
             Main.item[400] = new Item();
             int num = 400;
@@ -89,7 +92,7 @@ namespace TerraIntegration
 			return nextItem;
 		}
 
-		public static string ColorTag(Color color, string text, bool fixNewlines = true) 
+		public static string ColorTag(Color color, string text) 
 		{
 			if (text is null)
 				return null;
@@ -97,13 +100,21 @@ namespace TerraIntegration
 			if (text.Length == 0) return "";
 
 			uint v = color.PackedValue; // AABBGGRR
-
 			v = (v & 0xff0000) >> 16 | (v & 0x00ff00) | (v & 0x0000ff) << 16; // RRGGBB
+			string tagStart = $"[c/{v:x6}:";
 
-			if (fixNewlines)
-				text = text.Replace("\n", $"]\n[c/{v:x6}:");
+			return NotTagText.Replace(text, m =>
+			{
+				string v = m.Value;
 
-			return $"[c/{v:x6}:{text}]";
+				if (v.IsNullEmptyOrWhitespace())
+					return v;
+
+				if (v.Contains('\n'))
+					v = v.Replace("\n", "]\n" + tagStart);
+				
+				return tagStart + v + "]";
+			});
 
 		}
 
