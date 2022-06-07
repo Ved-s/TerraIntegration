@@ -17,6 +17,8 @@ namespace TerraIntegration.Variables.Actions
         public override string TypeName => "trigEvt";
         public override string TypeDefaultDisplayName => "Trigger event";
 
+        public override SpriteSheetPos SpriteSheetPos => new(ActionsSheet, 2, 0);
+
         public override void Execute(Point16 pos, Variable var, ComponentSystem system, List<Error> errors)
         {
             if (var is Event evt)

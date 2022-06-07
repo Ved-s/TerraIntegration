@@ -13,6 +13,8 @@ namespace TerraIntegration.Basic
 {
     public abstract class ActionVariable : Variable, IOwnProgrammerInterface
     {
+        internal readonly static SpriteSheet ActionsSheet = new("TerraIntegration/Assets/Types/actions", new(32, 32));
+
         public abstract VariableMatch Variables { get; }
         public abstract bool NeedsSaveTag { get; }
 

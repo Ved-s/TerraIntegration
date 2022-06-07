@@ -16,6 +16,8 @@ namespace TerraIntegration.Variables.Actions
         public override string TypeName => "condExec";
         public override string TypeDefaultDisplayName => "Conditional exec";
 
+        public override SpriteSheetPos SpriteSheetPos => new(ActionsSheet, 0, 0);
+
         public override bool VisibleInProgrammerVariables => true;
 
         public override void Execute(Point16 pos, Variable var, VariableValue refValue, ComponentSystem system, List<Error> errors)

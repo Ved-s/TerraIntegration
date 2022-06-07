@@ -17,6 +17,8 @@ namespace TerraIntegration.Variables.Actions
         public override string TypeName => "setconst";
         public override string TypeDefaultDisplayName => "Set Constant";
 
+        public override SpriteSheetPos SpriteSheetPos => new(ActionsSheet, 1, 0);
+
         public override void Execute(Point16 pos, Basic.Variable var, VariableValue refValue, ComponentSystem system, List<Error> errors)
         {
             if (var is not Constant @const) return;
