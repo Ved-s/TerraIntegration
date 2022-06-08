@@ -24,9 +24,9 @@ namespace TerraIntegration.ValueProperties.Numeric
 
         public override ValueProperty CreateVariable(Variable var)
         {
-            Increment inc = new() { VariableId = var.Id };
-            inc.SetReturnTypeCache(var.VariableReturnType);
-            return inc;
+            Decrement dec = new() { VariableId = var.Id };
+            dec.SetReturnTypeCache(var.VariableReturnType);
+            return dec;
         }
 
         public override VariableValue GetProperty(ComponentSystem system, VariableValue value, List<Error> errors)

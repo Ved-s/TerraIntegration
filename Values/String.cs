@@ -107,7 +107,7 @@ namespace TerraIntegration.Values
 
         public Basic.Variable WriteVariable()
         {
-            return new Constant(new String(InterfaceValue.CurrentString));
+            return new Constant(new String(InterfaceValue.CurrentString.Replace("\\n", "\n")));
         }
 
         public IEnumerable<VariableValue> Enumerate(ComponentSystem system, List<Error> errors)

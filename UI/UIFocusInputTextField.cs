@@ -147,7 +147,8 @@ namespace TerraIntegration.UI
 			space.Y += PaddingTop;
 
 			DynamicSpriteFont font = FontAssets.MouseText.Value;
-			Vector2 size = font.MeasureString(text);
+			TextSnippet[] snippets = ChatManager.ParseMessage(text, color).ToArray();
+			Vector2 size = ChatManager.GetStringSize(font, snippets, new(1));
 
 			if (size.Y <= 0)
 				size.Y = font.LineSpacing;
@@ -156,7 +157,7 @@ namespace TerraIntegration.UI
 			pos.X += TextHAlign.GetValue(space.Width - size.X);
 			pos.Y += TextHAlign.GetValue(space.Height - size.Y);
 
-			ChatManager.DrawColorCodedStringWithShadow(spriteBatch, font, text, pos, color, 0f, Vector2.Zero, Vector2.One);
+			ChatManager.DrawColorCodedStringWithShadow(spriteBatch, font, snippets, pos, 0f, Vector2.Zero, Vector2.One, out _);
 
 			if (blinker)
 			{

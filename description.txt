@@ -1,1 +1,28 @@
-Terra Integration is a pretty cool mod, it does...this. Modify this file with a description of your mod.
+Terra Integration is a mod about variables. You can read values from world into them and write them back into the world in any form you want.
+Inspired by Integrated Dynamics Minecraft mod.
+
+Mod mechanics:
+	Components - tiles, that you can place in world. They interact with variables in some ways.
+		For example, Display can display variables.
+	Variables - Items that can store different values, operations with values, actions with other variables.
+		For example variable Rain Time (which is World Reader component property) will return an Integer value which represents how many ticks current rain will last.
+	Values - they are returned by variables and (in most cases) can be displayed.
+		For example: Integer 1289, String "Hello"
+
+	Variables can be different types:
+		Constant - stores the raw value. Can be defined in Variable Programmer
+		Component property - reads some value from component assigned to it. Can be defined only in its componemt "Properties" tab
+		Value property - modifies the value in some way, for example Increment adds 1 to the value and returns it. Can be found in Properties list of Variable Programmer when needed value is selected in Variables
+		Event - Triggers all its Event Subscribers in system. For example, Wire IO will trigger event in its Variables tab slot once it receives a wire signal
+		Action - Contains an action that can modify other variables. Can be executed in Action Box. Example action: Set Constant, it copies new value into existing Constant
+		And many other variable and value operators
+
+	Variable Programmer:
+		An item like Logic Programmer from Integrated Dynamics, that can program variables. All programmable variable types are listed in Variables list, some of them can have properties in Properties list.
+		Variables can have UIs in Programmer, it will be displayed in right half of Programmer UI.
+		At last, variables can be written or programmed into variable items - place empty Variable into Result slot and hit Write.
+
+	Resources:
+		TerraIntegration generates some Bluewood trees on world gen, which you can cut down and use in recipes.
+		However, to get main crafting ingredient - Crystallized sap, you need to cut off tree branches and after some time some Sap may crystallize there.
+		Sap collection can be automated using special block called Sap Collector, you need to place it in place of cutted off branch or root.
