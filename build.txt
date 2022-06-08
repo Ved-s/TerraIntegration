@@ -1,6 +1,6 @@
 displayName = Terra Integration
 author = Ved_s
-version = 1.0
-homepage = https://github.com/Ved-s/TerraIntegration
+version = 1.0.1
+homepage = https://forums.terraria.org/index.php?threads/terra-integration.112868/
 buildIgnore = *.xcf, *.csproj.user, Properties/*
 modReferences = CustomTreeLib
