@@ -566,6 +566,9 @@ namespace TerraIntegration.Basic
 
         public bool CheckValid()
         {
+            if (!ComponentWorld.Instance.HasData(MainTilePos))
+                return false;
+
             ComponentData data = MainData;
             Rectangle multi = new(data.Position.X, data.Position.Y, data.Size.X, data.Size.Y);
             return multi.Contains(data.Position);

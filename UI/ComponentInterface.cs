@@ -67,10 +67,11 @@ namespace TerraIntegration.UI
                 return;
             }
 
-            InterfaceComponent = new(pos, c);
-
             if (InterfaceComponent.Component?.Type != c?.Type)
                 CurrentTab = 0;
+
+            InterfaceComponent = new(pos, c);
+
             if (Interface.CurrentState is null)
                 Interface.SetState(new());
             SetupUI();

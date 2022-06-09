@@ -48,7 +48,7 @@ namespace TerraIntegration
 
         public T GetData<T>(Point16 pos, Component c = null, bool resolveSubTiles = true) where T : ComponentData, new()
         {
-            if (ComponentData.TryGetValue(pos, out ComponentData data))
+            if (ComponentData.TryGetValue(pos, out ComponentData data) && data is not null)
             {
                 if (data is SubTileComponentData subTile)
                 {
@@ -79,7 +79,7 @@ namespace TerraIntegration
         }
         public ComponentData GetData(Point16 pos, Component c = null, bool resolveSubTiles = true)
         {
-            if (ComponentData.TryGetValue(pos, out ComponentData data))
+            if (ComponentData.TryGetValue(pos, out ComponentData data) && data is not null)
             {
                 if (data is SubTileComponentData subTile)
                 {
@@ -376,7 +376,7 @@ namespace TerraIntegration
                         pos.Y = component.GetShort("y");
 
                     ComponentData data = Component.LoadTag(component, pos);
-                    if (data is null) continue;
+                    if (data is null || !Framing.GetTileSafely(pos).HasTile) continue;
 
                     ComponentData[pos] = data;
                 }

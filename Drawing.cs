@@ -25,10 +25,10 @@ namespace TerraIntegration
             if (stroke.HasValue)
             {
                 spriteBatch.DrawLine(new(rect.X, rect.Y), 0, rect.Width - strokeThickness, stroke.Value, strokeThickness);
-                spriteBatch.DrawLine(new(rect.X, rect.Y), (float)Math.PI/2, rect.Height - strokeThickness, stroke.Value, strokeThickness);
+                spriteBatch.DrawLine(new(rect.X + 1, rect.Y), (float)Math.PI/2, rect.Height - strokeThickness, stroke.Value, strokeThickness);
 
-                spriteBatch.DrawLine(new(rect.X-1, rect.Y + rect.Height - strokeThickness), 0, rect.Width, stroke.Value, strokeThickness);
-                spriteBatch.DrawLine(new(rect.X + rect.Width - strokeThickness, rect.Y), (float)Math.PI/2, rect.Height, stroke.Value, strokeThickness);
+                spriteBatch.DrawLine(new(rect.X, rect.Y + rect.Height - strokeThickness), 0, rect.Width, stroke.Value, strokeThickness);
+                spriteBatch.DrawLine(new(rect.X + rect.Width - strokeThickness + 1, rect.Y), (float)Math.PI/2, rect.Height, stroke.Value, strokeThickness);
             }
         }
     }

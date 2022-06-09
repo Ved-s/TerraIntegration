@@ -120,14 +120,15 @@ namespace TerraIntegration.Components
         public override void OnPlaced(Point16 pos)
         {
             base.OnPlaced(pos);
-            ScanAndUpdateDisplayFrames(pos);
+            if (!GetData(pos).FrameScanCompleted)
+                ScanAndUpdateDisplayFrames(pos);
         }
         public override void OnKilled(Point16 pos)
         {
-            base.OnKilled(pos);
             DisplayData data = GetData(pos);
             data.NoMoreMaster(null);
             ScanAndUpdateDisplayFrames(pos, true);
+            base.OnKilled(pos);
         }
         public override void OnUpdate(Point16 pos)
         {
@@ -419,6 +420,8 @@ namespace TerraIntegration.Components
 
         private void SetDisplayRectangle(HashSet<Point16> setToRemoveFrom, Point16 size, Point16 master)
         {
+            DisplayData masterData = GetData(master, false);
+            masterData.FrameScanCompleted = true;
             for (int dy = 0; dy < size.Y; dy++)
                 for (int dx = 0; dx < size.X; dx++)
                 {
