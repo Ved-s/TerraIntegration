@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using TerraIntegration.Basic;
 using TerraIntegration.Components;
@@ -21,10 +22,10 @@ namespace TerraIntegration
         public static HashSet<int> CableWalls = new();
 
         public HashSet<WorldPoint> AllPoints { get; } = new();
+        HashSet<Point16> datas = new();
         public Dictionary<Point16, Component> AllComponents { get; } = new();
         public Dictionary<Point16, Component> ComponentsWithVariables { get; } = new();
         public Dictionary<string, Dictionary<Point16, Component>> ComponentsByType { get; } = new();
-        public Dictionary<Point16, Component> ComponentsByPos { get; } = new();
 
         public Dictionary<Guid, (Point16 pos, string slot)> VariableCache { get; } = new();
 
@@ -147,6 +148,10 @@ namespace TerraIntegration
             {
                 Point16 pos = point.ToPoint16();
 
+                ComponentData data = World.GetData(pos, null, false);
+                if (data is SubTileComponentData)
+                    return;
+
                 AllComponents.Add(pos, component);
 
                 if (component.CanHaveVariables)
@@ -160,9 +165,7 @@ namespace TerraIntegration
                 }
                 componentsByType.Add(pos, component);
 
-                ComponentsByPos[pos] = component;
-
-                component.GetData(pos).System = this;
+                data.System = this;
             }
         }
 
@@ -201,6 +204,8 @@ namespace TerraIntegration
             Statistics.VariableRequests++;
             Statistics.Start(Statistics.UpdateTime.VariableRequests);
 
+            bool needsCleaning = false;
+
             try
             {
                 if (VariableCache.TryGetValue(varId, out var varCache)
@@ -222,8 +227,12 @@ namespace TerraIntegration
 
                 foreach (var com in ComponentsWithVariables)
                 {
-                    ComponentData d = com.Value?.GetDataOrNull(com.Key);
-                    if (d is null) continue;
+                    ComponentData d = com.Value?.GetDataOrNull(com.Key, false);
+                    if (d is null || d is SubTileComponentData)
+                    {
+                        needsCleaning = true;
+                        continue;
+                    }
 
                     foreach (var var in d.Variables)
                         if (var.Value is not null)
@@ -259,6 +268,9 @@ namespace TerraIntegration
             }
             finally
             {
+                if (needsCleaning)
+                    CleanSystem();
+
                 Statistics.Stop(Statistics.UpdateTime.VariableRequests);
             }
         }
@@ -268,7 +280,7 @@ namespace TerraIntegration
             Statistics.Start(Statistics.UpdateTime.ComponentRequests);
             try
             {
-                if (ComponentsByPos.TryGetValue(pos, out Component c))
+                if (AllComponents.TryGetValue(pos, out Component c))
                 {
                     if (type is not null && c.TypeName != type)
                     {
@@ -299,6 +311,24 @@ namespace TerraIntegration
                 return null;
             }
             return tv;
+        }
+
+        void CleanSystem() 
+        {
+            List<Point16> removePoints = new();
+
+            foreach (Point16 p in AllComponents.Keys)
+                if (World.GetDataOrNull(p) is null or SubTileComponentData)
+                    removePoints.Add(p);
+
+            foreach (Point16 p in removePoints)
+            {
+                AllComponents.Remove(p);
+                ComponentsWithVariables.Remove(p);
+
+                foreach (var value in ComponentsByType.Values)
+                    value.Remove(p);
+            }
         }
     }
 }

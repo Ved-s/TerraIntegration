@@ -2,3 +2,6 @@ Terra Integration is a mod about variables. You can read values from world into 
 Inspired by Integrated Dynamics Minecraft mod.
 
 Prease visit mod's forum page for more details
+
+Forum page (homepage): https://forums.terraria.org/index.php?threads/terra-integration.112868/
+GitHub page: https://github.com/Ved-s/TerraIntegration

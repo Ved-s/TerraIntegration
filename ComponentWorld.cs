@@ -46,10 +46,18 @@ namespace TerraIntegration
 
         private UnloadedComponent UnloadedComponent = new();
 
-        public T GetData<T>(Point16 pos, Component c = null) where T : ComponentData, new()
+        public T GetData<T>(Point16 pos, Component c = null, bool resolveSubTiles = true) where T : ComponentData, new()
         {
             if (ComponentData.TryGetValue(pos, out ComponentData data))
             {
+                if (data is SubTileComponentData subTile)
+                {
+                    if (!subTile.CheckValid())
+                        RemoveAll(pos);
+                    else if (resolveSubTiles)
+                        return GetData<T>(subTile.MainTilePos, c, resolveSubTiles);
+                }
+
                 if (data is T tdata)
                     return tdata;
             }
@@ -69,10 +77,18 @@ namespace TerraIntegration
             ComponentData[pos] = newData;
             return newData;
         }
-        public ComponentData GetData(Point16 pos, Component c = null)
+        public ComponentData GetData(Point16 pos, Component c = null, bool resolveSubTiles = true)
         {
             if (ComponentData.TryGetValue(pos, out ComponentData data))
             {
+                if (data is SubTileComponentData subTile)
+                {
+                    if (!subTile.CheckValid())
+                        RemoveAll(pos);
+                    else if (resolveSubTiles)
+                        return GetData(subTile.MainTilePos, c, resolveSubTiles);
+                }
+
                 return data;
             }
 
@@ -88,23 +104,41 @@ namespace TerraIntegration
             ComponentData[pos] = newData;
             return newData;
         }
-        public T GetDataOrNull<T>(Point16 pos) where T : ComponentData
+
+        public T GetDataOrNull<T>(Point16 pos, bool resolveSubTiles = true) where T : ComponentData
         {
             if (ComponentData.TryGetValue(pos, out ComponentData data) && data is T t)
             {
+                if (data is SubTileComponentData subTile)
+                {
+                    if (!subTile.CheckValid())
+                        RemoveAll(pos);
+                    else if (resolveSubTiles)
+                        return GetDataOrNull<T>(subTile.MainTilePos, resolveSubTiles);
+                }
+
                 return t;
             }
             return null;
         }
-        public ComponentData GetDataOrNull(Point16 pos)
+        public ComponentData GetDataOrNull(Point16 pos, bool resolveSubTiles = true)
         {
             if (ComponentData.TryGetValue(pos, out ComponentData data))
             {
+                if (data is SubTileComponentData subTile)
+                {
+                    if (!subTile.CheckValid())
+                        RemoveAll(pos);
+                    else if (resolveSubTiles)
+                        return GetDataOrNull(subTile.MainTilePos, resolveSubTiles);
+                }
+
                 return data;
             }
 
             return null;
         }
+
         public void InitData(Point16 pos, Component c) 
         {
             ComponentData newData = new();
@@ -118,15 +152,62 @@ namespace TerraIntegration
             ComponentData[pos] = newData;
         }
 
+        public void DefineMultitile(Rectangle tileRect)
+        {
+            ComponentData data = GetData(new(tileRect.X, tileRect.Y));
+            data.Size = new(tileRect.Width, tileRect.Height);
+
+            for (int i = tileRect.Left; i < tileRect.Right; i++)
+                for (int j = tileRect.Top; j < tileRect.Bottom; j++)
+                {
+                    if (i == tileRect.Left && j == tileRect.Top)
+                        continue;
+
+                    Point16 pos = new(i, j);
+
+                    RemoveAll(pos);
+
+                    SubTileComponentData sub = new();
+                    sub.Position = pos;
+                    sub.MainTilePos = new(tileRect.X, tileRect.Y);
+                    ComponentData[pos] = sub;
+                }
+        }
+
         public void RemoveAll(Point16 pos)
         {
             TileMimicking.MimicData.Remove(pos);
-            if (ComponentData.TryGetValue(pos, out ComponentData data))
+            if (ComponentData.TryGetValue(pos, out ComponentData data) && data.Position == pos)
             {
                 data.Destroy(pos);
                 ComponentData.Remove(pos);
             }
             ComponentUpdates.Remove(pos);
+        }
+
+        public bool HasData(Point16 pos)
+        {
+            if (ComponentData.TryGetValue(pos, out ComponentData data))
+            {
+                if (data is SubTileComponentData subTile && !subTile.CheckValid())
+                {
+                    RemoveAll(pos);
+                    return false;
+                }
+                return true;
+            }
+            return false;
+        }
+
+        public IEnumerable<ComponentData> EnumerateAllComponentData() 
+        {
+            foreach (var kvp in ComponentData)
+            {
+                if (kvp.Value is SubTileComponentData)
+                    continue;
+                
+                yield return kvp.Value;
+            }
         }
 
         public override void Load()
@@ -256,22 +337,24 @@ namespace TerraIntegration
         {
             List<TagCompound> components = new();
 
-            foreach (KeyValuePair<Point16, ComponentData> kvp in ComponentData)
+            foreach (ComponentData data in EnumerateAllComponentData())
             {
                 bool shouldSave = false;
-                if (kvp.Value.Component is not null)
-                    shouldSave = kvp.Value.Component.ShouldSaveData(kvp.Value);
-                if (kvp.Value is UnloadedComponentData)
+                if (data.Component is not null)
+                    shouldSave = data.Component.ShouldSaveData(data);
+                if (data is UnloadedComponentData)
                     shouldSave = true;
+                else if (data is SubTileComponentData)
+                    shouldSave = false;
 
                 if (!shouldSave) continue;
 
-                TagCompound t = kvp.Value is UnloadedComponentData ?
-                    UnloadedComponent.SaveTag(kvp.Value) :
-                    kvp.Value.Component.SaveTag(kvp.Value);
+                TagCompound t = data is UnloadedComponentData ?
+                    UnloadedComponent.SaveTag(data) :
+                    data.Component.SaveTag(data);
                 if (t is null) continue;
-                t["x"] = kvp.Key.X;
-                t["y"] = kvp.Key.Y;
+                t["x"] = data.Position.X;
+                t["y"] = data.Position.Y;
                 components.Add(t);
             }
 

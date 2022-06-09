@@ -204,8 +204,8 @@ namespace TerraIntegration.Basic
         public virtual bool HandlePacket(Point16 pos, ushort messageType, BinaryReader reader, int whoAmI, ref bool broadcast) { return false; }
         public ModPacket CreatePacket(Point16 pos, ushort messageType) => Networking.CreateComponentPacket(TypeName, pos, messageType);
 
-        public ComponentData GetData(Point16 pos) => ModContent.GetInstance<ComponentWorld>().GetData(pos, this);
-        public ComponentData GetDataOrNull(Point16 pos) => ModContent.GetInstance<ComponentWorld>().GetDataOrNull(pos);
+        public ComponentData GetData(Point16 pos, bool resolveSubTiles = true) => ModContent.GetInstance<ComponentWorld>().GetData(pos, this, resolveSubTiles);
+        public ComponentData GetDataOrNull(Point16 pos, bool resolveSubTiles = true) => ModContent.GetInstance<ComponentWorld>().GetDataOrNull(pos, resolveSubTiles);
 
         internal virtual void NetSendData(BinaryWriter writer, ComponentData data)
         {
@@ -379,14 +379,15 @@ namespace TerraIntegration.Basic
 
     public class ComponentData
     {
-        public Component Component { get; internal set; }
-        public ComponentSystem System { get; internal set; }
+        public virtual Component Component { get; internal set; }
+        public virtual ComponentSystem System { get; internal set; }
         public Point16 Position { get; internal set; }
 
         public ushort UpdateFrequency { get; set; } = 1;
         public TimeSpan LastUpdateTime { get; set; } = default;
+        public Point16 Size { get; set; } = new(1, 1);
 
-        public Dictionary<string, Items.Variable> Variables { get; internal set; }
+        public virtual Dictionary<string, Items.Variable> Variables { get; protected internal set; }
 
         public void CopyTo(ComponentData data)
         {
@@ -394,6 +395,7 @@ namespace TerraIntegration.Basic
             data.Variables = Variables;
             data.UpdateFrequency = UpdateFrequency;
             data.Position = Position;
+            data.Size = Size;
         }
 
         internal void Init(Component c, Point16 pos)
@@ -410,6 +412,9 @@ namespace TerraIntegration.Basic
 
         internal void Destroy(Point16 pos)
         {
+            if (this is SubTileComponentData)
+                return;
+
             foreach (Items.Variable v in Variables.Values)
                 if (v is not null)
                 {
@@ -462,8 +467,8 @@ namespace TerraIntegration.Basic
     {
         internal override bool HasData => true;
 
-        public new TDataType GetData(Point16 pos) => ModContent.GetInstance<ComponentWorld>().GetData<TDataType>(pos, this);
-        public new TDataType GetDataOrNull(Point16 pos) => ModContent.GetInstance<ComponentWorld>().GetDataOrNull<TDataType>(pos);
+        public new TDataType GetData(Point16 pos, bool resolveSubTiles = true) => ModContent.GetInstance<ComponentWorld>().GetData<TDataType>(pos, this, resolveSubTiles);
+        public new TDataType GetDataOrNull(Point16 pos, bool resolveSubTiles = true) => ModContent.GetInstance<ComponentWorld>().GetDataOrNull<TDataType>(pos, resolveSubTiles);
 
         public virtual TagCompound SaveCustomDataTag(TDataType data) => null;
         public virtual TDataType LoadCustomDataTag(TagCompound data, Point16 pos) => new();
@@ -546,6 +551,24 @@ namespace TerraIntegration.Basic
         public void SaveTag()
         {
             throw new NotImplementedException();
+        }
+    }
+
+    public class SubTileComponentData : ComponentData
+    {
+        public Point16 MainTilePos { get; internal set; }
+
+        public ComponentData MainData => ComponentWorld.Instance.GetData(MainTilePos);
+
+        public override Dictionary<string, Items.Variable> Variables => MainData.Variables;
+        public override Component Component => MainData.Component;
+        public override ComponentSystem System => MainData.System;
+
+        public bool CheckValid()
+        {
+            ComponentData data = MainData;
+            Rectangle multi = new(data.Position.X, data.Position.Y, data.Size.X, data.Size.Y);
+            return multi.Contains(data.Position);
         }
     }
 

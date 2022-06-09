@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Graphics;
 using System;
+using System.Linq;
 using System.Collections.Generic;
 using System.IO;
 using TerraIntegration.Basic;
@@ -22,40 +23,34 @@ namespace TerraIntegration.Components
     public class DisplayData : ComponentData
     {
         public bool FrameScanCompleted = false;
-        public Point16 MasterPos = default;
-        public Point16 DisplaySize = default;
 
-        public MasterDisplayData Master;
+        public DisplayedValue DisplayValue;
+        public DisplayedValue SentDisplayValue;
 
-        public void NoMoreMaster(Point16 pos)
+        public void NoMoreMaster(Point16? newMasterPos)
         {
             Variable v = GetVariable(Display.DisplayVariableSlot);
             if (v is not null)
             {
-                DisplayData master = (Component as Display).GetData(MasterPos);
-                Variable masterVar = master.GetVariable(Display.DisplayVariableSlot);
-                if (masterVar is null)
+                if (newMasterPos.HasValue)
                 {
-                    master.SetVariable(Display.DisplayVariableSlot, v);
-                    ClearVariable(Display.DisplayVariableSlot);
-                    master.Component.OnVariableChanged(MasterPos, Display.DisplayVariableSlot);
-                    Component.OnVariableChanged(pos, Display.DisplayVariableSlot);
-                    return;
+                    DisplayData master = (Component as Display).GetData(newMasterPos.Value);
+                    Variable masterVar = master.GetVariable(Display.DisplayVariableSlot);
+                    if (masterVar is null)
+                    {
+                        master.SetVariable(Display.DisplayVariableSlot, v);
+                        ClearVariable(Display.DisplayVariableSlot);
+                        master.Component.OnVariableChanged(newMasterPos.Value, Display.DisplayVariableSlot);
+                        Component.OnVariableChanged(Position, Display.DisplayVariableSlot);
+                        return;
+                    }
                 }
 
-                Util.DropItemInWorld(GetVariableItem(Display.DisplayVariableSlot).Item, pos.X * 16, pos.Y * 16);
+                Util.DropItemInWorld(GetVariableItem(Display.DisplayVariableSlot).Item, Position.X * 16, Position.Y * 16);
                 ClearVariable(Display.DisplayVariableSlot);
-                Component.OnVariableChanged(pos, Display.DisplayVariableSlot);
+                Component.OnVariableChanged(Position, Display.DisplayVariableSlot);
             }
         }
-    }
-
-    public class MasterDisplayData
-    {
-        public DisplayedValue DisplayValue;
-
-        public string SentErrors;
-        public DisplayedValue SentDisplayValue;
     }
 
     public class Display : Component<DisplayData>
@@ -102,24 +97,22 @@ namespace TerraIntegration.Components
             Point16 pos = new(i, j);
             DisplayData data = GetData(pos);
 
-            Point16 drawTile = data.MasterPos + data.DisplaySize - new Point16(1, 1);
+            Point16 drawTile = data.Position + data.Size - new Point16(1, 1);
 
             if (drawTile != pos) return;
 
             Rectangle screenRect = new();
 
-            Vector2 screen = data.MasterPos.ToVector2() * 16 + new Vector2(Main.offScreenRange) - Main.screenPosition;
+            Vector2 screen = data.Position.ToVector2() * 16 + new Vector2(Main.offScreenRange) - Main.screenPosition;
             screenRect.X = (int)screen.X;
             screenRect.Y = (int)screen.Y;
-            screenRect.Width = 16 * data.DisplaySize.X;
-            screenRect.Height = 16 * data.DisplaySize.Y;
+            screenRect.Width = 16 * data.Size.X;
+            screenRect.Height = 16 * data.Size.Y;
 
             screenRect.X += 2;
             screenRect.Y += 2;
             screenRect.Width -= 4;
             screenRect.Height -= 4;
-
-            data = GetData(data.MasterPos);
 
             DisplayDraw(data, screenRect, spriteBatch);
         }
@@ -133,8 +126,7 @@ namespace TerraIntegration.Components
         {
             base.OnKilled(pos);
             DisplayData data = GetData(pos);
-            if (data.Master is not null)
-                data.NoMoreMaster(pos);
+            data.NoMoreMaster(null);
             ScanAndUpdateDisplayFrames(pos, true);
         }
         public override void OnUpdate(Point16 pos)
@@ -142,15 +134,10 @@ namespace TerraIntegration.Components
             base.OnUpdate(pos);
             DisplayData data = GetData(pos);
 
-            if (data.Master is null)
-            {
-                SetUpdates(pos, false);
-                return;
-            }
             if (!data.HasVariable(DisplayVariableSlot))
             {
-                data.Master.DisplayValue = null;
-                SyncNull(pos, data.Master);
+                data.DisplayValue = null;
+                SyncNull(data);
                 return;
             }
             Errors.Clear();
@@ -163,18 +150,18 @@ namespace TerraIntegration.Components
 
                 if (Errors.Count > 0)
                 {
-                    data.Master.DisplayValue = new ErrorDisplay(Errors.ToArray());
-                    SyncValue(pos, data.Master);
+                    data.DisplayValue = new ErrorDisplay(Errors.ToArray());
+                    SyncValue(data);
                     return;
                 }
                 if (value is null)
                 {
-                    data.Master.DisplayValue = null;
-                    SyncNull(pos, data.Master);
+                    data.DisplayValue = null;
+                    SyncNull(data);
                     return;
                 }
-                data.Master.DisplayValue = value.Display(data.System);
-                SyncValue(pos, data.Master);
+                data.DisplayValue = value.Display(data.System);
+                SyncValue(data);
             }
         }
         public override void OnSystemUpdate(Point16 pos)
@@ -189,19 +176,19 @@ namespace TerraIntegration.Components
             base.OnPlayerJoined(player);
 
             List<DisplayBoundaryData> boundaries = new();
-            List<(Point16, MasterDisplayData)> displays = new();
+            List<DisplayData> displays = new();
 
-            foreach (KeyValuePair<Point16, ComponentData> kvp in World.ComponentData)
-                if (kvp.Value is DisplayData display && display.Master is not null)
+            foreach (ComponentData data in World.EnumerateAllComponentData())
+                if (data is DisplayData display)
                 {
-                    boundaries.Add(new(display.MasterPos, display.DisplaySize));
-                    displays.Add((kvp.Key, display.Master));
+                    boundaries.Add(new(display.Position, display.Size));
+                    displays.Add(display);
                 }
 
             SendBoundaries(boundaries);
-            foreach (var (pos, data) in displays)
+            foreach (DisplayData data in displays)
             {
-                SyncValue(pos, data, false);
+                SyncValue(data, false);
             }
         }
 
@@ -237,34 +224,30 @@ namespace TerraIntegration.Components
                     return true;
 
                 case MessageType.DisplayNull:
-                    if (data.Master is null) break;
-                    data.Master.DisplayValue = null;
+                    data.DisplayValue = null;
                     return true;
 
                 case MessageType.DisplayValue:
-                    if (data.Master is null) break;
-                    data.Master.DisplayValue = DisplayedValue.ReceiveData(reader);
+                    data.DisplayValue = DisplayedValue.ReceiveData(reader);
                     return true;
             }
             return false;
         }
 
-        public void SyncNull(Point16 pos, MasterDisplayData data, bool changedOnly = true)
+        public void SyncNull(DisplayData data, bool changedOnly = true)
         {
             if (Main.netMode == NetmodeID.SinglePlayer) return;
 
             if (changedOnly)
             {
-                if (data.SentErrors is null &&
-                    data.SentDisplayValue is null)
+                if (data.SentDisplayValue is null)
                     return;
             }
 
-            CreatePacket(pos, (ushort)MessageType.DisplayNull).Send();
-            data.SentErrors = null;
+            CreatePacket(data.Position, (ushort)MessageType.DisplayNull).Send();
             data.SentDisplayValue = null;
         }
-        public void SyncValue(Point16 pos, MasterDisplayData data, bool changedOnly = true)
+        public void SyncValue(DisplayData data, bool changedOnly = true)
         {
             if (Main.netMode == NetmodeID.SinglePlayer) return;
 
@@ -272,7 +255,7 @@ namespace TerraIntegration.Components
                 if (data.DisplayValue.Equals(data.SentDisplayValue))
                     return;
 
-            ModPacket p = CreatePacket(pos, (ushort)MessageType.DisplayValue);
+            ModPacket p = CreatePacket(data.Position, (ushort)MessageType.DisplayValue);
 
             if (data.DisplayValue is null)
                 p.Write("");
@@ -286,18 +269,13 @@ namespace TerraIntegration.Components
         {
             DisplayData data = GetData(pos);
 
-            if (data.MasterPos == default)
-                return null;
-
-            data = GetData(data.MasterPos);
-
-            if (data.Master?.DisplayValue is null)
+            if (data.DisplayValue is null)
                 return null;
 
 
-            return data.Master.DisplayValue.HoverText;
+            return data.DisplayValue.HoverText;
         }
-        public override bool ShouldSaveData(DisplayData data) => data.Master is not null;
+        public override bool ShouldSaveData(DisplayData data) => true;
         public override UIPanel SetupInterface()
         {
             UIPanel p = new()
@@ -322,32 +300,28 @@ namespace TerraIntegration.Components
         public override Point16 GetInterfaceTarget(Point16 pos)
         {
             DisplayData data = GetData(pos);
-            return new(data.MasterPos.X, data.MasterPos.Y);
+            return data.Position;
         }
         public override void UpdateInterface(Point16 pos)
         {
             DisplayData data = GetData(pos);
-            Vector2 off = new(data.DisplaySize.X * 16, 0);
+            Vector2 off = new(data.Size.X * 16, 0);
 
             off.X += 8;
 
             InterfaceOffset = off;
 
-            Slot.Component = new(data.MasterPos, this);
-        }
-        public override bool CheckShowInterface(Point16 pos)
-        {
-            return GetData(pos).Master is not null;
+            Slot.Component = new(data.Position, this);
         }
         public override Vector2 GetInterfaceReachCheckPos(Point16 pos)
         {
             DisplayData data = GetData(pos);
 
             Rectangle frame = new(
-                data.MasterPos.X * 16,
-                data.MasterPos.Y * 16,
-                data.DisplaySize.X * 16,
-                data.DisplaySize.Y * 16
+                data.Position.X * 16,
+                data.Position.Y * 16,
+                data.Size.X * 16,
+                data.Size.Y * 16
                 );
 
             Vector2 playerCenter = Main.LocalPlayer.Center;
@@ -373,6 +347,9 @@ namespace TerraIntegration.Components
 
             int displayType = ModContent.TileType<Display>();
 
+            Point16 min = new(short.MaxValue, short.MaxValue);
+            Point16 max = new(0, 0);
+
             while (queue.Count > 0)
             {
                 Point16 p = queue.Dequeue();
@@ -380,6 +357,9 @@ namespace TerraIntegration.Components
                     continue;
 
                 found.Add(p);
+
+                min = new(Math.Min(min.X, p.X), Math.Min(min.Y, p.Y));
+                max = new(Math.Max(max.X, p.X), Math.Max(max.Y, p.Y));
 
                 Point16 check = new(p.X, p.Y - 1);
                 if (Main.tile[check.X, check.Y].TileType == displayType && !found.Contains(check))
@@ -403,13 +383,22 @@ namespace TerraIntegration.Components
 
             List<DisplayBoundaryData> boundaries = new();
 
+            int regionWidth = max.X - min.X;
+            int regionHeight = max.Y - min.Y;
+
             while (found.Count > 0)
             {
                 Point16 maxSize = default;
                 int maxArea = 0;
                 Point16 maxAreaPoint = default;
 
-                foreach (Point16 p in found)
+                foreach (Point16 p in found.OrderBy(p => 
+                {
+                    int relx = p.X - min.X;
+                    int rely = p.Y - min.Y;
+
+                    return relx + rely * regionWidth;
+                }))
                 {
                     Point16 rect = GetDisplayRectangle(p, found);
                     int area = rect.X * rect.Y;
@@ -446,27 +435,18 @@ namespace TerraIntegration.Components
                     t.TileFrameX = frameX;
                     t.TileFrameY = frameY;
 
-                    DisplayData data = GetData(p);
-                    data.MasterPos = master;
-                    data.DisplaySize = size;
-                    data.FrameScanCompleted = true;
-
+                    DisplayData data = GetDataOrNull(p);
                     bool isMaster = dx == 0 && dy == 0;
 
-                    SetUpdates(p, isMaster);
-
-                    if (!isMaster && data.Master is not null)
+                    if (data is not null && !isMaster && data.Position != p)
                     {
-                        data.NoMoreMaster(p);
-                        data.Master = null;
+                        data.NoMoreMaster(master);
                     }
-                    else if (isMaster && data.Master is null)
-                    {
-                        data.Master = new();
-                    }
+                    else SetUpdates(p, true);
 
                     setToRemoveFrom?.Remove(p);
                 }
+            World.DefineMultitile(new(master.X, master.Y, size.X, size.Y));
         }
 
         static Point16 GetDisplayRectangle(Point16 p, HashSet<Point16> displays)
@@ -517,10 +497,10 @@ namespace TerraIntegration.Components
 
         public void DisplayDraw(DisplayData data, Rectangle screenRect, SpriteBatch spriteBatch)
         {
-            if (data.Master is null || data.Master.DisplayValue is null)
+            if (data.DisplayValue is null)
                 return;
 
-           data.Master.DisplayValue.Draw(screenRect, spriteBatch);
+           data.DisplayValue.Draw(screenRect, spriteBatch);
         }
 
         internal record struct DisplayBoundaryData(Point16 Master, Point16 Size);

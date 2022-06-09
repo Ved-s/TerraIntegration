@@ -25,7 +25,7 @@ namespace TerraIntegration.ComponentProperties.Display
         public override VariableValue GetProperty(Components.Display component, Point16 pos, List<Error> errors)
         {
             DisplayData data = component.GetData(pos);
-            return new Integer(data.DisplaySize.X * data.DisplaySize.Y);
+            return new Integer(data.Size.X * data.Size.Y);
         }
     }
 }

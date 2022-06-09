@@ -106,33 +106,32 @@ namespace TerraIntegration
 
             ComponentWorld world = ModContent.GetInstance<ComponentWorld>();
 
-            List<(Point16, ComponentData)> send = new();
+            List<ComponentData> send = new();
 
-            IEnumerable<KeyValuePair<Point16, ComponentData>> ienum;
+            IEnumerable<ComponentData> ienum;
 
             if (positions is null)
-                ienum = world.ComponentData;
+                ienum = world.EnumerateAllComponentData();
             else
                 ienum = positions
-                    .Where(p => world.ComponentData.ContainsKey(p))
-                    .Select(p => new KeyValuePair<Point16, ComponentData>(p, world.ComponentData[p]));
+                    .Where(p => world.HasData(p))
+                    .Select(p => world.GetData(p));
 
-            foreach (KeyValuePair<Point16, ComponentData> pair in ienum)
+            foreach (ComponentData data in ienum)
             {
                 if (
-                    pair.Value is UnloadedComponentData 
-                    || pair.Value.Component is null
-                    || !pair.Value.Component.ShouldSyncData(pair.Value)) continue;
-                send.Add((pair.Key, pair.Value));
+                    data is UnloadedComponentData 
+                    || data.Component is null
+                    || !data.Component.ShouldSyncData(data)) continue;
+                send.Add(data);
             }
             ModPacket pack = CreatePacket(NetMessageType.ComponentDataSync);
             pack.Write((ushort)send.Count);
-            for (int i = 0; i < send.Count; i++)
+            foreach (ComponentData v in send)
             {
-                var (pos, cd) = send[i];
-                pack.Write(pos.X);
-                pack.Write(pos.Y);
-                cd.Component.NetSendData(pack, cd);
+                pack.Write(v.Position.X);
+                pack.Write(v.Position.Y);
+                v.Component.NetSendData(pack, v);
             }
             pack.Send(clientId);
         }

@@ -85,13 +85,13 @@ namespace TerraIntegration.Basic
                 {
                     currentLocation = null;
 
-                    foreach (KeyValuePair<Point16, ComponentData> kvp in World.ComponentData)
+                    foreach (ComponentData d in World.EnumerateAllComponentData())
                     {
-                        foundSlot = kvp.Value.Variables.FirstOrDefault(v => Id == v.Value?.Var?.Id).Key;
+                        foundSlot = d.Variables.FirstOrDefault(v => Id == v.Value?.Var?.Id).Key;
                         if (foundSlot is not null)
                         {
-                            data = kvp.Value;
-                            foundPos = kvp.Key;
+                            data = d;
+                            foundPos = d.Position;
                             break;
                         }
                     }
