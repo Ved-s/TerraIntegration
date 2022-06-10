@@ -171,5 +171,10 @@ namespace TerraIntegration
 
 			return text ?? "";
         }
+
+		public static IEnumerable<T> EnumOne<T>(T obj)
+		{
+			yield return obj;
+		}
     }
 }

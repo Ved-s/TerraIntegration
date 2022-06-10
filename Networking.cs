@@ -24,12 +24,21 @@ namespace TerraIntegration
         public static bool Server => Main.netMode == NetmodeID.Server;
         public static bool Client => Main.netMode == NetmodeID.MultiplayerClient;
 
+        internal static int LastTerrariaReceivedPacketLength { get; set; }
+        public static int LastPacketLength { get; private set; }
+
         public static void HandlePacket(BinaryReader reader, int whoAmI) 
         {
+            LastPacketLength = LastTerrariaReceivedPacketLength - 1 - ((ModNet.NetModCount < 256) ? 1 : 2);
+            long packetEndPos = reader.BaseStream.Position + LastPacketLength;
+
             ushort type = reader.ReadUInt16();
+            LastPacketLength -= 2;
+
             if (type >= MessageTypeNames.Length)
             {
-                LogWarn("Unrecognized netmessage type: {0}", type);
+                LogWarn("Unrecognized netmessage type: {0} ({1} bytes)", type, LastPacketLength);
+                reader.BaseStream.Seek(packetEndPos, SeekOrigin.Begin);
                 return;
             }
             NetMessageType msgType = (NetMessageType)type;
@@ -69,6 +78,13 @@ namespace TerraIntegration
                     default:
                         LogWarn("Unhandled netmessage: {0}", msgType);
                         break;
+                }
+
+                long read = reader.BaseStream.Position - startPos;
+                if (read != LastPacketLength)
+                {
+                    LogWarn("Read underflow {0} of {1} bytes in message {2}", read, LastPacketLength,  msgType);
+                    reader.BaseStream.Seek(packetEndPos, SeekOrigin.Begin);
                 }
 
                 if (broadcast && Main.netMode == NetmodeID.Server)
@@ -210,12 +226,14 @@ namespace TerraIntegration
         }
         private static void ReceiveComponentPacket(BinaryReader reader, int whoAmI, ref bool broadcast) 
         {
+            long startPos = reader.BaseStream.Position;
             string component = reader.ReadString();
             ushort type = reader.ReadUInt16();
             Point16 pos = new(reader.ReadInt16(), reader.ReadInt16());
+            long packetSize = LastPacketLength - (reader.BaseStream.Position - startPos);
 
             if (TerraIntegration.DebugMode)
-				Statistics.LogMessage($"[Net] Receiving {component} component packet at {pos}, type {type}");
+				Statistics.LogMessage($"[Net] Receiving {component} component packet{(pos == default? "" : $" at {pos}")}, type {type}");
 
             if (!Component.ByTypeName.TryGetValue(component, out Component c))
             {
@@ -224,10 +242,17 @@ namespace TerraIntegration
             }
             try
             {
+                startPos = reader.BaseStream.Position;
                 if (!c.HandlePacket(pos, type, reader, whoAmI, ref broadcast))
                 {
                     LogWarn("Unhandled message {0} for component {1}", type, component);
                     return;
+                }
+                long read = reader.BaseStream.Position - startPos;
+                if (read != packetSize)
+                {
+                    LogWarn("Read underflow {0} of {1} bytes in {2} component packet at {3}, type {4}", read, packetSize, component, pos, type);
+                    reader.BaseStream.Seek(startPos + packetSize, SeekOrigin.Begin);
                 }
             }
             catch (Exception e)

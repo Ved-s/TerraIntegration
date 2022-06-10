@@ -149,8 +149,8 @@ namespace TerraIntegration
 
         public void DefineMultitile(Rectangle tileRect)
         {
-            ComponentData data = GetData(new(tileRect.X, tileRect.Y));
-            data.Size = new(tileRect.Width, tileRect.Height);
+            ComponentData data = GetDataOrNull(new(tileRect.X, tileRect.Y));
+            if (data is not null) data.Size = new(tileRect.Width, tileRect.Height);
 
             for (int i = tileRect.Left; i < tileRect.Right; i++)
                 for (int j = tileRect.Top; j < tileRect.Bottom; j++)

@@ -42,8 +42,10 @@ namespace TerraIntegration
         }
         public static void UpdateSystem(WorldPoint start, out List<ComponentSystem> systems)
         {
-            HashSet<WorldPoint> checks = new();
             systems = new();
+            if (Networking.Client) return;
+
+            HashSet<WorldPoint> checks = new();
 
             if (IsConnector(start)) checks.Add(start);
             else checks.UnionWith(GetConnectorsAround(start));

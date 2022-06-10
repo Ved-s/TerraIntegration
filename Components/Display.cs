@@ -1,18 +1,14 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using ReLogic.Graphics;
 using System;
-using System.Linq;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using TerraIntegration.Basic;
 using TerraIntegration.DataStructures;
 using TerraIntegration.DisplayedValues;
 using TerraIntegration.UI;
-using TerraIntegration.Values;
-using TerraIntegration.Variables;
 using Terraria;
-using Terraria.GameContent;
 using Terraria.GameContent.UI.Elements;
 using Terraria.ID;
 using Terraria.ModLoader;
@@ -72,6 +68,7 @@ namespace TerraIntegration.Components
         public override bool CanHaveVariables => true;
 
         private UIComponentVariable Slot = new();
+        private List<DisplayData> SyncList = new();
 
         public override void SetStaticDefaults()
         {
@@ -132,37 +129,31 @@ namespace TerraIntegration.Components
         public override void OnUpdate(Point16 pos)
         {
             base.OnUpdate(pos);
+            if (Networking.Client) return;
+
             DisplayData data = GetData(pos);
 
             if (!data.HasVariable(DisplayVariableSlot))
             {
                 data.DisplayValue = null;
-                SyncNull(data);
+                SyncValue(Util.EnumOne(data));
                 return;
             }
             data.LastErrors.Clear();
 
-            if (Main.netMode != NetmodeID.MultiplayerClient)
-            {
-                Variable var = data.GetVariable(DisplayVariableSlot);
-                VariableValue value = var?.GetValue(data.System, data.LastErrors);
-                var?.SetLastValue(value, data.System);
+            Variable var = data.GetVariable(DisplayVariableSlot);
+            VariableValue value = var?.GetValue(data.System, data.LastErrors);
+            var?.SetLastValue(value, data.System);
 
-                if (data.LastErrors.Count > 0)
-                {
-                    data.DisplayValue = new ErrorDisplay(data.LastErrors.ToArray());
-                    SyncValue(data);
-                    return;
-                }
-                if (value is null)
-                {
-                    data.DisplayValue = null;
-                    SyncNull(data);
-                    return;
-                }
+            if (data.LastErrors.Count > 0)
+                data.DisplayValue = new ErrorDisplay(data.LastErrors.ToArray());
+
+            else if (value is null)
+                data.DisplayValue = null;
+
+            else
                 data.DisplayValue = value.Display(data.System);
-                SyncValue(data);
-            }
+            SyncValue(Util.EnumOne(data));
         }
         public override void OnSystemUpdate(Point16 pos)
         {
@@ -186,10 +177,7 @@ namespace TerraIntegration.Components
                 }
 
             SendBoundaries(boundaries);
-            foreach (DisplayData data in displays)
-            {
-                SyncValue(data, false);
-            }
+            SyncValue(displays, false);
         }
 
         private void SendBoundaries(List<DisplayBoundaryData> boundaries)
@@ -209,8 +197,6 @@ namespace TerraIntegration.Components
 
         public override bool HandlePacket(Point16 pos, ushort messageType, BinaryReader reader, int whoAmI, ref bool broadcast)
         {
-            DisplayData data = GetData(pos);
-
             switch ((MessageType)messageType)
             {
                 case MessageType.DisplayBoundaries:
@@ -223,46 +209,53 @@ namespace TerraIntegration.Components
                     }
                     return true;
 
-                case MessageType.DisplayNull:
-                    data.DisplayValue = null;
-                    return true;
-
                 case MessageType.DisplayValue:
-                    data.DisplayValue = DisplayedValue.ReceiveData(reader);
+                    int dc = reader.ReadInt32();
+
+                    for (int i = 0; i < dc; i++)
+                    {
+                        Point16 dp = new(reader.ReadInt16(), reader.ReadInt16());
+                        bool notNull = reader.ReadBoolean();
+
+                        DisplayData data = GetData(dp);
+                        data.DisplayValue = notNull ? DisplayedValue.ReceiveData(reader) : null;
+                    }
                     return true;
             }
             return false;
         }
 
-        public void SyncNull(DisplayData data, bool changedOnly = true)
+        public void SyncValue(IEnumerable<DisplayData> data, bool changedOnly = true)
         {
             if (Main.netMode == NetmodeID.SinglePlayer) return;
 
             if (changedOnly)
+                data = data.Where(d => !Util.ObjectsNullEqual(d.DisplayValue, d.SentDisplayValue));
+
+            SyncList.Clear();
+            SyncList.AddRange(data);
+
+            if (SyncList.Count == 0)
+                return;
+
+            ModPacket p = CreatePacket(SyncList.Count > 1 ? default : SyncList[0].Position, (ushort)MessageType.DisplayValue);
+            p.Write(SyncList.Count);
+            foreach (DisplayData d in SyncList)
             {
-                if (data.SentDisplayValue is null)
-                    return;
+                Point16 pos = d.Position;
+                p.Write(pos.X);
+                p.Write(pos.Y);
+
+                if (d.DisplayValue is null)
+                    p.Write(false);
+                else
+                {
+                    p.Write(true);
+                    d.DisplayValue.SendData(p);
+                }
+                d.SentDisplayValue = d.DisplayValue;
             }
-
-            CreatePacket(data.Position, (ushort)MessageType.DisplayNull).Send();
-            data.SentDisplayValue = null;
-        }
-        public void SyncValue(DisplayData data, bool changedOnly = true)
-        {
-            if (Main.netMode == NetmodeID.SinglePlayer) return;
-
-            if (changedOnly)
-                if (data.DisplayValue.Equals(data.SentDisplayValue))
-                    return;
-
-            ModPacket p = CreatePacket(data.Position, (ushort)MessageType.DisplayValue);
-
-            if (data.DisplayValue is null)
-                p.Write("");
-            else
-                data.DisplayValue.SendData(p);
             p.Send();
-            data.SentDisplayValue = data.DisplayValue;
         }
 
         public override string GetHoverText(Point16 pos)
@@ -384,7 +377,7 @@ namespace TerraIntegration.Components
                 int maxArea = 0;
                 Point16 maxAreaPoint = default;
 
-                foreach (Point16 p in found.OrderBy(p => 
+                foreach (Point16 p in found.OrderBy(p =>
                 {
                     int relx = p.X - min.X;
                     int rely = p.Y - min.Y;
@@ -494,14 +487,13 @@ namespace TerraIntegration.Components
             if (data.DisplayValue is null)
                 return;
 
-           data.DisplayValue.Draw(screenRect, spriteBatch);
+            data.DisplayValue.Draw(screenRect, spriteBatch);
         }
 
         internal record struct DisplayBoundaryData(Point16 Master, Point16 Size);
         enum MessageType : ushort
         {
             DisplayBoundaries,
-            DisplayNull,
             DisplayValue
         }
     }

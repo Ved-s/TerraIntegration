@@ -56,6 +56,7 @@ namespace TerraIntegration.Basic
         public virtual bool ConfigurableFrequency => true;
 
         public virtual bool CanHaveVariables => false;
+        public virtual Point16 DefaultSize => new(1, 1);
 
         public virtual string DefaultPropertyTexture => null;
         public virtual SpriteSheet DefaultPropertySpriteSheet { get; set; } = null;
@@ -414,7 +415,12 @@ namespace TerraIntegration.Basic
             Position = pos;
             Variables = new();
             UpdateFrequency = c.DefaultUpdateFrequency;
+            Size = c.DefaultSize;
+
             CustomInit(c);
+
+            if (Size.X > 1 || Size.Y > 1)
+                ComponentWorld.Instance.DefineMultitile(new(pos.X, pos.Y, Size.X, Size.Y));
         }
 
         public virtual void CustomInit(Component c) { }

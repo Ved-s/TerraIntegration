@@ -17,6 +17,7 @@ namespace TerraIntegration.Components
         public override string TypeDefaultDescription => "Announcement box, but with\nvariable message text";
 
         public override bool CanHaveVariables => true;
+        public override Point16 DefaultSize => new(2, 2);
 
         public ChatWriter()
         {
@@ -121,10 +122,10 @@ namespace TerraIntegration.Components
                 else if (Networking.Server)
                 {
                     if (Main.AnnouncementBoxRange < 0)
-                        NetMessage.SendData(MessageID.SmartTextMessage, -1, -1, NetworkText.FromLiteral(str.Value), 255, 1f, 1f, 1f, 460, 0, 0);
+                        NetMessage.SendData(MessageID.SmartTextMessage, -1, -1, NetworkText.FromLiteral(str.Value), 255, 255, 255, 255, 460, 0, 0);
                     else for (int i = 0; i < 255; i++)
                             if (Main.player[i].active && CheckRange(Main.player[i], center))
-                                NetMessage.SendData(MessageID.SmartTextMessage, i, -1, NetworkText.FromLiteral(str.Value), 255, 1f, 1f, 1f, 460, 0, 0);
+                                NetMessage.SendData(MessageID.SmartTextMessage, i, -1, NetworkText.FromLiteral(str.Value), 255, 255, 255, 255, 460, 0, 0);
                 }
             }
         }

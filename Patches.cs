@@ -29,6 +29,7 @@ namespace TerraIntegration
             On.Terraria.TileObject.Place += TileObject_Place;
             On.Terraria.WorldGen.PlaceWall += WorldGen_PlaceWall;
             On.Terraria.WorldGen.KillWall += WorldGen_KillWall;
+            On.Terraria.MessageBuffer.GetData += MessageBuffer_GetData;
 
             Terraria.IO.WorldFile.OnWorldLoad += WorldFile_OnWorldLoad;
         }
@@ -45,6 +46,7 @@ namespace TerraIntegration
             On.Terraria.TileObject.Place -= TileObject_Place;
             On.Terraria.WorldGen.PlaceWall -= WorldGen_PlaceWall;
             On.Terraria.WorldGen.KillWall -= WorldGen_KillWall;
+            On.Terraria.MessageBuffer.GetData -= MessageBuffer_GetData;
 
             Terraria.IO.WorldFile.OnWorldLoad -= WorldFile_OnWorldLoad;
         }
@@ -150,6 +152,11 @@ namespace TerraIntegration
             {
                 ComponentSystem.UpdateSystem(new((short)i, (short)j, true), out _);
             }
+        }
+        private void MessageBuffer_GetData(On.Terraria.MessageBuffer.orig_GetData orig, MessageBuffer self, int start, int length, out int messageType)
+        {
+            Networking.LastTerrariaReceivedPacketLength = length;
+            orig(self, start, length, out messageType);
         }
 
         private void WallOutlinePatch(ILContext il)
