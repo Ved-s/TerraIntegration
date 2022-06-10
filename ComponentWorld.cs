@@ -57,6 +57,8 @@ namespace TerraIntegration
                     return tdata;
             }
 
+            RemoveAll(pos);
+
             if (c is null)
             {
                 Tile t = Main.tile[pos.X, pos.Y];

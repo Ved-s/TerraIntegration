@@ -25,7 +25,7 @@ namespace TerraIntegration.Components
 
         public void NoMoreMaster(Point16? newMasterPos)
         {
-            if (Networking.Client) return;
+            if (!Networking.SinglePlayer) return;
 
             Variable v = GetVariable(Display.DisplayVariableSlot);
             if (v is not null)
@@ -126,7 +126,7 @@ namespace TerraIntegration.Components
         }
         public override void OnKilled(Point16 pos)
         {
-            DisplayData data = GetData(pos, false);
+            DisplayData data = GetDataOrNull(pos, false);
             data?.NoMoreMaster(null);
             ScanAndUpdateDisplayFrames(pos, true);
             base.OnKilled(pos);
