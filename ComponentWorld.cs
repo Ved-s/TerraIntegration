@@ -7,19 +7,13 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using TerraIntegration.Basic;
-using TerraIntegration.Components;
 using TerraIntegration.DataStructures;
 using TerraIntegration.UI;
-using TerraIntegration.Variables;
 using Terraria;
-using Terraria.Audio;
-using Terraria.GameContent;
-using Terraria.GameContent.UI.Elements;
 using Terraria.ID;
 using Terraria.ModLoader;
 using Terraria.ModLoader.IO;
 using Terraria.UI;
-using Terraria.WorldBuilding;
 
 namespace TerraIntegration
 {
@@ -36,7 +30,8 @@ namespace TerraIntegration
         public uint UpdateCounter = 0;
 
         public Item HoverItem = null;
-        public string HoverText = null;
+        private string HoverText = null;
+        public bool ComponentDebug = false;
 
         public readonly List<DelayedWireTrip> WireTrips = new();
 
@@ -139,7 +134,7 @@ namespace TerraIntegration
             return null;
         }
 
-        public void InitData(Point16 pos, Component c) 
+        public void InitData(Point16 pos, Component c)
         {
             ComponentData newData = new();
             newData.Init(c, pos);
@@ -199,13 +194,13 @@ namespace TerraIntegration
             return false;
         }
 
-        public IEnumerable<ComponentData> EnumerateAllComponentData() 
+        public IEnumerable<ComponentData> EnumerateAllComponentData()
         {
             foreach (var kvp in ComponentData)
             {
                 if (kvp.Value is SubTileComponentData)
                     continue;
-                
+
                 yield return kvp.Value;
             }
         }
@@ -250,7 +245,7 @@ namespace TerraIntegration
 
                     Statistics.StopComponent(kvp.Value.TypeName);
                 }
-                
+
             }
 
             if (Main.netMode != NetmodeID.Server && !Main.LocalPlayer.mouseInterface)
@@ -283,6 +278,25 @@ namespace TerraIntegration
         }
         public override void PostDrawTiles()
         {
+            if (ComponentDebug)
+            {
+                Main.spriteBatch.Begin();
+                Rectangle screen = new(0, 0, Main.screenWidth, Main.screenHeight);
+                foreach (ComponentData data in EnumerateAllComponentData())
+                {
+                    Point tl = Util.WorldToScreen(data.Position).ToPoint();
+                    Point br = Util.WorldToScreen(data.Position + data.Size).ToPoint();
+                    Rectangle rect = new(tl.X, tl.Y, br.X - tl.X, br.Y - tl.Y);
+                    if (!rect.Intersects(screen))
+                        continue;
+
+                    uint color = ((uint?)data.System?.TempId.GetHashCode() ?? 0xffU) ^ 0xab73f0;
+
+                    Drawing.DrawRect(Main.spriteBatch, rect, new Color { PackedValue = color });
+                }
+                Main.spriteBatch.End();
+            }
+
             ModContent.GetInstance<ComponentInterface>().Draw();
         }
 
@@ -291,26 +305,18 @@ namespace TerraIntegration
             ProgrammerInterface.Draw();
             Statistics.Draw();
 
-            //if (HoverText is null && TerraIntegration.DebugMode) 
-            //{
-            //    Point mouse = (Main.MouseWorld / 16).ToPoint();
-            //
-            //    //Tile t = Main.tile[mouse.X, mouse.Y];
-            //    //
-            //    //if (t.HasTile && TileID.Sets.IsATreeTrunk[t.TileType])
-            //    //{
-            //    //    TreeStats stats = TreeGrowing.GetTreeStats(mouse.X, mouse.Y);
-            //    //    bool haveSettings = CustomTree.TryGetTreeSettingsByType(t.TileType, out TreeSettings settings);
-            //    //
-            //    //    HoverText = $"- TerraIntegration tree info -\ntX: {t.TileFrameX} tY: {t.TileFrameY}\n"
-            //    //        + TreeTileInfo.GetInfo(mouse.X, mouse.Y) + "\n"
-            //    //        + stats.ToString()
-            //    //        + (haveSettings? 
-            //    //            $"\nGV:{(settings.GroundTypeCheck(stats.GroundType)? "T" : "F")} " +
-            //    //            $"GM:{(settings.CanGrowMoreCheck(stats.Top, settings, stats) ? "T" : "F")}" : "");
-            //    //}
-            //    //HoverText = mouse.ToString();
-            //}
+            Point mouse = (Main.MouseWorld / 16).ToPoint();
+
+            Tile t = Main.tile[mouse.X, mouse.Y];
+
+            ComponentData data = GetDataOrNull(new(mouse.X, mouse.Y));
+            if (data is not null && data.LastErrors.Count > 0)
+            {
+                AddHoverText(Util.ColorTag(Color.OrangeRed, $"Errors:\n{string.Join('\n', data.LastErrors)}"));
+            }
+
+            if (TerraIntegration.DebugMode && ComponentDebug)
+                AddHoverText($"X: {mouse.X} Y: {mouse.Y}\nFx: {t.TileFrameX} Fy: {t.TileFrameY}\n{TileLoader.GetTile(t.TileType)?.Name}");
 
             if (HoverItem is not null)
             {
@@ -412,7 +418,7 @@ namespace TerraIntegration
 
             for (int i = 1; i < Main.maxTilesX - 1; i++)
                 for (int j = 1; j < Main.worldSurface; j++)
-                    if (TileID.Sets.IsATreeTrunk[Main.tile[i,j].TileType])
+                    if (TileID.Sets.IsATreeTrunk[Main.tile[i, j].TileType])
                     {
                         TreeTileInfo info = TreeTileInfo.GetInfo(i, j);
                         if (!info.IsCenter) continue;
@@ -440,11 +446,18 @@ namespace TerraIntegration
                 foreach (PositionedTreeTile tile in TreeGrowing.EnumerateTreeTiles(pos.X, pos.Y))
                     Main.tile[tile.Pos.X, tile.Pos.Y].ClearTile();
 
-                if (TreeGrowing.GrowTree(pos.X, pos.Y+1, tree.GetTreeSettings()))
+                if (TreeGrowing.GrowTree(pos.X, pos.Y + 1, tree.GetTreeSettings()))
                     treesToSpawn--;
 
                 validTrees.RemoveAt(index);
             }
+        }
+
+        public void AddHoverText(string text)
+        {
+            if (HoverText is not null)
+                HoverText += "\n" + text;
+            else HoverText = text;
         }
     }
 

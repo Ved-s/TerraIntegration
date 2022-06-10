@@ -36,8 +36,6 @@ namespace TerraIntegration.Components
 
         public override bool CanHaveVariables => true;
 
-        List<Error> Errors = new();
-
         public Camo() 
         {
             VariableInfo = new ComponentVariableInfo[]
@@ -137,13 +135,13 @@ namespace TerraIntegration.Components
 
             if (data.TryGetVariable("camoTile", out Variable var))
             {
-                Errors.Clear();
-                Values.Tile tile = var.GetValue(data.System, Errors) as Values.Tile;
+                data.LastErrors.Clear();
+                Values.Tile tile = var.GetValue(data.System, data.LastErrors) as Values.Tile;
                 var.SetLastValue(tile, data.System);
 
                 TileMimic mimic = null;
 
-                if (tile is not null && Errors.Count <= 0 && tile.TileType >= 0)
+                if (tile is not null && data.LastErrors.Count <= 0 && tile.TileType >= 0)
                 {
                     mimic = new();
                     mimic.Type = (ushort)tile.TileType;

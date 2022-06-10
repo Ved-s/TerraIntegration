@@ -36,8 +36,6 @@ namespace TerraIntegration.Components
         UIComponentVariable TriggerVar, ActionVar;
         UISwitch ModeSwitch;
 
-        List<Error> Errors = new();
-
         public override void OnUpdate(Point16 pos)
         {
             base.OnUpdate(pos);
@@ -53,10 +51,10 @@ namespace TerraIntegration.Components
                 return;
             }
 
-            Errors.Clear();
-            VariableValue value = trig.GetValue(td.System, Errors);
+            td.LastErrors.Clear();
+            VariableValue value = trig.GetValue(td.System, td.LastErrors);
             trig.SetLastValue(value, td.System);
-            if (value is not Values.Boolean @bool || Errors.Count > 0)
+            if (value is not Values.Boolean @bool || td.LastErrors.Count > 0)
             {
                 td.Value = null;
                 return;

@@ -303,7 +303,7 @@ namespace TerraIntegration.Values
                 {
                     if (system is null)
                     {
-                        Strings.Add($"Ref {ModContent.GetInstance<ComponentWorld>().Guids.GetShortGuid(v.Id)}");
+                        Strings.Add($"Ref {ComponentWorld.Instance.Guids.GetShortGuid(v.Id)}");
                         continue;
                     }
                     else value = system.GetVariableValue(v.Id, Errors);

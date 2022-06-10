@@ -104,7 +104,7 @@ namespace TerraIntegration
             if (TerraIntegration.DebugMode)
 				Statistics.LogMessage($"[Net] Sending {positions?.Count.ToString() ?? "all"} component data");
 
-            ComponentWorld world = ModContent.GetInstance<ComponentWorld>();
+            ComponentWorld world = ComponentWorld.Instance;
 
             List<ComponentData> send = new();
 
@@ -137,7 +137,7 @@ namespace TerraIntegration
         }
         private static void ReceiveComponentDataSync(BinaryReader reader) 
         {
-            ComponentWorld world = ModContent.GetInstance<ComponentWorld>();
+            ComponentWorld world = ComponentWorld.Instance;
 
             ushort count = reader.ReadUInt16();
             if (TerraIntegration.DebugMode)
@@ -275,7 +275,7 @@ namespace TerraIntegration
             if (TerraIntegration.DebugMode)
 				Statistics.LogMessage($"[Net] Sending variable at {pos}, slot {slot}");
 
-            ComponentWorld world = ModContent.GetInstance<ComponentWorld>();
+            ComponentWorld world = ComponentWorld.Instance;
             ComponentData data = world.GetDataOrNull(pos);
             if (!data.Variables.TryGetValue(slot, out Items.Variable var))
                 return;
@@ -292,7 +292,7 @@ namespace TerraIntegration
         }
         private static void ReceiveComponentVariable(BinaryReader reader) 
         {
-            ComponentWorld world = ModContent.GetInstance<ComponentWorld>();
+            ComponentWorld world = ComponentWorld.Instance;
 
             Point16 pos = new(reader.ReadInt16(), reader.ReadInt16());
             string slot = reader.ReadString();
@@ -313,7 +313,7 @@ namespace TerraIntegration
             if (TerraIntegration.DebugMode)
 				Statistics.LogMessage($"[Net] Sending component frequency at {pos}");
 
-            ComponentWorld world = ModContent.GetInstance<ComponentWorld>();
+            ComponentWorld world = ComponentWorld.Instance;
             ComponentData data = world.GetDataOrNull(pos);
             if (data is null) return;
 
@@ -325,7 +325,7 @@ namespace TerraIntegration
         }
         private static void ReceiveComponentFrequency(BinaryReader reader) 
         {
-            ComponentWorld world = ModContent.GetInstance<ComponentWorld>();
+            ComponentWorld world = ComponentWorld.Instance;
 
             Point16 pos = new(reader.ReadInt16(), reader.ReadInt16());
             ushort freq = reader.ReadUInt16();

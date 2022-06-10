@@ -162,12 +162,7 @@ namespace TerraIntegration
             ComponentData data = ComponentWorld.Instance.GetDataOrNull(tile);
             if (data is not null && data.UpdateFrequency > 0 && ComponentWorld.Instance.ComponentUpdates.ContainsKey(tile))
             {
-                string comtext = $"{data.Component?.TypeName}\nFreq: {data.UpdateFrequency}\nUpdate: {FormatTime(data.LastUpdateTime)}";
-
-                if (!ComponentWorld.Instance.HoverText.IsNullEmptyOrWhitespace())
-                    comtext = ComponentWorld.Instance.HoverText + "\n" + comtext;
-
-                ComponentWorld.Instance.HoverText = comtext;
+                ComponentWorld.Instance.AddHoverText($"{data.Component?.TypeName}\nFreq: {data.UpdateFrequency}\nUpdate: {FormatTime(data.LastUpdateTime)}");
             }
         }
 

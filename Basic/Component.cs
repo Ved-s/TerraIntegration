@@ -29,7 +29,7 @@ namespace TerraIntegration.Basic
         private UIPanel @interface;
 
         public new static TerraIntegration Mod => ModContent.GetInstance<TerraIntegration>();
-        public static ComponentWorld World => ModContent.GetInstance<ComponentWorld>();
+        public static ComponentWorld World => ComponentWorld.Instance;
 
         public abstract string TypeName { get; }
         public string TypeDisplayName => Util.GetLangText(DisplayNameLocalizationKey, TypeDefaultDisplayName, DisplayNameFormatters);
@@ -61,9 +61,17 @@ namespace TerraIntegration.Basic
         public virtual SpriteSheet DefaultPropertySpriteSheet { get; set; } = null;
         public virtual Point DefaultPropertySpriteSheetPos => default;
 
-        public bool HasInterface => HasCustomInterface || VariableInfo?.Length is not null and > 0 || HasProperties();
+        public virtual bool HasInterface => HasCustomInterface || VariableInfo?.Length is not null and > 0 || HasProperties();
         public virtual bool HasCustomInterface => false;
-        public virtual Vector2 InterfaceOffset { get; protected set; } = new(24, 0);
+        public virtual Vector2 InterfaceOffset
+        {
+            get 
+            {
+                ComponentData data = GetDataOrNull(InterfacePos);
+                if (data is null) return new(24, 0);
+                return new(data.Size.X * 16 + 8, 0);
+            }
+        }
         public UIPanel Interface
         {
             get
@@ -204,8 +212,8 @@ namespace TerraIntegration.Basic
         public virtual bool HandlePacket(Point16 pos, ushort messageType, BinaryReader reader, int whoAmI, ref bool broadcast) { return false; }
         public ModPacket CreatePacket(Point16 pos, ushort messageType) => Networking.CreateComponentPacket(TypeName, pos, messageType);
 
-        public ComponentData GetData(Point16 pos, bool resolveSubTiles = true) => ModContent.GetInstance<ComponentWorld>().GetData(pos, this, resolveSubTiles);
-        public ComponentData GetDataOrNull(Point16 pos, bool resolveSubTiles = true) => ModContent.GetInstance<ComponentWorld>().GetDataOrNull(pos, resolveSubTiles);
+        public ComponentData GetData(Point16 pos, bool resolveSubTiles = true) => ComponentWorld.Instance.GetData(pos, this, resolveSubTiles);
+        public ComponentData GetDataOrNull(Point16 pos, bool resolveSubTiles = true) => ComponentWorld.Instance.GetDataOrNull(pos, resolveSubTiles);
 
         internal virtual void NetSendData(BinaryWriter writer, ComponentData data)
         {
@@ -387,6 +395,8 @@ namespace TerraIntegration.Basic
         public TimeSpan LastUpdateTime { get; set; } = default;
         public Point16 Size { get; set; } = new(1, 1);
 
+        public List<Error> LastErrors { get; } = new();
+
         public virtual Dictionary<string, Items.Variable> Variables { get; protected internal set; }
 
         public void CopyTo(ComponentData data)
@@ -467,8 +477,8 @@ namespace TerraIntegration.Basic
     {
         internal override bool HasData => true;
 
-        public new TDataType GetData(Point16 pos, bool resolveSubTiles = true) => ModContent.GetInstance<ComponentWorld>().GetData<TDataType>(pos, this, resolveSubTiles);
-        public new TDataType GetDataOrNull(Point16 pos, bool resolveSubTiles = true) => ModContent.GetInstance<ComponentWorld>().GetDataOrNull<TDataType>(pos, resolveSubTiles);
+        public new TDataType GetData(Point16 pos, bool resolveSubTiles = true) => ComponentWorld.Instance.GetData<TDataType>(pos, this, resolveSubTiles);
+        public new TDataType GetDataOrNull(Point16 pos, bool resolveSubTiles = true) => ComponentWorld.Instance.GetDataOrNull<TDataType>(pos, resolveSubTiles);
 
         public virtual TagCompound SaveCustomDataTag(TDataType data) => null;
         public virtual TDataType LoadCustomDataTag(TagCompound data, Point16 pos) => new();
@@ -560,9 +570,9 @@ namespace TerraIntegration.Basic
 
         public ComponentData MainData => ComponentWorld.Instance.GetData(MainTilePos);
 
-        public override Dictionary<string, Items.Variable> Variables => MainData.Variables;
-        public override Component Component => MainData.Component;
-        public override ComponentSystem System => MainData.System;
+        public override Dictionary<string, Items.Variable> Variables => MainData?.Variables;
+        public override Component Component => MainData?.Component;
+        public override ComponentSystem System => MainData?.System;
 
         public bool CheckValid()
         {

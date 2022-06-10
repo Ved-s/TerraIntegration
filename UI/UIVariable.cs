@@ -34,7 +34,7 @@ namespace TerraIntegration.UI
         public override void OnHover()
         {
             if (Var is null && VariableValidator is not null)
-                ModContent.GetInstance<ComponentWorld>().VariableHighlights.Add(VariableValidator);
+                ComponentWorld.Instance.VariableHighlights.Add(VariableValidator);
         }
     }
     public delegate bool VariableMatchDelegate(Variable var);

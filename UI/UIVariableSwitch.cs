@@ -82,7 +82,7 @@ namespace TerraIntegration.UI
                     else
                         hover = value;
 
-                    ModContent.GetInstance<ComponentWorld>().HoverText = hover;
+                    ComponentWorld.Instance.AddHoverText(hover);
                 }
             }
         }

@@ -412,7 +412,7 @@ namespace TerraIntegration
         {
             if (slot >= inv.Length) return;
 
-            ModContent.GetInstance<ComponentWorld>().HighlightItem(spriteBatch, inv[slot], texture, position, scale);
+            ComponentWorld.Instance.HighlightItem(spriteBatch, inv[slot], texture, position, scale);
         }
     }
 }

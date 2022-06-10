@@ -84,13 +84,13 @@ namespace TerraIntegration
 
     public record struct PositionedComponent(Point16 Pos, Component Component)
     {
-        public ComponentData GetData() => ModContent.GetInstance<ComponentWorld>().GetData(Pos, Component);
-        public ComponentData GetDataOrNull() => ModContent.GetInstance<ComponentWorld>().GetDataOrNull(Pos);
+        public ComponentData GetData() => ComponentWorld.Instance.GetData(Pos, Component);
+        public ComponentData GetDataOrNull() => ComponentWorld.Instance.GetDataOrNull(Pos);
 
         public T GetData<T>() where T : ComponentData, new()
-            => ModContent.GetInstance<ComponentWorld>().GetData<T>(Pos, Component);
+            => ComponentWorld.Instance.GetData<T>(Pos, Component);
         public T GetDataOrNull<T>() where T : ComponentData, new()
-            => ModContent.GetInstance<ComponentWorld>().GetDataOrNull<T>(Pos);
+            => ComponentWorld.Instance.GetDataOrNull<T>(Pos);
     }
 
     public enum CallSide { Both, Client, Server }

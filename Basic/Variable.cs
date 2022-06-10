@@ -20,7 +20,7 @@ namespace TerraIntegration.Basic
         internal readonly static SpriteSheet TileSheet = new("TerraIntegration/Assets/Types/tile", new(32, 32));
 
         public virtual Mod Mod => ModContent.GetInstance<TerraIntegration>();
-        public static ComponentWorld World => ModContent.GetInstance<ComponentWorld>();
+        public static ComponentWorld World => ComponentWorld.Instance;
 
         public static readonly Dictionary<Type, Variable> ByType = new();
         public static readonly Dictionary<string, Variable> ByTypeName = new();
@@ -34,7 +34,7 @@ namespace TerraIntegration.Basic
 
         public TypeIdentity TypeIdentity => TypeIdentity.Variable(this);
 
-        public string ShortId => ModContent.GetInstance<ComponentWorld>().Guids.GetShortGuid(Id);
+        public string ShortId => ComponentWorld.Instance.Guids.GetShortGuid(Id);
 
         public abstract string TypeName { get; }
         public string TypeDisplayName => Util.GetLangText(DisplayNameLocalizationKey, TypeDefaultDisplayName, DisplayNameFormatters);

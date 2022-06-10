@@ -92,7 +92,7 @@ namespace TerraIntegration.UI
         {
             base.DrawSelf(spriteBatch);
 
-            ComponentWorld world = ModContent.GetInstance<ComponentWorld>();
+            ComponentWorld world = ComponentWorld.Instance;
             const float size = 40;
 
             CalculatedStyle dim = GetDimensions();
@@ -139,11 +139,10 @@ namespace TerraIntegration.UI
 
                 if (!VariableDescription.IsNullEmptyOrWhitespace())
                 {
-                    hover.AppendLine();
                     hover.Append(VariableDescription);
                 }
 
-                ModContent.GetInstance<ComponentWorld>().HoverText = hover.ToString();
+                ComponentWorld.Instance.AddHoverText(hover.ToString());
             }
         }
     }

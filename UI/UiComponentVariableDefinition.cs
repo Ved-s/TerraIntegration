@@ -103,10 +103,10 @@ namespace TerraIntegration.UI
             {
                 string returns = VariableValue.TypeToName(Property.VariableReturnType, true);
 
-                ModContent.GetInstance<ComponentWorld>().HoverText =
+                ComponentWorld.Instance.AddHoverText(
                     $"[c/aaaa00:Type:] {Property.TypeDisplayName}" +
                     (returns is null ? "" : $"\n[c/aaaa00:Returns:] {returns}") +
-                    (Property.TypeDescription is null ? "" : "\n" + Property.TypeDescription);
+                    (Property.TypeDescription is null ? "" : "\n" + Property.TypeDescription));
             }
         }
 

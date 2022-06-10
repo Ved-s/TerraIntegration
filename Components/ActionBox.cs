@@ -25,8 +25,6 @@ namespace TerraIntegration.Components
         public string SlotIds = "0123";
         public UIComponentVariable[] Slots;
 
-        List<Error> Errors = new();
-
         public ActionBox() 
         {
             VariableInfo = new ComponentVariableInfo[]
@@ -95,8 +93,8 @@ namespace TerraIntegration.Components
                     string sid = id.ToString();
                     if (data.TryGetVariable(sid, out Variable var) && var is ActionVariable action)
                     {
-                        Errors.Clear();
-                        action.Execute(pos, data.System, Errors);
+                        data.LastErrors.Clear();
+                        action.Execute(pos, data.System, data.LastErrors);
                     }
                 }
             }

@@ -58,10 +58,10 @@ namespace TerraIntegration.UI
                 Main.LocalPlayer.mouseInterface = true;
 
                 if (Item is not null)
-                    ModContent.GetInstance<ComponentWorld>().HoverItem = Item;
+                    ComponentWorld.Instance.HoverItem = Item;
                 
                 else if (HoverText is not null)
-                    ModContent.GetInstance<ComponentWorld>().HoverText = HoverText;
+                    ComponentWorld.Instance.AddHoverText(HoverText);
 
                 OnHover();
                 Item playerHeld = PlayerHeldItem;

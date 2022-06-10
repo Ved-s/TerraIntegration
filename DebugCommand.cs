@@ -26,7 +26,7 @@ namespace TerraIntegration
 
             if (arg.Count == 0)
             {
-                caller.Reply("Expected subcommand: var, gen, todo, stats");
+                caller.Reply("Expected subcommand: var, gen, todo, stats, comdbg");
                 return;
             }
             string sub = arg[0];
@@ -37,13 +37,16 @@ namespace TerraIntegration
                     VarCommand(caller, arg);
                     return;
                 case "gen":
-                    ModContent.GetInstance<ComponentWorld>().PostWorldGen();
+                    ComponentWorld.Instance.PostWorldGen();
                     return;
                 case "todo":
                     ToDoCommand(caller);
                     return;
                 case "stats":
                     Statistics.Visible = !Statistics.Visible;
+                    return;
+                case "comdbg":
+                    ComponentWorld.Instance.ComponentDebug = !ComponentWorld.Instance.ComponentDebug;
                     return;
             }
 
@@ -70,8 +73,8 @@ namespace TerraIntegration
             {
                 string sid = arg[0][1..];
                 if (sid.StartsWith('!'))
-                    id = ModContent.GetInstance<ComponentWorld>().Guids.GetGuid(sid[1..]);
-                else id = ModContent.GetInstance<ComponentWorld>().Guids.GetUniqueId(sid);
+                    id = ComponentWorld.Instance.Guids.GetGuid(sid[1..]);
+                else id = ComponentWorld.Instance.Guids.GetUniqueId(sid);
                 arg.RemoveAt(0);
 
                 if (arg.Count < 1)

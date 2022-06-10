@@ -3,13 +3,8 @@ using Microsoft.Xna.Framework.Graphics;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using TerraIntegration.Basic;
-using TerraIntegration.ComponentProperties;
-using TerraIntegration.Components;
 using TerraIntegration.DataStructures;
-using TerraIntegration.Variables;
 using Terraria;
 using Terraria.Audio;
 using Terraria.GameContent.UI.Elements;
@@ -48,7 +43,7 @@ namespace TerraIntegration.UI
                 SetupDescription));
 
             Tabs.Add(new ComponentUITab("Config",
-                () => InterfaceComponent.Component.DefaultUpdateFrequency > 0 
+                () => InterfaceComponent.Component.DefaultUpdateFrequency > 0
                 && InterfaceComponent.Component.ConfigurableFrequency,
                 SetupComponentConfig));
         }
@@ -59,6 +54,11 @@ namespace TerraIntegration.UI
 
         public void SetInterfaceComponent(Point16 pos, Component c)
         {
+            ComponentData data = c.GetDataOrNull(pos);
+            if (data is null)
+                return;
+            pos = data.Position;
+
             if (!CheckReach(c.GetInterfaceReachCheckPos(pos))) return;
 
             if (InterfaceComponent.Pos == pos)
@@ -200,30 +200,30 @@ namespace TerraIntegration.UI
             ComponentVariableInfo[] info = InterfaceComponent.Component.VariableInfo;
             if (info is null || info.Length == 0) return;
 
-                int y = (int)pos.Y;
+            int y = (int)pos.Y;
 
-                foreach (ComponentVariableInfo inf in info)
+            foreach (ComponentVariableInfo inf in info)
+            {
+                var var = new UIComponentNamedVariable()
                 {
-                    var var = new UIComponentNamedVariable()
-                    {
-                        Top = new(y, 0),
-                        Left = new(pos.X, 0),
-                        Width = new(0, 1),
+                    Top = new(y, 0),
+                    Left = new(pos.X, 0),
+                    Width = new(0, 1),
 
-                        VariableTypes = inf.AcceptVariableTypes,
-                        VariableReturnTypes = inf.AcceptVariableReturnTypes,
-                        VariableName = inf.VariableName,
-                        VariableSlot = inf.VariableSlot,
-                        VariableDescription = inf.VariableDescription,
-                        Component = InterfaceComponent
-                    };
-                    Interface.CurrentState.Append(var);
+                    VariableTypes = inf.AcceptVariableTypes,
+                    VariableReturnTypes = inf.AcceptVariableReturnTypes,
+                    VariableName = inf.VariableName,
+                    VariableSlot = inf.VariableSlot,
+                    VariableDescription = inf.VariableDescription,
+                    Component = InterfaceComponent
+                };
+                Interface.CurrentState.Append(var);
 
-                    y += (int)(var.Height.Pixels) + 4;
-                }
-            
+                y += (int)(var.Height.Pixels) + 4;
+            }
+
         }
-        private void SetupDescription(Vector2 pos) 
+        private void SetupDescription(Vector2 pos)
         {
             string typeDescription = InterfaceComponent.Component.TypeDescription;
             if (typeDescription.IsNullEmptyOrWhitespace()) return;
@@ -460,7 +460,7 @@ namespace TerraIntegration.UI
 
                 screen /= Main.UIScale;
                 screen += InterfaceOffset;
-                
+
 
                 //screen *= Main.GameZoomTarget;
                 //screen /= Main.UIScale;
@@ -472,7 +472,7 @@ namespace TerraIntegration.UI
                 Main.spriteBatch.End();
             }
         }
-        public void Update() 
+        public void Update()
         {
             if (InterfaceComponent.Component is not null)
             {

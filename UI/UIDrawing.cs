@@ -21,8 +21,8 @@ namespace TerraIntegration.UI
         public override void Update(GameTime gameTime)
         {
             base.Update(gameTime);
-            if (IsMouseHovering && !HoverText.IsNullEmptyOrWhitespace() && ComponentWorld.Instance.HoverText is null)
-                ComponentWorld.Instance.HoverText = HoverText;
+            if (IsMouseHovering && !HoverText.IsNullEmptyOrWhitespace())
+                ComponentWorld.Instance.AddHoverText(HoverText);
         }
     }
 }

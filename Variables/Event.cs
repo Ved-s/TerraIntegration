@@ -42,8 +42,8 @@ namespace TerraIntegration.Variables
             {
                 if (com.Key == pos) continue;
 
-                ComponentData data = com.Value?.GetDataOrNull(com.Key);
-                if (data is null) continue;
+                ComponentData data = com.Value?.GetDataOrNull(com.Key, false);
+                if (data is null or SubTileComponentData) continue;
 
                 foreach (var kvp in data.Variables)
                 {

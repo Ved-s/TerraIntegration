@@ -16,7 +16,7 @@ namespace TerraIntegration
     public class ComponentSystem
     {
         public static TerraIntegration Mod => ModContent.GetInstance<TerraIntegration>();
-        public static ComponentWorld World => ModContent.GetInstance<ComponentWorld>();
+        public static ComponentWorld World => ComponentWorld.Instance;
 
         public static HashSet<int> CableTiles = new();
         public static HashSet<int> CableWalls = new();

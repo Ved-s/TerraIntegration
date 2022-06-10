@@ -72,7 +72,6 @@ namespace TerraIntegration.Components
         public override bool CanHaveVariables => true;
 
         private UIComponentVariable Slot = new();
-        private List<Error> Errors = new();
 
         public override void SetStaticDefaults()
         {
@@ -141,17 +140,17 @@ namespace TerraIntegration.Components
                 SyncNull(data);
                 return;
             }
-            Errors.Clear();
+            data.LastErrors.Clear();
 
             if (Main.netMode != NetmodeID.MultiplayerClient)
             {
                 Variable var = data.GetVariable(DisplayVariableSlot);
-                VariableValue value = var?.GetValue(data.System, Errors);
+                VariableValue value = var?.GetValue(data.System, data.LastErrors);
                 var?.SetLastValue(value, data.System);
 
-                if (Errors.Count > 0)
+                if (data.LastErrors.Count > 0)
                 {
-                    data.DisplayValue = new ErrorDisplay(Errors.ToArray());
+                    data.DisplayValue = new ErrorDisplay(data.LastErrors.ToArray());
                     SyncValue(data);
                     return;
                 }
@@ -270,9 +269,8 @@ namespace TerraIntegration.Components
         {
             DisplayData data = GetData(pos);
 
-            if (data.DisplayValue is null)
+            if (data.DisplayValue is null or ErrorDisplay)
                 return null;
-
 
             return data.DisplayValue.HoverText;
         }
@@ -305,14 +303,7 @@ namespace TerraIntegration.Components
         }
         public override void UpdateInterface(Point16 pos)
         {
-            DisplayData data = GetData(pos);
-            Vector2 off = new(data.Size.X * 16, 0);
-
-            off.X += 8;
-
-            InterfaceOffset = off;
-
-            Slot.Component = new(data.Position, this);
+            Slot.Component = new(pos, this);
         }
         public override Vector2 GetInterfaceReachCheckPos(Point16 pos)
         {

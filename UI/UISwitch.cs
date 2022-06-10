@@ -60,12 +60,12 @@ namespace TerraIntegration.UI
         {
             base.Update(gameTime);
 
-            if (IsMouseHovering && ComponentWorld.Instance.HoverText is null)
+            if (IsMouseHovering)
             {
                 SwitchState? state = CurrentState;
                 if (state?.HoverText.IsNullEmptyOrWhitespace() ?? true) return;
 
-                ComponentWorld.Instance.HoverText = state.Value.HoverText;
+                ComponentWorld.Instance.AddHoverText(state.Value.HoverText);
             }
         }
 
