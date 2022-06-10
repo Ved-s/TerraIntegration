@@ -231,6 +231,11 @@ namespace TerraIntegration.Basic
                 Variable.SaveData(kvp.Value.Var, writer);
             }
             writer.Write(data.UpdateFrequency);
+            writer.Write(data.LastErrors.Count);
+            foreach (Error e in data.LastErrors)
+            {
+                e.NetSend(writer);
+            }
             SendDataInternal(writer, data);
         }
         internal static ComponentData NetReceiveData(BinaryReader reader, Point16 pos)
@@ -249,6 +254,12 @@ namespace TerraIntegration.Basic
                 vars[index] = var;
             }
             ushort freq = reader.ReadUInt16();
+
+            int errorsCount = reader.ReadInt32();
+            Error[] errors = new Error[errorsCount];
+            for (int i = 0; i < errorsCount; i++)
+                errors[i] = Error.NetReceive(reader);
+
             ushort dataLength = reader.ReadUInt16();
 
             ComponentData data;
@@ -261,6 +272,7 @@ namespace TerraIntegration.Basic
 
             data = c.ReceiveDataInternal(reader, dataLength, component, pos);
             data.Init(c, pos);
+            data.LastErrors.AddRange(errors);
 
             foreach (var kvp in vars)
                 data.SetVariable(kvp.Key, kvp.Value);
@@ -396,6 +408,7 @@ namespace TerraIntegration.Basic
         public TimeSpan LastUpdateTime { get; set; } = default;
         public Point16 Size { get; set; } = new(1, 1);
 
+        List<Error> SentErrors = new();
         public List<Error> LastErrors { get; } = new();
 
         public virtual Dictionary<string, Items.Variable> Variables { get; protected internal set; }
@@ -428,7 +441,7 @@ namespace TerraIntegration.Basic
 
         internal void Destroy(Point16 pos)
         {
-            if (this is SubTileComponentData)
+            if (this is SubTileComponentData || Networking.Client)
                 return;
 
             foreach (Items.Variable v in Variables.Values)
@@ -476,6 +489,16 @@ namespace TerraIntegration.Basic
         {
             var = GetVariable(slot);
             return var is not null;
+        }
+
+        public void SyncErrors()
+        {
+            if (!Networking.Server || SentErrors.SequenceEqual(LastErrors))
+                return;
+
+            Networking.SendComponentErrors(Position);
+            SentErrors.Clear();
+            SentErrors.AddRange(LastErrors);
         }
     }
 

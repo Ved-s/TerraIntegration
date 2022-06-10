@@ -75,6 +75,10 @@ namespace TerraIntegration
                         broadcast = true;
                         break;
 
+                    case NetMessageType.ComponentErrors:
+                        ReceiveComponentErrors(reader);
+                        break;
+
                     default:
                         LogWarn("Unhandled netmessage: {0}", msgType);
                         break;
@@ -137,6 +141,7 @@ namespace TerraIntegration
             {
                 if (
                     data is UnloadedComponentData 
+                    || data is SubTileComponentData
                     || data.Component is null
                     || !data.Component.ShouldSyncData(data)) continue;
                 send.Add(data);
@@ -302,10 +307,10 @@ namespace TerraIntegration
 
             ComponentWorld world = ComponentWorld.Instance;
             ComponentData data = world.GetDataOrNull(pos);
-            if (!data.Variables.TryGetValue(slot, out Items.Variable var))
+            if (data is null)
                 return;
 
-            Variable v = var?.Var;
+            Variable v = data.GetVariable(slot);
 
             ModPacket pack = CreatePacket(NetMessageType.ComponentVariable);
             pack.Write(pos.X);
@@ -364,6 +369,37 @@ namespace TerraIntegration
             data.UpdateFrequency = freq;
         }
 
+        public static void SendComponentErrors(Point16 pos)
+        {
+            if (!Server) return;
+            ComponentData data = ComponentWorld.Instance.GetDataOrNull(pos);
+            if (data is null) return;
+
+            ModPacket pack = CreatePacket(NetMessageType.ComponentErrors);
+            pack.Write(pos.X);
+            pack.Write(pos.Y);
+
+            pack.Write(data.LastErrors.Count);
+            foreach (Error e in data.LastErrors)
+            {
+                e.NetSend(pack);
+            }
+
+            pack.Send();
+        }
+        private static void ReceiveComponentErrors(BinaryReader reader)
+        {
+            Point16 pos = new(reader.ReadInt16(),reader.ReadInt16());
+
+            ComponentData data = ComponentWorld.Instance.GetData(pos);
+
+            int count = reader.ReadInt32();
+            data.LastErrors.Clear();
+
+            for (int i = 0; i < count; i++)
+                data.LastErrors.Add(Error.NetReceive(reader));
+        }
+
         private static void LogWarn(string format, params object[] args) 
         {
             if (Main.dedServ)
@@ -388,7 +424,8 @@ namespace TerraIntegration
         ComponentPacket,
         VariablePacket,
         ComponentVariable,
-        ComponentFrequency
+        ComponentFrequency,
+        ComponentErrors
     }
 
     public class NetworkException : Exception

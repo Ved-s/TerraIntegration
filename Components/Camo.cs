@@ -148,7 +148,7 @@ namespace TerraIntegration.Components
                     mimic.FrameX = (short)tile.TileFrameX;
                     mimic.FrameY = (short)tile.TileFrameY;
                 }
-
+                data.SyncErrors();
                 CamoChanged(mimic, pos, false);
             }
         }

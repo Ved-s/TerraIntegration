@@ -88,15 +88,16 @@ namespace TerraIntegration.Components
             if (variableSlot == "evt")
             { 
                 ComponentData data = GetData(pos);
+                data.LastErrors.Clear();
                 foreach (char id in SlotIds)
                 {
                     string sid = id.ToString();
                     if (data.TryGetVariable(sid, out Variable var) && var is ActionVariable action)
                     {
-                        data.LastErrors.Clear();
                         action.Execute(pos, data.System, data.LastErrors);
                     }
                 }
+                data.SyncErrors();
             }
         }
     }

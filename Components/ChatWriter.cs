@@ -1,8 +1,10 @@
 ﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using TerraIntegration.Basic;
 using TerraIntegration.DataStructures;
 using Terraria;
 using Terraria.Enums;
+using Terraria.GameContent;
 using Terraria.ID;
 using Terraria.Localization;
 using Terraria.ModLoader;
@@ -82,6 +84,21 @@ namespace TerraIntegration.Components
             Tile t = Framing.GetTileSafely(i, j);
             noItem = t.TileFrameX % 34 != 0 || t.TileFrameY != 0;
         }
+        public override void PostDraw(int i, int j, SpriteBatch spriteBatch)
+        {
+            base.PostDraw(i, j, spriteBatch);
+
+            Vector2 screen = new Vector2(i, j) * 16 + new Vector2(Main.offScreenRange) - Main.screenPosition;
+
+            Texture2D tex = TextureAssets.Tile[Type].Value;
+            ComponentData data = GetData(new(i, j));
+
+            Color c = data.LastErrors.Count == 0 ? Color.Lime : Color.OrangeRed;
+            Tile t = Main.tile[i, j];
+
+            Rectangle glowFrame = new(t.TileFrameX, t.TileFrameY + 34, 16, 16);
+            spriteBatch.Draw(tex, screen, glowFrame, c);
+        }
 
         public override void OnPlaced(Point16 pos)
         {
@@ -108,7 +125,7 @@ namespace TerraIntegration.Components
                     return;
                 data.LastErrors.Clear();
                 VariableValue value = msg.GetValue(data.System, data.LastErrors);
-
+                data.SyncErrors();
                 if (value is not Values.String str)
                     return;
 

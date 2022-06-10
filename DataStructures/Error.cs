@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -18,6 +19,12 @@ namespace TerraIntegration.DataStructures
         {
             Type = type;
             Args = args.Select(o => o.ToString()).ToArray();
+        }
+
+        public Error(string type, params string[] args)
+        {
+            Type = type;
+            Args = args;
         }
 
         public override bool Equals(object obj)
@@ -42,6 +49,29 @@ namespace TerraIntegration.DataStructures
             }
 
             return $"{Type}: {string.Join(", ", Args)}";
+        }
+
+        public void NetSend(BinaryWriter writer)
+        {
+            writer.Write(Type);
+            writer.Write(Args?.Length ?? 0);
+
+            if (Args?.Length is not null and > 0)
+                foreach (string arg in Args)
+                    writer.Write(arg);
+        }
+        public static Error NetReceive(BinaryReader reader)
+        {
+            string type = reader.ReadString();
+            int count = reader.ReadInt32();
+            string[] args = new string[count];
+
+            for (int i = 0; i < count; i++)
+            {
+                args[i] = reader.ReadString();
+            }
+
+            return new Error(type, args);
         }
     }
 

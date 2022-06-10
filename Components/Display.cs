@@ -25,20 +25,25 @@ namespace TerraIntegration.Components
 
         public void NoMoreMaster(Point16? newMasterPos)
         {
+            if (Networking.Client) return;
+
             Variable v = GetVariable(Display.DisplayVariableSlot);
             if (v is not null)
             {
                 if (newMasterPos.HasValue)
                 {
-                    DisplayData master = (Component as Display).GetData(newMasterPos.Value);
-                    Variable masterVar = master.GetVariable(Display.DisplayVariableSlot);
-                    if (masterVar is null)
+                    DisplayData master = (Component as Display).GetDataOrNull(newMasterPos.Value);
+                    if (master is not null)
                     {
-                        master.SetVariable(Display.DisplayVariableSlot, v);
-                        ClearVariable(Display.DisplayVariableSlot);
-                        master.Component.OnVariableChanged(newMasterPos.Value, Display.DisplayVariableSlot);
-                        Component.OnVariableChanged(Position, Display.DisplayVariableSlot);
-                        return;
+                        Variable masterVar = master.GetVariable(Display.DisplayVariableSlot);
+                        if (masterVar is null)
+                        {
+                            master.SetVariable(Display.DisplayVariableSlot, v);
+                            ClearVariable(Display.DisplayVariableSlot);
+                            master.Component.OnVariableChanged(master.Position, Display.DisplayVariableSlot);
+                            Component.OnVariableChanged(Position, Display.DisplayVariableSlot);
+                            return;
+                        }
                     }
                 }
 
@@ -121,8 +126,8 @@ namespace TerraIntegration.Components
         }
         public override void OnKilled(Point16 pos)
         {
-            DisplayData data = GetData(pos);
-            data.NoMoreMaster(null);
+            DisplayData data = GetData(pos, false);
+            data?.NoMoreMaster(null);
             ScanAndUpdateDisplayFrames(pos, true);
             base.OnKilled(pos);
         }
@@ -144,6 +149,8 @@ namespace TerraIntegration.Components
             Variable var = data.GetVariable(DisplayVariableSlot);
             VariableValue value = var?.GetValue(data.System, data.LastErrors);
             var?.SetLastValue(value, data.System);
+
+            data.SyncErrors();
 
             if (data.LastErrors.Count > 0)
                 data.DisplayValue = new ErrorDisplay(data.LastErrors.ToArray());
