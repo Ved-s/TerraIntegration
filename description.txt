@@ -3,5 +3,7 @@ Inspired by Integrated Dynamics Minecraft mod.
 
 Prease visit mod's forum page for more details
 
+Multiplayer is still bugged, so expect bugs and item duping.
+
 Forum page (homepage): https://forums.terraria.org/index.php?threads/terra-integration.112868/
 GitHub page: https://github.com/Ved-s/TerraIntegration
