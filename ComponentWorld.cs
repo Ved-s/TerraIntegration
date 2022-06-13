@@ -223,6 +223,7 @@ namespace TerraIntegration
             int ind = layers.FindIndex(l => l.Name == "Vanilla: Inventory");
             if (ind >= 0) layers.Insert(ind, new LegacyGameInterfaceLayer($"{Mod.Name}: UI", DrawUI, InterfaceScaleType.UI));
         }
+
         public override void PostUpdateEverything()
         {
             Statistics.ResetUpdates();
@@ -258,7 +259,7 @@ namespace TerraIntegration
                 {
                     string hover = cdata.Component.GetHoverText(mouseWorldTile);
                     if (hover is not null)
-                        HoverText = hover;
+                        AddHoverText(hover);
                 }
             }
 
@@ -460,11 +461,17 @@ namespace TerraIntegration
             }
         }
 
+        internal void ResetHoverText() 
+        {
+            HoverText = null;
+        }
+
         public void AddHoverText(string text)
         {
-            if (HoverText is not null)
+            if (!HoverText.IsNullEmptyOrWhitespace())
                 HoverText += "\n" + text;
-            else HoverText = text;
+            else 
+                HoverText = text;
         }
     }
 
