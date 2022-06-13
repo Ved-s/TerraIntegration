@@ -10,7 +10,7 @@ namespace TerraIntegration.Variables.Actions
 {
     public class TriggerEvent : ActionVariable
     {
-        public override VariableMatch Variables => VariableMatch.OfType<Event>();
+        protected override VariableMatch InitVariables => VariableMatch.OfType<Event>();
         public override bool NeedsSaveTag => true;
         public override bool HasComplexInterface => false;
 

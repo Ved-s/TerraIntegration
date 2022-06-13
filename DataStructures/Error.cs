@@ -99,6 +99,13 @@ namespace TerraIntegration.DataStructures
             return new("ExpectedValues", id.ToString(),
                 string.Join(", ", valueTypes.Select(t => VariableValue.TypeToName(t, false))));
         }
+        public static Error ExpectedValues(string values, TypeIdentity id)
+        {
+            if (values is null) throw new ArgumentNullException(nameof(values));
+
+            return new("ExpectedValues", id.ToString(), values);
+        }
+
         public static Error ExpectedVariable(Type variableType, TypeIdentity id)
         {
             string varName = Variable.ByType.TryGetValue(variableType, out Variable var) ?

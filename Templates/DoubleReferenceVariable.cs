@@ -25,7 +25,10 @@ namespace TerraIntegration.Templates
         public virtual string LeftSlotDescription => null;
         public virtual string RightSlotDescription => null;
 
-        public abstract Type[] LeftSlotValueTypes { get; }
+        private VariableMatch LeftSlotMatchCache;
+        public VariableMatch LeftSlotMatch => LeftSlotMatchCache ??= InitLeftSlotMatch;
+        protected abstract VariableMatch InitLeftSlotMatch { get; }
+
         public virtual UIDrawing CenterDrawing => new UIDrawing()
         {
             OnDraw = (e, sb, style) =>
@@ -38,7 +41,7 @@ namespace TerraIntegration.Templates
         public Guid RightId { get; set; }
         public bool HasComplexInterface => false;
 
-        public override Type[] RelatedTypes => LeftSlotValueTypes;
+        protected override VariableMatch InitRelated => LeftSlotMatch;
 
         private Type[] ValidRightTypes;
         private Dictionary<Type, Type[]> ValidTypesCache = new();
@@ -52,8 +55,8 @@ namespace TerraIntegration.Templates
                 Left = new(-75, .5f),
 
                 DisplayOnly = true,
-                VariableValidator = (var) => LeftSlotValueTypes is not null && LeftSlotValueTypes.Any(t => t.IsAssignableFrom(var.VariableReturnType)),
-                HoverText = TypeListWithDescription(LeftSlotValueTypes, LeftSlotDescription),
+                VariableValidator = (var) => LeftSlotMatch.MatchVariable(var),
+                HoverText = TypeListWithDescription(LeftSlotMatch.GetMatchDescription(), LeftSlotDescription),
 
                 VariableChanged = (var) =>
                 {
@@ -114,11 +117,23 @@ namespace TerraIntegration.Templates
             return doubleRef;
         }
 
+        public string TypeListWithDescription(string types, string description)
+        {
+            if (types is null) return description;
+
+            string result = types;
+
+            if (description is not null)
+                result += "\n" + description;
+
+            return result;
+        }
+
         public string TypeListWithDescription(IEnumerable<Type> types, string description)
         {
             if (types is null) return description;
 
-            string result = string.Join(", ", string.Join(", ", types.Select(t => VariableValue.TypeToName(t, true))));
+            string result = string.Join(", ", types.Select(t => VariableValue.TypeToName(t, true)));
 
             if (description is not null)
                 result += "\n" + description;
@@ -137,9 +152,9 @@ namespace TerraIntegration.Templates
 
             if (!ValidTypePairs.Contains((leftType, rightType)))
             {
-                if (LeftSlotValueTypes is not null && !LeftSlotValueTypes.Any(t => t.IsAssignableFrom(leftType)))
+                if (LeftSlotMatch is not null && !LeftSlotMatch.MatchType(leftType))
                 {
-                    errors.Add(Errors.ExpectedValues(LeftSlotValueTypes, TypeIdentity));
+                    errors.Add(Errors.ExpectedValues(LeftSlotMatch.GetMatchDescription(), TypeIdentity));
                     return null;
                 }
 

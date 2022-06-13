@@ -23,7 +23,7 @@ namespace TerraIntegration.Variables.Numeric
 
         public override SpriteSheetPos SpriteSheetPos => new(MathSheet, 0, 0);
 
-        public override Type[] LeftSlotValueTypes => new[] { typeof(IAddable) };
+        protected override VariableMatch InitLeftSlotMatch => VariableMatch.OfReturnType(typeof(IAddable));
 
         public override Type[] GetValidRightReferenceSlotTypes(Type leftSlotType)
         {

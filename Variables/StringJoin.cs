@@ -20,7 +20,7 @@ namespace TerraIntegration.Variables
 
         public override object[] DescriptionFormatters => new[] { VariableValue.TypeToName<IToString>() };
 
-        public override Type[] LeftSlotValueTypes => new[] { typeof(Values.String) };
+        protected override VariableMatch InitLeftSlotMatch => VariableMatch.OfReturnType<Values.String>();
         List<string> Strings = new();
 
         public override SpriteSheetPos SpriteSheetPos => new(BasicSheet, 2, 1);

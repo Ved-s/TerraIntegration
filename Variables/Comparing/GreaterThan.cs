@@ -19,7 +19,7 @@ namespace TerraIntegration.Variables.Comparing
 
         public override SpriteSheetPos SpriteSheetPos => new(ComparingSheet, 1, 1);
 
-        public override Type[] LeftSlotValueTypes => new[] { typeof(Interfaces.IComparable) };
+        protected override VariableMatch InitLeftSlotMatch => VariableMatch.OfReturnType(typeof(Interfaces.IComparable));
 
         public override Type VariableReturnType => typeof(Values.Boolean);
 

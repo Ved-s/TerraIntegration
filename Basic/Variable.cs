@@ -61,7 +61,10 @@ namespace TerraIntegration.Basic
             set => SetReturnTypeCache(value);
         }
 
-        public virtual Type[] RelatedTypes => null;
+        private VariableMatch RelatedCache;
+        public VariableMatch Related => RelatedCache ??= InitRelated;
+        protected virtual VariableMatch InitRelated => null;
+
         public virtual bool VisibleInProgrammerVariables => true;
         public virtual bool ShowLastValue => true;
 
@@ -438,11 +441,11 @@ namespace TerraIntegration.Basic
 
             foreach (Variable var in ByType.Values)
             {
-                var rel = var.RelatedTypes;
+                var rel = var.Related;
                 if (rel is null) continue;
-                foreach (Type relType in rel)
-                    if (allTypes.Contains(relType))
-                        yield return (relType, var);
+                foreach (Type type in allTypes)
+                    if (rel.MatchType(type))
+                        yield return (type, var);
             }
         }
 

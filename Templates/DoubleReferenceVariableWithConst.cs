@@ -19,7 +19,10 @@ namespace TerraIntegration.Templates
         public UIVariableSlot LeftSlot { get; set; }
         public UIConstantOrReference RightSlot { get; set; }
 
-        public abstract Type[] LeftSlotValueTypes { get; }
+        private VariableMatch LeftSlotMatchCache;
+        public VariableMatch LeftSlotMatch => LeftSlotMatchCache ??= InitLeftSlotMatch;
+        protected abstract VariableMatch InitLeftSlotMatch { get; }
+
         public virtual UIDrawing CenterDrawing => new UIDrawing()
         {
             OnDraw = (e, sb, style) =>
@@ -32,7 +35,7 @@ namespace TerraIntegration.Templates
         public ValueOrRef Right { get; set; }
         public bool HasComplexInterface => true;
 
-        public override Type[] RelatedTypes => LeftSlotValueTypes;
+        protected override VariableMatch InitRelated => LeftSlotMatch;
 
         private Dictionary<Type, Type[]> ValidTypesCache = new();
         private HashSet<(Type, Type)> ValidTypePairs = new();
@@ -45,8 +48,8 @@ namespace TerraIntegration.Templates
                 Left = new(-75, .5f),
 
                 DisplayOnly = true,
-                VariableValidator = (var) => LeftSlotValueTypes is not null && LeftSlotValueTypes.Any(t => t.IsAssignableFrom(var.VariableReturnType)),
-                HoverText = LeftSlotValueTypes is null ? null : string.Join(", ", LeftSlotValueTypes.Select(t => VariableValue.TypeToName(t, true))),
+                VariableValidator = (var) => LeftSlotMatch is not null && LeftSlotMatch.MatchVariable(var),
+                HoverText = LeftSlotMatch is null ? null : LeftSlotMatch.GetMatchDescription(),
 
                 VariableChanged = (var) =>
                 {
@@ -107,9 +110,9 @@ namespace TerraIntegration.Templates
 
             if (!ValidTypePairs.Contains((leftType, rightType)))
             {
-                if (LeftSlotValueTypes is not null && !LeftSlotValueTypes.Any(t => t.IsAssignableFrom(leftType)))
+                if (LeftSlotMatch is not null && !LeftSlotMatch.MatchType(leftType))
                 {
-                    errors.Add(Errors.ExpectedValues(LeftSlotValueTypes, TypeIdentity));
+                    errors.Add(Errors.ExpectedValues(LeftSlotMatch.GetMatchDescription(), TypeIdentity));
                     return null;
                 }
 

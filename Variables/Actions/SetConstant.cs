@@ -11,7 +11,7 @@ namespace TerraIntegration.Variables.Actions
 {
     public class SetConstant : ActionWithReferenceConst
     {
-        public override VariableMatch Variables => VariableMatch.OfType<Constant>();
+        protected override VariableMatch InitVariables => VariableMatch.OfType<Constant>();
         public override bool HasComplexInterface => false;
 
         public override string TypeName => "setconst";

@@ -15,7 +15,10 @@ namespace TerraIntegration.Basic
     {
         internal readonly static SpriteSheet ActionsSheet = new("TerraIntegration/Assets/Types/actions", new(32, 32));
 
-        public abstract VariableMatch Variables { get; }
+        private VariableMatch VariablesCache;
+        protected VariableMatch Variables => VariablesCache ??= InitVariables;
+        protected abstract VariableMatch InitVariables { get; }
+
         public abstract bool NeedsSaveTag { get; }
 
         public sealed override Type VariableReturnType => null;
@@ -28,7 +31,7 @@ namespace TerraIntegration.Basic
         public UIVariableSlot ActionVarSlot { get; set; }
         public Guid ActionVarId { get; set; }
 
-        public override Type[] RelatedTypes => Variables.ToTypeArray();
+        protected override VariableMatch InitRelated => Variables;
         public override bool VisibleInProgrammerVariables => false;
 
         public void Execute(Point16 pos, ComponentSystem system, List<Error> errors)
@@ -36,11 +39,9 @@ namespace TerraIntegration.Basic
             Variable var = system.GetVariable(ActionVarId, errors);
             if (var is null) return;
 
-            VariableMatch match = Variables;
-
-            if (!match.Match(var))
+            if (!Variables.MatchVariable(var))
             {
-                errors.Add(Errors.ExpectedVariables(match.ToTypeNameString(), TypeIdentity));
+                errors.Add(Errors.ExpectedVariables(Variables.GetMatchDescription(), TypeIdentity));
                 return;
             }
             Execute(pos, var, system, errors);
@@ -97,8 +98,8 @@ namespace TerraIntegration.Basic
                 Top = new(-21, .5f),
                 DisplayOnly = true,
 
-                VariableValidator = var => Variables.Match(var),
-                HoverText = Variables.ToTypeNameString(),
+                VariableValidator = var => Variables.MatchVariable(var),
+                HoverText = Variables.GetMatchDescription(),
             });
             SetupActionInterface();
         }

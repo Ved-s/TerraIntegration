@@ -12,7 +12,7 @@ namespace TerraIntegration.Variables.Bitwise
 {
     public class Xnor : DoubleReferenceVariableWithConst
     {
-        public override Type[] LeftSlotValueTypes => new[] { typeof(Values.Boolean), typeof(INumeric) };
+        protected override VariableMatch InitLeftSlotMatch => VariableMatch.OfReturnTypes(typeof(Values.Boolean), typeof(INumeric));
         public override string TypeName => "xnor";
         public override string TypeDefaultDisplayName => "Xnor";
         public override string TypeDefaultDescription => "Boolean or bitwise Xnor operator";

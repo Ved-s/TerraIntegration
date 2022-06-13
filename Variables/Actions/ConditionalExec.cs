@@ -11,7 +11,7 @@ namespace TerraIntegration.Variables.Actions
 {
     public class ConditionalExec : ActionWithReference
     {
-        public override VariableMatch Variables => VariableMatch.OfType<ActionVariable>();
+        protected override VariableMatch InitVariables => VariableMatch.OfType<ActionVariable>();
 
         public override string TypeName => "condExec";
         public override string TypeDefaultDisplayName => "Conditional exec";

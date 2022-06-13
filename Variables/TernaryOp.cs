@@ -21,7 +21,7 @@ namespace TerraIntegration.Variables
 
         public override SpriteSheetPos SpriteSheetPos => new(BasicSheet, 3, 2);
 
-        public override Type[] RelatedTypes => new[] { typeof(Values.Boolean) };
+        protected override VariableMatch InitRelated => VariableMatch.OfReturnType<Values.Boolean>();
 
         public Guid Condition, TrueValue, FalseValue;
 

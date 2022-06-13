@@ -12,7 +12,7 @@ namespace TerraIntegration.Variables.Bitwise
 {
     public class And : DoubleReferenceVariableWithConst
     {
-        public override Type[] LeftSlotValueTypes => new[] { typeof(Values.Boolean), typeof(INumeric) };
+        protected override VariableMatch InitLeftSlotMatch => VariableMatch.OfReturnTypes(typeof(Values.Boolean), typeof(INumeric));
         public override string TypeName => "and";
         public override string TypeDefaultDisplayName => "And";
         public override string TypeDefaultDescription => "Boolean or bitwise And operator";

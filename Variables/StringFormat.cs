@@ -22,7 +22,7 @@ namespace TerraIntegration.Variables
 
         public override SpriteSheetPos SpriteSheetPos => new(BasicSheet, 2, 2);
 
-        public override Type[] LeftSlotValueTypes => new[] { typeof(Values.String) };
+        protected override VariableMatch InitLeftSlotMatch => VariableMatch.OfReturnType<Values.String>();
         List<string> Strings = new();
 
         public override string LeftSlotDescription => "Format string\nExample: The value is {0}";

@@ -21,6 +21,7 @@ namespace TerraIntegration.Templates
         public sealed override string TypeName => $"{(ValueTypeName is null ? "" : ValueTypeName + ".")}{PropertyName}";
 
         public abstract Type[] ValueTypes { get; }
+
         public string ValueTypeName
         {
             get
@@ -48,8 +49,8 @@ namespace TerraIntegration.Templates
         public sealed override string TypeDefaultDescription => PropertyDescription;
         public sealed override string TypeDefaultDisplayName => PropertyDisplay;
 
-        public override Type[] ReferenceReturnTypes => ValueTypes;
-        public override Type[] RelatedTypes => ValueTypes;
+        protected override VariableMatch InitReferenceMatch => VariableMatch.OfReturnTypes(ValueTypes);
+        protected override VariableMatch InitRelated => VariableMatch.OfReturnTypes(ValueTypes);
         public override bool VisibleInProgrammerVariables => false;
 
         public abstract VariableValue GetProperty(ComponentSystem system, VariableValue value, List<Error> errors);
