@@ -13,7 +13,7 @@ using Terraria.ModLoader;
 
 namespace TerraIntegration.Variables
 {
-    public class TernaryOp : Variable, IOwnProgrammerInterface
+    public class TernaryOp : Variable, IProgrammable
     {
         public override string TypeName => "tern";
         public override string TypeDefaultDisplayName => "Ternary operator";

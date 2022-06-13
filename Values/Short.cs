@@ -17,7 +17,7 @@ using Terraria.ModLoader;
 
 namespace TerraIntegration.Values
 {
-    public class Short : VariableValue, INumeric, IToString, IOwnProgrammerInterface
+    public class Short : VariableValue, INumeric, IToString, IProgrammable
     {
         public override string TypeName => "short";
         public override string TypeDefaultDisplayName => "Short";

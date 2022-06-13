@@ -17,7 +17,7 @@ using Terraria.ModLoader;
 
 namespace TerraIntegration.Values
 {
-    public class Float : VariableValue, IToString, IDecimal, IOwnProgrammerInterface
+    public class Float : VariableValue, IToString, IDecimal, IProgrammable
     {
         public override string TypeName => "float";
         public override string TypeDefaultDisplayName => "Float";

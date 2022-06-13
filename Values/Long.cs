@@ -16,7 +16,7 @@ using Terraria.ModLoader;
 
 namespace TerraIntegration.Values
 {
-    public class Long : VariableValue, INumeric, IToString, IOwnProgrammerInterface
+    public class Long : VariableValue, INumeric, IToString, IProgrammable
     {
         public override string TypeName => "long";
         public override string TypeDefaultDisplayName => "Long";

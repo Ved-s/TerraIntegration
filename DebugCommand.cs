@@ -56,7 +56,25 @@ namespace TerraIntegration
 
         public void NonDebugAction(CommandCaller caller, List<string> arg)
         {
-            Statistics.Visible = !Statistics.Visible;
+            if (arg.Count == 0)
+            {
+                caller.Reply("Expected subcommand: stats, comdbg");
+                return;
+            }
+            string sub = arg[0];
+            arg.RemoveAt(0);
+            switch (sub)
+            {
+                case "stats":
+                    Statistics.Visible = !Statistics.Visible;
+                    return;
+                case "comdbg":
+                    ComponentWorld.Instance.ComponentDebug = !ComponentWorld.Instance.ComponentDebug;
+                    return;
+            }
+
+            caller.Reply("Unknown subcommand");
+            return;
         }
 
         private void VarCommand(CommandCaller caller, List<string> arg)

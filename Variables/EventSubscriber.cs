@@ -14,7 +14,7 @@ using Terraria.ModLoader;
 
 namespace TerraIntegration.Variables
 {
-    public class EventSubscriber : Variable, IOwnProgrammerInterface
+    public class EventSubscriber : Variable, IProgrammable
     {
         public override string TypeName => "eventsub";
         public override string TypeDefaultDisplayName => "Event subscriber";

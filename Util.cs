@@ -8,6 +8,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Terraria;
+using Terraria.Audio;
 using Terraria.ID;
 using Terraria.Localization;
 using Terraria.ModLoader;
@@ -175,6 +176,43 @@ namespace TerraIntegration
 		public static IEnumerable<T> EnumOne<T>(T obj)
 		{
 			yield return obj;
+		}
+
+		public static Item TryGetItemFromPlayerInventory(Func<Item, bool> matcher, int amount = 1)
+		{
+			IEnumerable<Item> items = Main.LocalPlayer.inventory;
+
+			if (Main.LocalPlayer.chest > -1)
+				items = items.Concat(Main.chest[Main.LocalPlayer.chest].item);
+			
+			else if (Main.LocalPlayer.chest == -2)
+				items = items.Concat(Main.LocalPlayer.bank.item);
+			
+			else if (Main.LocalPlayer.chest == -3)
+				items = items.Concat(Main.LocalPlayer.bank2.item);
+			
+			else if (Main.LocalPlayer.chest == -4)
+				items = items.Concat(Main.LocalPlayer.bank3.item);
+			
+			else if (Main.LocalPlayer.chest == -5)
+				items = items.Concat(Main.LocalPlayer.bank4.item);
+
+			foreach (Item item in items)
+				if (matcher(item) && item.stack >= amount)
+				{
+					Item clone = item.Clone();
+					clone.stack = amount;
+					item.stack -= amount;
+
+					if (item.stack <= 0)
+						item.TurnToAir();
+
+					SoundEngine.PlaySound(SoundID.Grab);
+
+					return clone;
+				}
+
+			return null;
 		}
     }
 }

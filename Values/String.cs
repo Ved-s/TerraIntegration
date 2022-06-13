@@ -18,7 +18,7 @@ using Terraria.ModLoader;
 
 namespace TerraIntegration.Values
 {
-    public class String : VariableValue, IToString, IAddable, Interfaces.ICollection<Char>, IEquatable, IOwnProgrammerInterface
+    public class String : VariableValue, IToString, IAddable, Interfaces.ICollection<Char>, IEquatable, IProgrammable
     {
         public override string TypeName => "str";
         public override string TypeDefaultDisplayName => "String";

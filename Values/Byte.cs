@@ -18,7 +18,7 @@ using Terraria.ModLoader;
 
 namespace TerraIntegration.Values
 {
-    public class Byte : VariableValue, INumeric, IToString, IOwnProgrammerInterface
+    public class Byte : VariableValue, INumeric, IToString, IProgrammable
     {
         public override string TypeName => "byte";
         public override string TypeDefaultDisplayName => "Byte";

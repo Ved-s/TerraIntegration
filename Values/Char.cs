@@ -17,7 +17,7 @@ using Terraria.ModLoader;
 
 namespace TerraIntegration.Values
 {
-    public class Char : VariableValue, IToString, IOwnProgrammerInterface
+    public class Char : VariableValue, IToString, IProgrammable
     {
         public override string TypeName => "char";
         public override string TypeDefaultDisplayName => "Char";

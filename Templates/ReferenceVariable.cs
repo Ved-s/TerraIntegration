@@ -13,7 +13,7 @@ using Terraria.ModLoader.IO;
 
 namespace TerraIntegration.Templates
 {
-    public abstract class ReferenceVariable : Variable, IOwnProgrammerInterface
+    public abstract class ReferenceVariable : Variable, IProgrammable
     {
         public Guid VariableId { get; set; }
         public virtual Type[] ReferenceReturnTypes { get; }

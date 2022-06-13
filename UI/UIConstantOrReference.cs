@@ -71,7 +71,7 @@ namespace TerraIntegration.UI
         }
 
         UIVariableSlot RefSlot;
-        IOwnProgrammerInterface Owner;
+        IProgrammable Owner;
         UIVariableSwitch Switch;
 
         private Type[] validRefTypes;
@@ -130,11 +130,11 @@ namespace TerraIntegration.UI
             }
 
             if (!VariableValue.ByType.TryGetValue(valueType, out var value)
-                || value is not IOwnProgrammerInterface owner
+                || value is not IProgrammable owner
                 || owner.HasComplexInterface)
                 return;
 
-            Owner = (IOwnProgrammerInterface)value.Clone();
+            Owner = (IProgrammable)value.Clone();
             Owner.Interface = null;
             Owner.SetupInterfaceIfNeeded();
             if (Owner.Interface is null)

@@ -18,7 +18,7 @@ using Terraria.ModLoader;
 
 namespace TerraIntegration.Values
 {
-    public class List : VariableValue, ICollection, IEquatable, IOwnProgrammerInterface
+    public class List : VariableValue, ICollection, IEquatable, IProgrammable
     {
         public override string TypeName => "list";
         public override string TypeDefaultDisplayName => "List";
@@ -76,7 +76,7 @@ namespace TerraIntegration.Values
 
             List<ValueVariablePair> switches = new() { new(null, "ref") };
             switches.AddRange(from kvp in ByType
-                              where kvp.Value is IOwnProgrammerInterface owner && !owner.HasComplexInterface
+                              where kvp.Value is IProgrammable owner && !owner.HasComplexInterface
                               select new ValueVariablePair(kvp.Key, "const"));
 
             Interface.Append(NewValueSwitch = new()
@@ -146,19 +146,19 @@ namespace TerraIntegration.Values
             ValueVariablePair current = NewValueSwitch.Current.Value;
             Type entryType = current.ValueType;
 
-            IOwnProgrammerInterface owner;
+            IProgrammable owner;
             if (current.VariableType == "ref")
             {
                 if (!Basic.Variable.ByTypeName.TryGetValue(current.VariableType, out var var)
-                    || var is not IOwnProgrammerInterface) return;
-                owner = (IOwnProgrammerInterface)var.Clone();
+                    || var is not IProgrammable) return;
+                owner = (IProgrammable)var.Clone();
                 entryType = null;
             }
             else
             {
                 if (entryType is null || !ByType.TryGetValue(entryType, out VariableValue val)) return;
-                if (val is not IOwnProgrammerInterface) return;
-                owner = (IOwnProgrammerInterface)val.Clone();
+                if (val is not IProgrammable) return;
+                owner = (IProgrammable)val.Clone();
             }
 
             owner.Interface = null;
@@ -341,7 +341,7 @@ namespace TerraIntegration.Values
         class ListEntry
         {
             public Type Type;
-            public IOwnProgrammerInterface Owner;
+            public IProgrammable Owner;
             public UIPanel Panel;
             public UITextPanel<string> Index;
         }

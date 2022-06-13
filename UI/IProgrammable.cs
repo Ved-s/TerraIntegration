@@ -10,7 +10,7 @@ using Terraria.GameContent.UI.Elements;
 
 namespace TerraIntegration.UI
 {
-    public interface IOwnProgrammerInterface
+    public interface IProgrammable
     {
         UIPanel Interface { get; set; }
         bool HasComplexInterface { get; }

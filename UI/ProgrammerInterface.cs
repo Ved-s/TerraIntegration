@@ -51,7 +51,7 @@ namespace TerraIntegration.UI
         static UIText ResultText;
         static UIVariableSlot ResultSlot;
 
-        static IOwnProgrammerInterface CurrentOwner;
+        static IProgrammable CurrentOwner;
 
         static VariableValue CurrentValue;
         static Type CurrentType;
@@ -338,7 +338,16 @@ namespace TerraIntegration.UI
         }
         private static void WriteButton_OnClick(UIMouseEvent evt, UIElement listeningElement)
         {
-            if (ResultSlot?.Var is null) return;
+            if (ResultSlot is null) return;
+
+            if (ResultSlot.Var is null) 
+            {
+                Item emptyVar = Util.TryGetItemFromPlayerInventory(i => i.ModItem is Items.Variable var && var.Var is null);
+                if (emptyVar is null)
+                    return;
+
+                ResultSlot.Var = emptyVar.ModItem as Items.Variable;
+            }
             if (CurrentOwner is not null)
             {
                 Guid id = ResultSlot.Var.Var is null ? default : ResultSlot.Var.Var.Id;
@@ -449,7 +458,7 @@ namespace TerraIntegration.UI
             {
                 VariableValue v = kvp.Value;
                 if (!v.TypeName.ToLower().Contains(VariablesSearch.CurrentString.ToLower())
-                    || (!v.HasProperties() && v is not IOwnProgrammerInterface)) continue;
+                    || (!v.HasProperties() && v is not IProgrammable)) continue;
 
                 VariablesList.Add(CreateVariableButton(
                     v.TypeDefaultDisplayName,
@@ -469,7 +478,7 @@ namespace TerraIntegration.UI
 
             foreach (Variable v in Variable.ByTypeName.Values)
             {
-                if (v is not IOwnProgrammerInterface interfaceOwner 
+                if (v is not IProgrammable interfaceOwner 
                     || !v.TypeDisplayName.ToLower().Contains(VariablesSearch.CurrentString.ToLower())
                     || !v.VisibleInProgrammerVariables) continue;
 
@@ -498,7 +507,7 @@ namespace TerraIntegration.UI
                 {
                     if (!var.TypeDisplayName.ToLower().Contains(PropertiesSearch.CurrentString.ToLower())
                         || CurrentValue is not null && var is ValueProperty prop && !prop.AppliesTo(CurrentValue)
-                        || var is not IOwnProgrammerInterface owner) continue;
+                        || var is not IProgrammable owner) continue;
 
                     string headText = null;
 
@@ -522,7 +531,7 @@ namespace TerraIntegration.UI
         {
             CurrentValue = value;
             CurrentType = value.GetType();
-            SetInterface(value as IOwnProgrammerInterface);
+            SetInterface(value as IProgrammable);
             PopulateProperties();
         }
         static void TypeClicked(Type type)
@@ -532,7 +541,7 @@ namespace TerraIntegration.UI
             SetInterface(null);
             PopulateProperties();
         }
-        static void VariableClicked(IOwnProgrammerInterface var)
+        static void VariableClicked(IProgrammable var)
         {
             CurrentValue = null;
             CurrentType = var.GetType();
@@ -540,12 +549,12 @@ namespace TerraIntegration.UI
             PopulateProperties();
         }
 
-        static void PropertyClicked(IOwnProgrammerInterface prop)
+        static void PropertyClicked(IProgrammable prop)
         {
             SetInterface(prop);
         }
 
-        static void SetInterface(IOwnProgrammerInterface owner)
+        static void SetInterface(IProgrammable owner)
         {
             CurrentOwner = owner;
 

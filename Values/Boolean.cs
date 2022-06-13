@@ -19,7 +19,7 @@ using Terraria.ModLoader;
 
 namespace TerraIntegration.Values
 {
-    public class Boolean : VariableValue, IToString, IEquatable, IOwnProgrammerInterface
+    public class Boolean : VariableValue, IToString, IEquatable, IProgrammable
     {
         public override string TypeName => "bool";
         public override string TypeDefaultDisplayName => "Boolean";

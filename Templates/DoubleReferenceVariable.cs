@@ -15,7 +15,7 @@ using Terraria.ModLoader.IO;
 
 namespace TerraIntegration.Templates
 {
-    public abstract class DoubleReferenceVariable : Variable, IOwnProgrammerInterface
+    public abstract class DoubleReferenceVariable : Variable, IProgrammable
     {
         public UIPanel Interface { get; set; }
 

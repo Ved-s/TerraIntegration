@@ -13,7 +13,7 @@ using Terraria.GameContent.UI.Elements;
 
 namespace TerraIntegration.Variables
 {
-    public class Event : Variable, IOwnProgrammerInterface
+    public class Event : Variable, IProgrammable
     {
         public override string TypeName => "event";
         public override string TypeDefaultDisplayName => "Event";

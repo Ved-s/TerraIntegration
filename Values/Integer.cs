@@ -16,7 +16,7 @@ using Terraria.ModLoader;
 
 namespace TerraIntegration.Values
 {
-    public class Integer : VariableValue, INumeric, IToString, IOwnProgrammerInterface
+    public class Integer : VariableValue, INumeric, IToString, IProgrammable
     {
         public override string TypeName => "int";
         public override string TypeDefaultDisplayName => "Integer";

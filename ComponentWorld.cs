@@ -284,7 +284,7 @@ namespace TerraIntegration
             {
                 Main.spriteBatch.Begin();
                 Rectangle screen = new(0, 0, Main.screenWidth, Main.screenHeight);
-                foreach (ComponentData data in EnumerateAllComponentData())
+                foreach (ComponentData data in ComponentData.Values)
                 {
                     Point tl = Util.WorldToScreen(data.Position).ToPoint();
                     Point br = Util.WorldToScreen(data.Position + data.Size).ToPoint();
@@ -292,9 +292,14 @@ namespace TerraIntegration
                     if (!rect.Intersects(screen))
                         continue;
 
+                    if (data is SubTileComponentData)
+                    {
+                        Drawing.DrawRect(Main.spriteBatch, rect, null, Color.Yellow * .2f);
+                        continue;
+                    }
                     uint color = ((uint?)data.System?.TempId.GetHashCode() ?? 0xffU) ^ 0xab73f0;
-
                     Drawing.DrawRect(Main.spriteBatch, rect, new Color { PackedValue = color });
+
                 }
                 Main.spriteBatch.End();
             }

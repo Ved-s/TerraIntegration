@@ -18,7 +18,7 @@ using Terraria.ModLoader;
 
 namespace TerraIntegration.Values
 {
-    public class Double : VariableValue, IToString, IDecimal, IOwnProgrammerInterface
+    public class Double : VariableValue, IToString, IDecimal, IProgrammable
     {
         public override string TypeName => "double";
         public override string TypeDefaultDisplayName => "Double";

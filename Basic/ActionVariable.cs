@@ -11,7 +11,7 @@ using Terraria.ModLoader.IO;
 
 namespace TerraIntegration.Basic
 {
-    public abstract class ActionVariable : Variable, IOwnProgrammerInterface
+    public abstract class ActionVariable : Variable, IProgrammable
     {
         internal readonly static SpriteSheet ActionsSheet = new("TerraIntegration/Assets/Types/actions", new(32, 32));
 
