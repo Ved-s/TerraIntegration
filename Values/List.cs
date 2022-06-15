@@ -9,6 +9,7 @@ using TerraIntegration.DisplayedValues;
 using TerraIntegration.Interfaces;
 using TerraIntegration.Items;
 using TerraIntegration.UI;
+using TerraIntegration.Utilities;
 using TerraIntegration.Variables;
 using Terraria.Audio;
 using Terraria.GameContent;

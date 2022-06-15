@@ -3,16 +3,14 @@ using Microsoft.Xna.Framework.Graphics;
 using ReLogic.Content;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using TerraIntegration;
 using TerraIntegration.Basic;
 using TerraIntegration.DataStructures;
 using Terraria;
 using Terraria.GameContent;
 using Terraria.ModLoader;
 
-namespace TerraIntegration
+namespace TerraIntegration.Utilities
 {
     public static class VariableRenderer
     {
@@ -20,13 +18,13 @@ namespace TerraIntegration
 
         public static Dictionary<Type, SpriteSheetPos> TypeSpritesheetOverrides = new();
 
-        public static void Unload() 
+        public static void Unload()
         {
             AssetCache.Clear();
             TypeSpritesheetOverrides.Clear();
         }
 
-        public static Texture2D GetAsset(string path) 
+        public static Texture2D GetAsset(string path)
         {
             if (AssetCache.TryGetValue(path, out Texture2D tex))
                 return tex;
@@ -122,7 +120,7 @@ namespace TerraIntegration
                 }
             }
 
-            if (type is not null && Basic.Variable.ByTypeName.TryGetValue(type, out var var))
+            if (type is not null && Variable.ByTypeName.TryGetValue(type, out var var))
             {
                 SpriteSheet ss = var.SpriteSheetPos.SpriteSheet ?? var.DefaultSpriteSheet;
                 if (ss is not null)
@@ -141,7 +139,7 @@ namespace TerraIntegration
                         frame = new(0, 0, texture.Width, texture.Height);
                 }
 
-                if (texture is null && var is ComponentProperty prop 
+                if (texture is null && var is ComponentProperty prop
                     && Component.ByTypeName.TryGetValue(prop.ComponentType, out Component com))
                 {
                     SpriteSheet sheet = com.DefaultPropertySpriteSheet;

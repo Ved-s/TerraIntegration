@@ -6,6 +6,7 @@ using System.IO;
 using TerraIntegration.Basic;
 using TerraIntegration.DataStructures;
 using TerraIntegration.UI;
+using TerraIntegration.Utilities;
 using Terraria;
 using Terraria.GameContent;
 using Terraria.GameContent.UI.Elements;

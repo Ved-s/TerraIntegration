@@ -5,6 +5,7 @@ using System.Reflection;
 using TerraIntegration.Basic;
 using TerraIntegration.Components;
 using TerraIntegration.DataStructures;
+using TerraIntegration.Utilities;
 using TerraIntegration.Values;
 using TerraIntegration.Variables;
 using Terraria;

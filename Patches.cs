@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using TerraIntegration.Basic;
 using TerraIntegration.DataStructures;
+using TerraIntegration.Utilities;
 using Terraria;
 using Terraria.GameContent.Drawing;
 using Terraria.ID;

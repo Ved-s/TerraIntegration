@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace TerraIntegration
+namespace TerraIntegration.Utilities
 {
     public class ShortGuids
     {
@@ -12,7 +12,7 @@ namespace TerraIntegration
 
         private Dictionary<Guid, string> GuidToStr = new Dictionary<Guid, string>();
 
-        public ShortGuids(int minShortLength = 3) 
+        public ShortGuids(int minShortLength = 3)
         {
             DefaultGuidStringLength = minShortLength;
         }
@@ -45,9 +45,9 @@ namespace TerraIntegration
             }
             else GuidToStr.Add(guid, GetGuidString(guid, DefaultGuidStringLength));
         }
-        public Guid? GetGuid(string str) 
+        public Guid? GetGuid(string str)
         {
-            foreach (KeyValuePair<Guid, string> kvp in GuidToStr) 
+            foreach (KeyValuePair<Guid, string> kvp in GuidToStr)
             {
                 if (kvp.Value.StartsWith(str))
                     return kvp.Key;
@@ -92,7 +92,7 @@ namespace TerraIntegration
             }
         }
 
-        private static int GetGuidSimilarity(Guid a, Guid b) 
+        private static int GetGuidSimilarity(Guid a, Guid b)
         {
             byte[] abytes = a.ToByteArray();
             byte[] bbytes = b.ToByteArray();
@@ -102,8 +102,8 @@ namespace TerraIntegration
             {
                 int arrindex = 0;
                 if (i < 4) arrindex = 3 - i;
-                else if (i < 6) arrindex = (1 - (i - 4)) + 4;
-                else if (i < 8) arrindex = (1 - (i - 6)) + 6;
+                else if (i < 6) arrindex = 1 - (i - 4) + 4;
+                else if (i < 8) arrindex = 1 - (i - 6) + 6;
                 else arrindex = i;
 
                 if (abytes[arrindex] == bbytes[arrindex])
@@ -117,7 +117,7 @@ namespace TerraIntegration
             }
             return sim;
         }
-        private static string GetGuidString(Guid g, int digits) 
+        private static string GetGuidString(Guid g, int digits)
         {
             string gstr = g.ToString();
             int dashes = 0;

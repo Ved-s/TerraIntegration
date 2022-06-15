@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using TerraIntegration.Basic;
+using TerraIntegration.Utilities;
 using TerraIntegration.Values;
 using TerraIntegration.Variables;
 using Terraria;

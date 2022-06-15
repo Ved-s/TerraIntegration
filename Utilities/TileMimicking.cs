@@ -7,7 +7,7 @@ using Terraria;
 using Terraria.ModLoader;
 using Terraria.ObjectData;
 
-namespace TerraIntegration
+namespace TerraIntegration.Utilities
 {
     public static class TileMimicking
     {
@@ -23,7 +23,7 @@ namespace TerraIntegration
 
         public static ushort GetRealTileType(int x, int y)
         {
-            if (TileMimicsInProgress.TryGetValue(new(x,y), out TileMimic mimic))
+            if (TileMimicsInProgress.TryGetValue(new(x, y), out TileMimic mimic))
                 return mimic.Type;
             return Main.tile[x, y].TileType;
         }
@@ -120,7 +120,10 @@ namespace TerraIntegration
             return !Main.tileFrameImportant[type];
         }
     }
+}
 
+namespace TerraIntegration
+{
     public class TileMimic
     {
         public ushort Type;

@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using TerraIntegration.Basic;
 using TerraIntegration.DataStructures;
+using TerraIntegration.Utilities;
 using TerraIntegration.Values;
 using TerraIntegration.Variables;
 using Terraria;

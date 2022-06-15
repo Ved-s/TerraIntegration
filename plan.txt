@@ -1,0 +1,13 @@
+Collection of T
+	Index(Integer) -> T or Error(IndexOutOfBounds)
+	Contains(Any) -> Boolean
+	First(Function(Any -> Boolean)?) -> T or Null
+	Any(Function(Any -> Boolean)?) -> Boolean
+	Take(Integer) -> Collection of T
+	Skip(Integer) -> Collection of T
+	Where(Function(Any -> Boolean)) -> Collection of T
+	Select(Function(Any -> Any)) -> Collection of T
+	
+Functions with args
+
+Text describing what's wrong when trying to write variable

@@ -9,6 +9,7 @@ using System.Linq;
 using TerraIntegration.Basic;
 using TerraIntegration.DataStructures;
 using TerraIntegration.UI;
+using TerraIntegration.Utilities;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
