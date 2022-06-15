@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Xna.Framework;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -105,7 +106,10 @@ namespace TerraIntegration.Basic
         public Variable WriteVariable()
         {
             if (ActionVarSlot?.Var?.Var is null)
+            {
+                ActionVarSlot?.NewFloatingText(TerraIntegration.Localize("ProgrammingErrors.NoVariable"), Color.Red);
                 return null;
+            }
 
             ActionVariable var = WriteActionvariable();
             if (var is null)

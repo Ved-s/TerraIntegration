@@ -42,14 +42,16 @@ namespace TerraIntegration.Templates
         }
         public Variable WriteVariable()
         {
-            if (InterfaceSlot.Var is not null)
+            if (InterfaceSlot?.Var?.Var is null)
             {
-                ReferenceVariable v = CreateVariable(InterfaceSlot.Var.Var);
-                if (v is not null)
-                {
-                    v.VariableId = InterfaceSlot.Var.Var.Id;
-                    return v;
-                }
+                InterfaceSlot?.NewFloatingText(TerraIntegration.Localize("ProgrammingErrors.NoVariable"), Color.Red);
+                return null;
+            }
+            ReferenceVariable v = CreateVariable(InterfaceSlot.Var.Var);
+            if (v is not null)
+            {
+                v.VariableId = InterfaceSlot.Var.Var.Id;
+                return v;
             }
             return null;
         }

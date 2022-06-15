@@ -159,19 +159,24 @@ namespace TerraIntegration.UI
 
         public ValueOrRef GetValue()
         {
+            if (!Switch.Current.HasValue)
+                return null;
+
             ValueVariablePair vvp = Switch.Current.Value;
-            if (vvp.ValueType is null && RefSlot?.Var?.Var is not null)
+            if (vvp.ValueType is null)
             {
+                if (RefSlot?.Var?.Var is null)
+                {
+                    RefSlot?.NewFloatingText(TerraIntegration.Localize("ProgrammingErrors.NoVariable"), Color.Red);
+                    return null;
+                }
                 return new(RefSlot.Var.Var.Id);
             }
-            if (vvp.ValueType is not null)
-            {
-                Variable var = Owner?.WriteVariable();
-                if (var is not Constant @const) return null;
 
-                return new(@const.Value);
-            }
-            return null;
+            Variable var = Owner?.WriteVariable();
+            if (var is not Constant @const) return null;
+
+            return new(@const.Value);
         }
     }
 }

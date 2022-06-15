@@ -341,20 +341,21 @@ namespace TerraIntegration.UI
         {
             if (ResultSlot is null) return;
 
-            if (ResultSlot.Var is null) 
-            {
-                Item emptyVar = Util.TryGetItemFromPlayerInventory(i => i.ModItem is Items.Variable var && var.Var is null);
-                if (emptyVar is null)
-                    return;
-
-                ResultSlot.Var = emptyVar.ModItem as Items.Variable;
-            }
             if (CurrentOwner is not null)
             {
-                Guid id = ResultSlot.Var.Var is null ? default : ResultSlot.Var.Var.Id;
+                Guid id = ResultSlot.Var?.Var is null ? default : ResultSlot.Var.Var.Id;
                 Variable result = CurrentOwner.WriteVariable();
                 if (result is not null)
                 {
+                    if (ResultSlot.Var is null)
+                    {
+                        Item emptyVar = Util.TryGetItemFromPlayerInventory(i => i.ModItem is Items.Variable var && var.Var is null);
+                        if (emptyVar is null)
+                            return;
+
+                        ResultSlot.Var = emptyVar.ModItem as Items.Variable;
+                    }
+
                     ResultSlot.Var.Var = result;
                     if (id != default)
                         ResultSlot.Var.Var.Id = id;

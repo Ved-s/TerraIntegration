@@ -102,7 +102,10 @@ namespace TerraIntegration.Templates
         public override ActionVariable WriteActionvariable()
         {
             if (ReferenceSlot?.Var?.Var is null)
+            {
+                ReferenceSlot?.NewFloatingText(TerraIntegration.Localize("ProgrammingErrors.NoVariable"), Color.Red);
                 return null;
+            }
 
             ActionWithReference awr = CreateVariable(ReferenceSlot.Var.Var);
             if (awr is null) return null;

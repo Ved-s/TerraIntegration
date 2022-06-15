@@ -83,9 +83,15 @@ namespace TerraIntegration.Templates
 
         public Variable WriteVariable()
         {
+            if (LeftSlot?.Var?.Var is null)
+            {
+                LeftSlot?.NewFloatingText(TerraIntegration.Localize("ProgrammingErrors.NoVariable"), Color.Red);
+                return null;
+            }
+
             ValueOrRef rightValue = RightSlot?.GetValue();
 
-            if (LeftSlot?.Var?.Var is null || rightValue is null) return null;
+            if (rightValue is null) return null;
 
             DoubleReferenceVariableWithConst doubleRef = CreateVariable(LeftSlot.Var.Var, rightValue);
 

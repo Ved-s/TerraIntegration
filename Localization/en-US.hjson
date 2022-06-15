@@ -18,5 +18,6 @@
 		CannotParseValue: "Cannot parse {0}",
 		CharStringEmpty: "There is nothing here!",
 		NoItem: "No item",
+		NoVariable: "No variable",
 	}
 }
