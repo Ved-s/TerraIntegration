@@ -436,7 +436,7 @@ namespace TerraIntegration.Basic
             HashSet<Type> allTypes = new(types);
             allTypes.UnionWith(types.SelectMany(t => t.GetInterfaces().Where(i => i.GetInterfaces().Any(t => t == typeof(IValueInterface)))));
 
-            foreach (Variable var in ByType.Values)
+            foreach (Variable var in ByTypeName.Values)
             {
                 var rel = var.RelatedTypes;
                 if (rel is null) continue;

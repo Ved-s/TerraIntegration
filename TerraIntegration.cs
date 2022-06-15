@@ -10,6 +10,7 @@ using TerraIntegration.Values;
 using TerraIntegration.Variables;
 using Terraria;
 using Terraria.ID;
+using Terraria.Localization;
 using Terraria.ModLoader;
 
 namespace TerraIntegration
@@ -81,6 +82,10 @@ namespace TerraIntegration
         {
             RecipeGroup.RegisterGroup("T2Watch", new(() => "Any tier 2 watches", ItemID.SilverWatch, ItemID.TungstenWatch));
         }
+
+        public static string Localize(string key) => LanguageManager.Instance.GetTextValue("Mods.TerraIntegration." + key);
+        public static string Localize(string key, object arg0) => LanguageManager.Instance.GetTextValue("Mods.TerraIntegration." + key, arg0);
+        public static string Localize(string key, object arg0, object arg1) => LanguageManager.Instance.GetTextValue("Mods.TerraIntegration." + key, arg0, arg1);
     }
 
     public record struct PositionedComponent(Point16 Pos, Component Component)

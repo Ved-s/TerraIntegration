@@ -123,6 +123,8 @@ namespace TerraIntegration.Values
         {
             if (int.TryParse(InterfaceValue.CurrentString, out int value))
                 return new Constant(new Integer(value));
+
+            InterfaceValue.NewFloatingText(TerraIntegration.Localize("ProgrammingErrors.CannotParseValue", Util.ColorTag(TypeColor, TypeDisplayName)), Color.Red, 100, 1, new(.5f, 0));
             return null;
         }
     }

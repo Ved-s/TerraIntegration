@@ -120,6 +120,8 @@ namespace TerraIntegration.Values
         {
             if (byte.TryParse(InterfaceValue.CurrentString, out byte value))
                 return new Constant(new Byte(value));
+
+            InterfaceValue.NewFloatingText(TerraIntegration.Localize("ProgrammingErrors.CannotParseValue", Util.ColorTag(TypeColor, TypeDisplayName)), Color.Red, 100, 1, new(.5f, 0));
             return null;
         }
     }

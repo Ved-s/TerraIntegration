@@ -13,6 +13,7 @@ using TerraIntegration.Items;
 using TerraIntegration.UI;
 using TerraIntegration.Variables;
 using Terraria.GameContent.UI.Elements;
+using Terraria.Localization;
 using Terraria.ModLoader;
 
 namespace TerraIntegration.Values
@@ -106,7 +107,11 @@ namespace TerraIntegration.Values
 
         public Basic.Variable WriteVariable()
         {
-            if (InterfaceValue.CurrentString.Length == 0) return null;
+            if (InterfaceValue.CurrentString.Length == 0)
+            {
+                InterfaceValue.NewFloatingText(TerraIntegration.Localize("ProgrammingErrors.CharStringEmpty"), Color.Red, 100, 1, new(.5f, 0));
+                return null;
+            }
 
             return new Constant(new Char(InterfaceValue.CurrentString[0]));
         }

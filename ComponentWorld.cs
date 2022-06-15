@@ -313,6 +313,7 @@ namespace TerraIntegration
         {
             ProgrammerInterface.Draw();
             Statistics.Draw();
+            FloatingText.Draw(Main.spriteBatch);
 
             Point mouse = (Main.MouseWorld / 16).ToPoint();
 
@@ -346,6 +347,7 @@ namespace TerraIntegration
 
             ProgrammerInterface.Update();
             ModContent.GetInstance<ComponentInterface>().Update();
+            FloatingText.Update();
         }
 
         public override void SaveWorldData(TagCompound tag)

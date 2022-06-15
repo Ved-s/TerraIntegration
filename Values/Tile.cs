@@ -5,12 +5,15 @@ using TerraIntegration.Basic;
 using TerraIntegration.DataStructures;
 using TerraIntegration.DisplayedValues;
 using TerraIntegration.Interfaces;
+using TerraIntegration.UI;
+using TerraIntegration.Variables;
+using Terraria.GameContent.UI.Elements;
 using Terraria.ID;
 using Terraria.ModLoader;
 
 namespace TerraIntegration.Values
 {
-    public class Tile : VariableValue, INamed, ITyped
+    public class Tile : VariableValue, INamed, ITyped, IProgrammable
     {
         public override string TypeName => "tile";
         public override string TypeDefaultDisplayName => "Tile";
@@ -50,6 +53,10 @@ namespace TerraIntegration.Values
             }
         }
         int ITyped.Type => TileType;
+
+        public UI.UIItemSlot TileSlot;
+        public UIPanel Interface { get; set; }
+        public bool HasComplexInterface => false;
 
         static Dictionary<int, string> VanillaTileNameCache = new();
 
@@ -110,6 +117,31 @@ namespace TerraIntegration.Values
                    GreenWire == tile.GreenWire &&
                    BlueWire == tile.BlueWire &&
                    YellowWire == tile.YellowWire;
+        }
+
+        public void SetupInterface()
+        {
+            Interface.Append(TileSlot = new()
+            {
+                Top = new(-21, .5f),
+                Left = new(-21, .5f),
+
+                DisplayOnly = true,
+                ItemValidator = (item) => item.createTile >= TileID.Dirt,
+                HoverText = "Any item that creates a tile",
+                MaxSlotCapacity = 1
+            });
+        }
+
+        public Variable WriteVariable()
+        {
+            if (TileSlot?.Item?.createTile is null or < 0)
+            {
+                TileSlot?.NewFloatingText(TerraIntegration.Localize("ProgrammingErrors.NoItem"), Microsoft.Xna.Framework.Color.Red);
+                return null;
+            }
+
+            return new Constant(new Tile(TileSlot.Item.createTile));
         }
     }
 }

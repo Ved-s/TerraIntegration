@@ -13,5 +13,10 @@
 		ExpectedVariables:			"{0} expected variables {1}",
 		ValueTooBigForType:			"{0} is too big for {1}",
 		ValueTooSmallForType:		"{0} is too small for {1}"
+	},
+	ProgrammingErrors: {
+		CannotParseValue: "Cannot parse {0}",
+		CharStringEmpty: "There is nothing here!",
+		NoItem: "No item",
 	}
 }

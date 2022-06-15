@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TerraIntegration.DataStructures;
 using Terraria.UI;
 
 namespace TerraIntegration
@@ -53,6 +54,31 @@ namespace TerraIntegration
         public static T NewInstance<T>(this T obj)
         {
             return (T)Activator.CreateInstance(obj.GetType());
+        }
+
+        public static void Deconstruct(this Vector2 vec, out float x, out float y)
+        {
+            x = vec.X;
+            y = vec.Y;
+        }
+
+        public static Vector2 GetAlignedPos(this UIElement element, Vector2 align)
+        {
+            CalculatedStyle size = element.GetDimensions();
+            return size.Position() + align * size.Size();
+        }
+
+        public static void NewFloatingText(this UIElement element, string text, Color color, int time = 100, float velocity = 1, Vector2? align = null)
+        {
+            if (align is null)
+                align = new(.5f, 0);
+
+            CalculatedStyle size = element.GetDimensions();
+            Vector2 spawn = size.Position() + align.Value * size.Size();
+            Vector2 spawnAlign = new Vector2(1) - align.Value;
+            Vector2 vel = (align.Value - spawnAlign) * velocity;
+
+            FloatingText.NewText(text, color, time, vel, spawn, spawnAlign);
         }
     }
 }
