@@ -114,5 +114,8 @@ namespace TerraIntegration.DataStructures
         
         public static Error ValueTooSmallForType(object value, VariableValue valueType)
             => new("ValueTooSmallForType", value, valueType?.TypeDisplayName ?? "null");
+
+        public static Error IndexOutOfBounds(int index, TypeIdentity id, int length)
+            => new("IndexOutOfBounds", index, id.ToString(), length);
     }
 }

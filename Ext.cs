@@ -4,7 +4,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TerraIntegration.Basic;
 using TerraIntegration.DataStructures;
+using TerraIntegration.Values;
 using Terraria.UI;
 
 namespace TerraIntegration
@@ -79,6 +81,11 @@ namespace TerraIntegration
             Vector2 vel = (align.Value - spawnAlign) * velocity;
 
             FloatingText.NewText(text, color, time, vel, spawn, spawnAlign);
+        }
+
+        public static VariableValue ToCollectionValue<T>(this IEnumerable<T> ienum, Type collectionType) where T : VariableValue
+        {
+            return new CollectionList(ienum, collectionType);
         }
     }
 }

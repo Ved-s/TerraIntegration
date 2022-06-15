@@ -44,6 +44,11 @@ namespace TerraIntegration.Interfaces
             }
             return TryGetCollectionType(var.VariableReturnType);
         }
+
+        public static Type OfType(Type valueType)
+        {
+            return typeof(ICollection<>).MakeGenericType(valueType);
+        }
     }
 
     public interface ICollection<T> : ICollection

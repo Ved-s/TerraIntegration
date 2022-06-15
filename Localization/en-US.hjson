@@ -12,7 +12,8 @@
 		ExpectedVariable:			"{0} expected variable {1}",
 		ExpectedVariables:			"{0} expected variables {1}",
 		ValueTooBigForType:			"{0} is too big for {1}",
-		ValueTooSmallForType:		"{0} is too small for {1}"
+		ValueTooSmallForType:		"{0} is too small for {1}",
+		IndexOutOfBounds:           "Index {0} for {1} is out of bounds of collection with length {2}"
 	},
 	ProgrammingErrors: {
 		CannotParseValue: "Cannot parse {0}",
