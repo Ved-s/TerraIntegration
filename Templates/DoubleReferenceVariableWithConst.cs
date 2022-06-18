@@ -20,7 +20,7 @@ namespace TerraIntegration.Templates
         public UIVariableSlot LeftSlot { get; set; }
         public UIConstantOrReference RightSlot { get; set; }
 
-        public abstract Type[] LeftSlotValueTypes { get; }
+        public abstract ReturnType[] LeftSlotValueTypes { get; }
         public virtual UIDrawing CenterDrawing => new UIDrawing()
         {
             OnDraw = (e, sb, style) =>
@@ -33,10 +33,10 @@ namespace TerraIntegration.Templates
         public ValueOrRef Right { get; set; }
         public bool HasComplexInterface => true;
 
-        public override Type[] RelatedTypes => LeftSlotValueTypes;
+        public override IEnumerable<Type> RelatedTypes => LeftSlotValueTypes.Select(rt => rt.Type);
 
-        private Dictionary<Type, Type[]> ValidTypesCache = new();
-        private HashSet<(Type, Type)> ValidTypePairs = new();
+        private Dictionary<ReturnType, ReturnType[]> ValidTypesCache = new();
+        private HashSet<(ReturnType, ReturnType)> ValidTypePairs = new();
 
         public void SetupInterface()
         {
@@ -46,8 +46,8 @@ namespace TerraIntegration.Templates
                 Left = new(-75, .5f),
 
                 DisplayOnly = true,
-                VariableValidator = (var) => LeftSlotValueTypes is not null && LeftSlotValueTypes.Any(t => t.IsAssignableFrom(var.VariableReturnType)),
-                HoverText = LeftSlotValueTypes is null ? null : string.Join(", ", LeftSlotValueTypes.Select(t => VariableValue.TypeToName(t, true))),
+                VariableValidator = (var) => LeftSlotValueTypes is not null && LeftSlotValueTypes.Any(t => t.Match(var.VariableReturnType)),
+                HoverText = LeftSlotValueTypes is null ? null : string.Join(", ", LeftSlotValueTypes.Select(t => t.ToStringName(true))),
 
                 VariableChanged = (var) =>
                 {
@@ -58,8 +58,8 @@ namespace TerraIntegration.Templates
                         return;
                     }
 
-                    RightSlot.ValidConstTypes = GetValidRightConstantSlotTypes(var.Var.VariableReturnType);
-                    RightSlot.ValidRefTypes = GetValidRightReferenceSlotTypes(var.Var.VariableReturnType);
+                    RightSlot.ValidConstTypes = GetValidRightConstantSlotTypes(var.Var.VariableReturnType.Value);
+                    RightSlot.ValidRefTypes = GetValidRightReferenceSlotTypes(var.Var.VariableReturnType.Value);
                 }
             });
 
@@ -109,24 +109,24 @@ namespace TerraIntegration.Templates
             VariableValue right = Right.GetValue(system, errors);
 
             if (left is null || right is null) return null;
-            Type leftType = left.GetType();
-            Type rightType = right.GetType();
+            ReturnType leftType = left.GetType();
+            ReturnType rightType = right.GetType();
 
             if (!ValidTypePairs.Contains((leftType, rightType)))
             {
-                if (LeftSlotValueTypes is not null && !LeftSlotValueTypes.Any(t => t.IsAssignableFrom(leftType)))
+                if (LeftSlotValueTypes is not null && !LeftSlotValueTypes.Any(t => t.Match(leftType)))
                 {
                     errors.Add(Errors.ExpectedValues(LeftSlotValueTypes, TypeIdentity));
                     return null;
                 }
 
-                if (!ValidTypesCache.TryGetValue(leftType, out Type[] validRightTypes))
+                if (!ValidTypesCache.TryGetValue(leftType, out ReturnType[] validRightTypes))
                 {
                     validRightTypes = GetValidRightSlotTypes(leftType);
                     ValidTypesCache[leftType] = validRightTypes;
                 }
 
-                if (validRightTypes is not null && !validRightTypes.Any(t => t.IsAssignableFrom(rightType)))
+                if (validRightTypes is not null && !validRightTypes.Any(t => t.Match(rightType)))
                 {
                     errors.Add(Errors.ExpectedValues(validRightTypes, TypeIdentity));
                     return null;
@@ -191,9 +191,9 @@ namespace TerraIntegration.Templates
         }
 
         public abstract VariableValue GetValue(ComponentSystem system, VariableValue left, VariableValue right, List<Error> errors);
-        public virtual Type[] GetValidRightReferenceSlotTypes(Type leftSlotType) => GetValidRightSlotTypes(leftSlotType);
-        public virtual Type[] GetValidRightConstantSlotTypes(Type leftSlotType) => GetValidRightSlotTypes(leftSlotType);
-        public virtual Type[] GetValidRightSlotTypes(Type leftSlotType) => null;
+        public virtual ReturnType[] GetValidRightReferenceSlotTypes(ReturnType leftSlotType) => GetValidRightSlotTypes(leftSlotType);
+        public virtual Type[] GetValidRightConstantSlotTypes(ReturnType leftSlotType) => GetValidRightSlotTypes(leftSlotType).Select(t => t.Type).ToArray();
+        public virtual ReturnType[] GetValidRightSlotTypes(ReturnType leftSlotType) => null;
 
         public virtual DoubleReferenceVariableWithConst CreateVariable(Variable left, ValueOrRef right)
             => (DoubleReferenceVariableWithConst)Activator.CreateInstance(GetType());

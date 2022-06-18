@@ -83,9 +83,15 @@ namespace TerraIntegration
             FloatingText.NewText(text, color, time, vel, spawn, spawnAlign);
         }
 
-        public static VariableValue ToCollectionValue<T>(this IEnumerable<T> ienum, Type collectionType) where T : VariableValue
+        public static VariableValue ToCollectionValue<T>(this IEnumerable<T> ienum, ReturnType collectionType) where T : VariableValue
         {
             return new CollectionList(ienum, collectionType);
         }
+
+        public static bool MatchNull(this ReturnType? returnType, Type type)
+            => returnType.HasValue && returnType.Value.Match(type);
+
+        public static bool MatchNull(this ReturnType? returnType, ReturnType? type)
+            => returnType.HasValue && returnType.Value.Match(type);
     }
 }

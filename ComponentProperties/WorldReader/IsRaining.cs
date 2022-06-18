@@ -17,7 +17,7 @@ namespace TerraIntegration.ComponentProperties.WorldReader
 
         public override SpriteSheetPos SpriteSheetPos => new(3, 0);
 
-        public override Type VariableReturnType => typeof(Values.Boolean);
+        public override ReturnType? VariableReturnType => typeof(Values.Boolean);
 
         public override VariableValue GetProperty(Components.WorldReader component, Point16 pos, List<Error> errors)
         {

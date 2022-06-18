@@ -29,7 +29,7 @@ namespace TerraIntegration.Values
 
         public override SpriteSheetPos SpriteSheetPos => new(BasicSheet, 0, 2);
 
-        public Type CollectionType { get; set; } = typeof(VariableValue);
+        public ReturnType CollectionType { get; set; } = typeof(VariableValue);
 
         public UIPanel Interface { get; set; }
         public bool HasComplexInterface => true;
@@ -112,7 +112,7 @@ namespace TerraIntegration.Values
         {
             ListValueEntry[] array = new ListValueEntry[Entries.Count];
 
-            Type type = null;
+            ReturnType? type = null;
             bool commonType = true;
 
             for (int i = 0; i < Entries.Count; i++)
@@ -122,7 +122,7 @@ namespace TerraIntegration.Values
                 if (entry is Reference @ref)
                 {
                     array[i] = new(true, null, @ref.VariableId);
-                    Type refType = @ref.VariableReturnType;
+                    ReturnType? refType = @ref.VariableReturnType;
 
                     if (type is null) type = refType;
                     else if (type != refType) commonType = false;
@@ -137,7 +137,7 @@ namespace TerraIntegration.Values
             }
             List list = new List(array);
             if (commonType && type is not null)
-                list.CollectionType = type;
+                list.CollectionType = type.Value;
 
             return new Constant(list);
         }
@@ -260,7 +260,7 @@ namespace TerraIntegration.Values
 
         protected override void SaveCustomData(BinaryWriter writer)
         {
-            writer.Write(TypeToString(CollectionType) ?? "");
+            writer.Write(CollectionType.ToTypeString());
             writer.Write((ushort)Values.Count());
             foreach (ListValueEntry value in Values)
             {

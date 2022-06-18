@@ -11,7 +11,7 @@ namespace TerraIntegration.UI
 {
     public class UIConstantOrReference : UIPanel
     {
-        public Type[] ValidRefTypes
+        public ReturnType[] ValidRefTypes
         {
             get => validRefTypes;
             set
@@ -74,7 +74,7 @@ namespace TerraIntegration.UI
         IProgrammable Owner;
         UIVariableSwitch Switch;
 
-        private Type[] validRefTypes;
+        private ReturnType[] validRefTypes;
         private Type[] validConstTypes;
 
         public UIConstantOrReference()
@@ -123,8 +123,8 @@ namespace TerraIntegration.UI
                     Left = new(-21, .5f),
                     DisplayOnly = true,
 
-                    VariableValidator = (var) => ValidRefTypes is not null && ValidRefTypes.Any(t => t.IsAssignableFrom(var.VariableReturnType)),
-                    HoverText = ValidRefTypes is null ? null : string.Join(", ", ValidRefTypes.Select(t => VariableValue.TypeToName(t, true)))
+                    VariableValidator = (var) => ValidRefTypes is not null && ValidRefTypes.Any(t => t.Match(var.VariableReturnType)),
+                    HoverText = ValidRefTypes is null ? null : string.Join(", ", ValidRefTypes.Select(t => t.ToStringName(true)))
                 });
                 return;
             }

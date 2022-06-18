@@ -23,7 +23,7 @@ namespace TerraIntegration.Variables.Numeric
 
         public override SpriteSheetPos SpriteSheetPos => new(MathSheet, 3, 1);
 
-        public override Type[] ReferenceReturnTypes => new[] { typeof(INumeric), typeof(IDecimal) };
+        public override ReturnType[] ReferenceReturnTypes => new ReturnType[] { typeof(INumeric), typeof(IDecimal) };
 
         public override VariableValue GetValue(VariableValue value, ComponentSystem system, List<Error> errors)
         {

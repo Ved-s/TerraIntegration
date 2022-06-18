@@ -15,7 +15,7 @@ namespace TerraIntegration.ValueProperties.Tile
         public override string PropertyDisplay => "Is actuated";
         public override string PropertyDescription => "Returns whether this tile is actuated";
 
-        public override Type VariableReturnType => typeof(Values.Boolean);
+        public override ReturnType? VariableReturnType => typeof(Values.Boolean);
 
         public override SpriteSheetPos SpriteSheetPos => new(TileSheet, 2, 1);
 
@@ -29,7 +29,7 @@ namespace TerraIntegration.ValueProperties.Tile
         public override string PropertyDisplay => "Has actuator";
         public override string PropertyDescription => "Returns whether this tile has an actuator on it";
 
-        public override Type VariableReturnType => typeof(Values.Boolean);
+        public override ReturnType? VariableReturnType => typeof(Values.Boolean);
 
         public override SpriteSheetPos SpriteSheetPos => new(TileSheet, 3, 1);
 
@@ -43,7 +43,7 @@ namespace TerraIntegration.ValueProperties.Tile
         public override string PropertyDisplay => "Has red wire";
         public override string PropertyDescription => "Returns whether this tile has red wire on it";
 
-        public override Type VariableReturnType => typeof(Values.Boolean);
+        public override ReturnType? VariableReturnType => typeof(Values.Boolean);
 
         public override SpriteSheetPos SpriteSheetPos => new(TileSheet, 0, 2);
 
@@ -58,7 +58,7 @@ namespace TerraIntegration.ValueProperties.Tile
 
         public override string PropertyDescription => "Returns whether this tile has green wire on it";
 
-        public override Type VariableReturnType => typeof(Values.Boolean);
+        public override ReturnType? VariableReturnType => typeof(Values.Boolean);
 
         public override SpriteSheetPos SpriteSheetPos => new(TileSheet, 1, 2);
 
@@ -73,7 +73,7 @@ namespace TerraIntegration.ValueProperties.Tile
 
         public override string PropertyDescription => "Returns whether this tile has blue wire on it";
 
-        public override Type VariableReturnType => typeof(Values.Boolean);
+        public override ReturnType? VariableReturnType => typeof(Values.Boolean);
 
         public override SpriteSheetPos SpriteSheetPos => new(TileSheet, 2, 2);
 
@@ -88,7 +88,7 @@ namespace TerraIntegration.ValueProperties.Tile
 
         public override string PropertyDescription => "Returns whether this tile has yellow wire on it";
 
-        public override Type VariableReturnType => typeof(Values.Boolean);
+        public override ReturnType? VariableReturnType => typeof(Values.Boolean);
 
         public override SpriteSheetPos SpriteSheetPos => new(TileSheet, 3, 2);
 

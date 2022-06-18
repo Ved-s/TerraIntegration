@@ -17,7 +17,7 @@ namespace TerraIntegration.Variables.Comparing
 
         public override SpriteSheetPos SpriteSheetPos => new(BasicSheet, 0, 3);
 
-        public override Type VariableReturnType => typeof(Values.Boolean);
+        public override ReturnType? VariableReturnType => typeof(Values.Boolean);
 
         public VariableValue OldValue;
 

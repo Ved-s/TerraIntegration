@@ -24,11 +24,11 @@ namespace TerraIntegration.ValueProperties.Collection
         {
             ToCollection result = new ToCollection();
 
-            Type collectionType = ICollection.TryGetCollectionType(var);
+            ReturnType? collectionType = ICollection.TryGetCollectionType(var);
 
             if (collectionType is not null)
             {
-                result.SetReturnTypeCache(typeof(Interfaces.ICollection<>).MakeGenericType(collectionType));
+                result.SetReturnTypeCache(new(typeof(Interfaces.ICollection), collectionType.Value));
             }
 
             return result;

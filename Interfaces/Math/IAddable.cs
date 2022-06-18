@@ -11,7 +11,7 @@ namespace TerraIntegration.Interfaces.Math
 {
     public interface IAddable : IValueInterface
     {
-        public Type[] ValidAddTypes { get; }
+        public ReturnType[] ValidAddTypes { get; }
         public VariableValue Add(VariableValue value, List<Error> errors, TypeIdentity id);
     }
 }

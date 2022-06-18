@@ -52,7 +52,7 @@ namespace TerraIntegration.Basic
         public virtual string DisplayNameLocalizationKey => "Mods.TerraIntegration.Names.Variables." + TypeName?.Replace('.', '_');
         public virtual string ItemNameLocalizationKey => "Mods.TerraIntegration.ItemNames.Variable";
 
-        public virtual Type VariableReturnType
+        public virtual ReturnType? VariableReturnType
         {
             get
             {
@@ -61,7 +61,7 @@ namespace TerraIntegration.Basic
             set => SetReturnTypeCache(value);
         }
 
-        public virtual Type[] RelatedTypes => null;
+        public virtual IEnumerable<Type> RelatedTypes => null;
         public virtual bool VisibleInProgrammerVariables => true;
         public virtual bool ShowLastValue => true;
 
@@ -113,7 +113,7 @@ namespace TerraIntegration.Basic
             } 
         }
         public string ReturnTypeCacheName;
-        public Type ReturnTypeCacheType;
+        public ReturnType? ReturnTypeCacheType;
         public VariableValue LastValue;
         public ComponentSystem LastSystem;
 
@@ -345,7 +345,7 @@ namespace TerraIntegration.Basic
         }
         public virtual Variable CloneCustom() => (Variable)MemberwiseClone();
 
-        public void SetReturnTypeCache(Type t)
+        public void SetReturnTypeCache(ReturnType? t)
         {
             if (t is null)
             {
@@ -354,19 +354,19 @@ namespace TerraIntegration.Basic
             }
             else
             {
-                ReturnTypeCacheType = t;
-                ReturnTypeCacheName = VariableValue.TypeToString(t);
+                ReturnTypeCacheType = t.Value;
+                ReturnTypeCacheName = t.Value.ToTypeString();
             }
         }
-        public Type GetReturnTypeCache()
+        public ReturnType? GetReturnTypeCache()
         {
             if (ReturnTypeCacheName is null && ReturnTypeCacheType is null)
                 return null;
 
             if (ReturnTypeCacheType is not null)
-                return ReturnTypeCacheType;
+                return ReturnTypeCacheType.Value;
 
-            ReturnTypeCacheType = VariableValue.StringToType(ReturnTypeCacheName);
+            ReturnTypeCacheType = ReturnType.FromTypeString(ReturnTypeCacheName);
             return ReturnTypeCacheType;
         }
 
@@ -415,8 +415,8 @@ namespace TerraIntegration.Basic
         public TValueInterface TryGetReturnTypeInterface<TValueInterface>() where TValueInterface : class, IValueInterface
         {
             if (VariableReturnType is not null
-                && VariableReturnType.IsAssignableTo(typeof(TValueInterface))
-                && VariableValue.ByType.TryGetValue(VariableReturnType, out VariableValue value))
+                && VariableReturnType.Value.Match(typeof(TValueInterface))
+                && VariableValue.ByType.TryGetValue(VariableReturnType.Value.Type, out VariableValue value))
                 return value as TValueInterface;
 
             return null;
@@ -424,7 +424,7 @@ namespace TerraIntegration.Basic
         public TValue TryGetReturnType<TValue>() where TValue : VariableValue
         {
             if (VariableReturnType is not null
-                && VariableReturnType == typeof(TValue)
+                && VariableReturnType.Value.Type == typeof(TValue)
                 && VariableValue.ByType.TryGetValue(typeof(TValue), out VariableValue value))
                 return (TValue)value;
 
@@ -478,7 +478,7 @@ namespace TerraIntegration.Basic
 
         public override SpriteSheetPos SpriteSheetPos => new(BasicSheet, 0, 0);
 
-        public override Type VariableReturnType => typeof(UnloadedVariableValue);
+        public override ReturnType? VariableReturnType => typeof(UnloadedVariableValue);
 
         public string UnloadedTypeName { get; private set; }
         public byte[] UnloadedData { get; private set; }

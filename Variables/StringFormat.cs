@@ -22,16 +22,16 @@ namespace TerraIntegration.Variables
 
         public override SpriteSheetPos SpriteSheetPos => new(BasicSheet, 2, 2);
 
-        public override Type[] LeftSlotValueTypes => new[] { typeof(Values.String) };
+        public override ReturnType[] LeftSlotValueTypes => new ReturnType[] { typeof(Values.String) };
         List<string> Strings = new();
 
         public override string LeftSlotDescription => "Format string\nExample: The value is {0}";
         public override string RightSlotDescription => $"{VariableValue.TypeToName(typeof(IToString), true)}s format with";
         public override UIDrawing CenterDrawing => null;
 
-        public override Type VariableReturnType => typeof(Values.String);
+        public override ReturnType? VariableReturnType => typeof(Values.String);
 
-        public override Type[] GetValidRightSlotTypes(Type leftSlotType) => new[] { typeof(ICollection) };
+        public override ReturnType[] GetValidRightSlotTypes(ReturnType leftSlotType) => new ReturnType[] { new(typeof(ICollection), typeof(IToString)) };
 
         public override VariableValue GetValue(ComponentSystem system, VariableValue left, VariableValue right, List<Error> errors)
         {

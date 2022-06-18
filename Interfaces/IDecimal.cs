@@ -14,7 +14,7 @@ namespace TerraIntegration.Interfaces
         public double DecimalMax { get; }
         public double DecimalMin { get; }
 
-        Type[] IMathOperable.ValidMathValueTypes => new[] { typeof(INumeric), typeof(IDecimal) };
+        ReturnType[] IMathOperable.ValidMathValueTypes => new ReturnType[] { typeof(INumeric), typeof(IDecimal) };
 
         public VariableValue GetFromDecimal(double value, List<Error> errors)
         {

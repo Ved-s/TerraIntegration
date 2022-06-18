@@ -12,14 +12,14 @@ namespace TerraIntegration.Variables.Bitwise
 {
     public class Xnor : DoubleReferenceVariableWithConst
     {
-        public override Type[] LeftSlotValueTypes => new[] { typeof(Values.Boolean), typeof(INumeric) };
+        public override ReturnType[] LeftSlotValueTypes => new ReturnType[] { typeof(Values.Boolean), typeof(INumeric) };
         public override string TypeName => "xnor";
         public override string TypeDefaultDisplayName => "Xnor";
         public override string TypeDefaultDescription => "Boolean or bitwise Xnor operator";
 
         public override SpriteSheetPos SpriteSheetPos => new(BooleanSheet, 3, 0);
 
-        public override Type[] GetValidRightSlotTypes(Type leftSlotType)
+        public override ReturnType[] GetValidRightSlotTypes(ReturnType leftSlotType)
         {
             return new[] { leftSlotType };
         }

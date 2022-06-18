@@ -12,14 +12,14 @@ namespace TerraIntegration.Variables.Bitwise
 {
     public class Or : DoubleReferenceVariableWithConst
     {
-        public override Type[] LeftSlotValueTypes => new[] { typeof(Values.Boolean), typeof(INumeric) };
+        public override ReturnType[] LeftSlotValueTypes => new ReturnType[] { typeof(Values.Boolean), typeof(INumeric) };
         public override string TypeName => "or";
         public override string TypeDefaultDisplayName => "Or";
         public override string TypeDefaultDescription => "Boolean or bitwise Or operator";
 
         public override SpriteSheetPos SpriteSheetPos => new(BooleanSheet, 1, 0);
 
-        public override Type[] GetValidRightSlotTypes(Type leftSlotType)
+        public override ReturnType[] GetValidRightSlotTypes(ReturnType leftSlotType)
         {
             return new[] { leftSlotType };
         }

@@ -11,7 +11,7 @@ namespace TerraIntegration.Interfaces.Math
 {
     public interface ISubtractable : IValueInterface
     {
-        public Type[] ValidSubtractTypes { get; }
+        public ReturnType[] ValidSubtractTypes { get; }
         public VariableValue Subtract(VariableValue value, List<Error> errors, TypeIdentity id);
     }
 }

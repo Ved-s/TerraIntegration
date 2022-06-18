@@ -11,14 +11,14 @@ namespace TerraIntegration.ValueProperties.Collection
 {
     public class Contains : DoubleReferenceVariableWithConst
     {
-        public override Type[] LeftSlotValueTypes => new[] { typeof(ICollection) };
+        public override ReturnType[] LeftSlotValueTypes => new ReturnType[] { typeof(ICollection) };
         public override string TypeName => "contains";
         public override string TypeDefaultDisplayName => "Contains";
         public override string TypeDefaultDescription => "Returns True if collection contains specified value";
 
-        public override Type VariableReturnType => typeof(Values.Boolean);
+        public override ReturnType? VariableReturnType => typeof(Values.Boolean);
 
-        public override Type[] GetValidRightSlotTypes(Type leftSlotType)
+        public override ReturnType[] GetValidRightSlotTypes(ReturnType leftSlotType)
         {
             if (LeftSlot?.Var is null) return null;
             return new[] { ICollection.TryGetCollectionType(LeftSlot.Var.Var) ?? typeof(VariableValue) };

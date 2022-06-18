@@ -15,7 +15,7 @@ namespace TerraIntegration.ValueProperties.Tile
 
         public override SpriteSheetPos SpriteSheetPos => new(TileSheet, 0, 3);
 
-        public override Type VariableReturnType => typeof(Values.Boolean);
+        public override ReturnType? VariableReturnType => typeof(Values.Boolean);
 
         public override VariableValue GetProperty(ComponentSystem system, Values.Tile value, List<Error> errors)
             => new Values.Boolean(value.HalfBlock);

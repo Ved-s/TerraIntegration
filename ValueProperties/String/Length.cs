@@ -16,7 +16,7 @@ namespace TerraIntegration.ValueProperties.String
     {
         public override string PropertyName => "length";
         public override string PropertyDisplay => "Length";
-        public override Type VariableReturnType => typeof(Integer);
+        public override ReturnType? VariableReturnType => typeof(Integer);
         public override string PropertyDescription => "Returns the length of the string";
 
         public override SpriteSheetPos SpriteSheetPos => new(BasicSheet, 3, 1);

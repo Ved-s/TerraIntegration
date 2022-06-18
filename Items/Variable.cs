@@ -62,7 +62,7 @@ namespace TerraIntegration.Items
 
             if (Var is null) return;
 
-            string returns = VariableValue.TypeToName(Var.VariableReturnType, true);
+            string returns = VariableValue.TypeToName(Var.VariableReturnType?.Type, true);
 
             tooltips.Add(new(Mod, "TIVarType", $"[c/aaaa00:Type:] {Var.TypeDisplayName}"));
             if (returns is not null)
@@ -152,7 +152,7 @@ namespace TerraIntegration.Items
             if (Var is null) return;
 
             Vector2 overlaySize = sourceRectangle.Size() * scale;
-            VariableRenderer.DrawVariableOverlay(spriteBatch, false, Var.VariableReturnType, Var.TypeName, position, overlaySize, color, rotation, origin);
+            VariableRenderer.DrawVariableOverlay(spriteBatch, false, Var.VariableReturnType?.Type, Var.TypeName, position, overlaySize, color, rotation, origin);
         }
 
         TagCompound GetUnloadedItemData(TagCompound tag)

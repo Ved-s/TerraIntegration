@@ -16,13 +16,13 @@ namespace TerraIntegration.Templates
     public abstract class ReferenceVariable : Variable, IProgrammable
     {
         public Guid VariableId { get; set; }
-        public virtual Type[] ReferenceReturnTypes { get; }
+        public virtual ReturnType[] ReferenceReturnTypes { get; }
 
         public UIPanel Interface { get; set; }
         public UIVariableSlot InterfaceSlot { get; set; }
         public bool HasComplexInterface => false;
 
-        public override Type[] RelatedTypes => ReferenceReturnTypes;
+        public override IEnumerable<Type> RelatedTypes => ReferenceReturnTypes?.Select(rt => rt.Type);
 
         public void SetupInterface()
         {
@@ -34,8 +34,8 @@ namespace TerraIntegration.Templates
             };
             if (ReferenceReturnTypes is not null)
             {
-                InterfaceSlot.VariableValidator = (var) => ReferenceReturnTypes.Any(t => t.IsAssignableFrom(var.VariableReturnType));
-                InterfaceSlot.HoverText = string.Join(", ", ReferenceReturnTypes.Select(t => VariableValue.TypeToName(t, true)));
+                InterfaceSlot.VariableValidator = (var) => ReferenceReturnTypes.Any(t => t.Match(var.VariableReturnType));
+                InterfaceSlot.HoverText = string.Join(", ", ReferenceReturnTypes.Select(t => t.ToStringName(true)));
             }
 
             Interface.Append(InterfaceSlot);

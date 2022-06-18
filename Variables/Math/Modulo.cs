@@ -23,15 +23,15 @@ namespace TerraIntegration.Variables.Numeric
 
         public override SpriteSheetPos SpriteSheetPos => new(MathSheet, 2, 1);
 
-        public override Type[] LeftSlotValueTypes => new[] { typeof(IModulable) };
+        public override ReturnType[] LeftSlotValueTypes => new ReturnType[] { typeof(IModulable) };
 
-        public override Type[] GetValidRightReferenceSlotTypes(Type leftSlotType)
+        public override ReturnType[] GetValidRightReferenceSlotTypes(ReturnType leftSlotType)
         {
-            if (VariableValue.ByType.TryGetValue(leftSlotType, out VariableValue value) && value is IModulable modulable)
+            if (VariableValue.ByType.TryGetValue(leftSlotType.Type, out VariableValue value) && value is IModulable modulable)
                 return modulable.ValidModuloTypes;
             return null;
         }
-        public override Type[] GetValidRightConstantSlotTypes(Type leftSlotType) => new[] { leftSlotType };
+        public override Type[] GetValidRightConstantSlotTypes(ReturnType leftSlotType) => new[] { leftSlotType.Type };
 
         public override VariableValue GetValue(ComponentSystem system, VariableValue left, VariableValue right, List<Error> errors)
         {

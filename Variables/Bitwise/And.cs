@@ -12,14 +12,14 @@ namespace TerraIntegration.Variables.Bitwise
 {
     public class And : DoubleReferenceVariableWithConst
     {
-        public override Type[] LeftSlotValueTypes => new[] { typeof(Values.Boolean), typeof(INumeric) };
+        public override ReturnType[] LeftSlotValueTypes => new ReturnType[] { typeof(Values.Boolean), typeof(INumeric) };
         public override string TypeName => "and";
         public override string TypeDefaultDisplayName => "And";
         public override string TypeDefaultDescription => "Boolean or bitwise And operator";
 
         public override SpriteSheetPos SpriteSheetPos => new(BooleanSheet, 0, 0);
 
-        public override Type[] GetValidRightSlotTypes(Type leftSlotType)
+        public override ReturnType[] GetValidRightSlotTypes(ReturnType leftSlotType)
         {
             return new[] { leftSlotType };
         }

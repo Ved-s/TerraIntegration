@@ -459,7 +459,8 @@ namespace TerraIntegration.UI
             foreach (var kvp in VariableValue.ByType)
             {
                 VariableValue v = kvp.Value;
-                if (!v.TypeName.ToLower().Contains(VariablesSearch.CurrentString.ToLower())
+                if (v.HideInProgrammer 
+                    || !v.TypeName.ToLower().Contains(VariablesSearch.CurrentString.ToLower())
                     || (!v.HasProperties() && v is not IProgrammable)) continue;
 
                 VariablesList.Add(CreateVariableButton(
@@ -484,7 +485,7 @@ namespace TerraIntegration.UI
                     || !v.TypeDisplayName.ToLower().Contains(VariablesSearch.CurrentString.ToLower())
                     || !v.VisibleInProgrammerVariables) continue;
 
-                VariablesList.Add(CreateVariableButton(v.TypeDisplayName, Color.White, v.VariableReturnType, v.TypeName, () => VariableClicked(interfaceOwner), iconHoverText: v.TypeDescription));
+                VariablesList.Add(CreateVariableButton(v.TypeDisplayName, Color.White, v.VariableReturnType?.Type, v.TypeName, () => VariableClicked(interfaceOwner), iconHoverText: v.TypeDescription));
             }
         }
         static void PopulateProperties()
@@ -518,7 +519,7 @@ namespace TerraIntegration.UI
 
                     UITextPanel panel = CreateVariableButton(var.TypeDisplayName,
                                                              Color.White,
-                                                             var.VariableReturnType,
+                                                             var.VariableReturnType?.Type,
                                                              var.TypeName,
                                                              () => PropertyClicked(owner),
                                                              headText,

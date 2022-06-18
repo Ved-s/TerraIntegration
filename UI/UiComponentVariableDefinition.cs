@@ -97,12 +97,12 @@ namespace TerraIntegration.UI
             Vector2 pos = new Vector2(8, (dim.Height - size) / 2);
             pos += dim.Position();
 
-            VariableRenderer.DrawVariableOverlay(spriteBatch, true, Property.VariableReturnType, Property.TypeName, pos, new(size), Color.White, 0f, Vector2.Zero);
+            VariableRenderer.DrawVariableOverlay(spriteBatch, true, Property.VariableReturnType?.Type, Property.TypeName, pos, new(size), Color.White, 0f, Vector2.Zero);
 
             Rectangle hitbox = new((int)pos.X, (int)pos.Y, (int)size, (int)size);
             if (hitbox.Contains(Main.MouseScreen.ToPoint())) 
             {
-                string returns = VariableValue.TypeToName(Property.VariableReturnType, true);
+                string returns = VariableValue.TypeToName(Property.VariableReturnType?.Type, true);
 
                 ComponentWorld.Instance.AddHoverText(
                     $"[c/aaaa00:Type:] {Property.TypeDisplayName}" +

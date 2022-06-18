@@ -48,8 +48,8 @@ namespace TerraIntegration.Templates
         public sealed override string TypeDefaultDescription => PropertyDescription;
         public sealed override string TypeDefaultDisplayName => PropertyDisplay;
 
-        public override Type[] ReferenceReturnTypes => ValueTypes;
-        public override Type[] RelatedTypes => ValueTypes;
+        public override ReturnType[] ReferenceReturnTypes => ValueTypes.Cast<ReturnType>().ToArray();
+        public override IEnumerable<Type> RelatedTypes => ValueTypes;
         public override bool VisibleInProgrammerVariables => false;
 
         public abstract VariableValue GetProperty(ComponentSystem system, VariableValue value, List<Error> errors);

@@ -25,7 +25,7 @@ namespace TerraIntegration.ValueProperties.Collection
         {
             First result = new();
 
-            Type collectionReturn = ICollection.TryGetCollectionType(var);
+            ReturnType? collectionReturn = ICollection.TryGetCollectionType(var);
             if (collectionReturn is not null)
             {
                 result.SetReturnTypeCache(collectionReturn);

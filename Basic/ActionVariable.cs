@@ -19,7 +19,7 @@ namespace TerraIntegration.Basic
         public abstract VariableMatch Variables { get; }
         public abstract bool NeedsSaveTag { get; }
 
-        public sealed override Type VariableReturnType => null;
+        public sealed override ReturnType? VariableReturnType => null;
         public override string DefaultItemName => "Action";
         public override string ItemNameLocalizationKey => "Mods.TerraIntegration.ItemNames.Action";
 
@@ -29,7 +29,7 @@ namespace TerraIntegration.Basic
         public UIVariableSlot ActionVarSlot { get; set; }
         public Guid ActionVarId { get; set; }
 
-        public override Type[] RelatedTypes => Variables.ToTypeArray();
+        public override IEnumerable<Type> RelatedTypes => Variables.ToTypeArray();
         public override bool VisibleInProgrammerVariables => false;
 
         public void Execute(Point16 pos, ComponentSystem system, List<Error> errors)

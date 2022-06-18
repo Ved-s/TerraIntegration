@@ -81,7 +81,7 @@ namespace TerraIntegration.UI
                 {
                     if (var.VariableReturnType is null)
                         return false;
-                    if (!VariableReturnTypes.Any(t => var.VariableReturnType.IsAssignableTo(t)))
+                    if (!VariableReturnTypes.Any(t => var.VariableReturnType.Value.Match(t)))
                         return false;
                 }
 

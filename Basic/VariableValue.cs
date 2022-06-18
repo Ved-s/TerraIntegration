@@ -24,6 +24,8 @@ namespace TerraIntegration.Basic
         public virtual SpriteSheet DefaultSpriteSheet => null;
         public virtual SpriteSheetPos SpriteSheetPos => default;
 
+        public virtual bool HideInProgrammer => false;
+
         public virtual Color TypeColor => Color.White;
 
         public abstract string TypeName { get; }
@@ -118,8 +120,10 @@ namespace TerraIntegration.Basic
         }
 
         public virtual VariableValue Clone() => (VariableValue)MemberwiseClone();
-        public abstract bool Equals(VariableValue value);
 
+        public virtual ReturnType GetReturnType() => GetType();
+
+        public abstract bool Equals(VariableValue value);
         public override bool Equals(object obj)
         {
             return obj is VariableValue value

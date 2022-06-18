@@ -27,6 +27,6 @@ namespace TerraIntegration.Variables.Actions
                 action.Execute(pos, system, errors);
         }
 
-        public override Type[] GetValidReferenceSlotTypes(Type leftSlotType) => new[] { typeof(Values.Boolean) };
+        public override ReturnType[] GetValidReferenceSlotTypes(ReturnType leftSlotType) => new ReturnType[] { typeof(Values.Boolean) };
     }
 }

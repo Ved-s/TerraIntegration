@@ -21,7 +21,7 @@ namespace TerraIntegration.Variables
 
         public VariableValue Value { get; set; }
 
-        public override Type VariableReturnType => Value.GetType();
+        public override ReturnType? VariableReturnType => Value.GetType();
 
         public override bool ShowLastValue => false;
 

@@ -23,15 +23,15 @@ namespace TerraIntegration.Variables.Numeric
 
         public override SpriteSheetPos SpriteSheetPos => new(MathSheet, 3, 0);
 
-        public override Type[] LeftSlotValueTypes => new[] { typeof(ISubtractable) };
+        public override ReturnType[] LeftSlotValueTypes => new ReturnType[] { typeof(ISubtractable) };
 
-        public override Type[] GetValidRightReferenceSlotTypes(Type leftSlotType)
+        public override ReturnType[] GetValidRightReferenceSlotTypes(ReturnType leftSlotType)
         {
-            if (VariableValue.ByType.TryGetValue(leftSlotType, out VariableValue value) && value is ISubtractable subtractable)
-                return subtractable.ValidSubtractTypes;
+            if (VariableValue.ByType.TryGetValue(leftSlotType.Type, out VariableValue value) && value is ISubtractable subtractable)
+                return subtractable.ValidSubtractTypes.Cast<ReturnType>().ToArray();
             return null;
         }
-        public override Type[] GetValidRightConstantSlotTypes(Type leftSlotType) => new[] { leftSlotType };
+        public override Type[] GetValidRightConstantSlotTypes(ReturnType leftSlotType) => new[] { leftSlotType.Type };
 
         public override VariableValue GetValue(ComponentSystem system, VariableValue left, VariableValue right, List<Error> errors)
         {

@@ -23,15 +23,15 @@ namespace TerraIntegration.Variables.Numeric
 
         public override SpriteSheetPos SpriteSheetPos => new(MathSheet, 1, 1);
 
-        public override Type[] LeftSlotValueTypes => new[] { typeof(IDivisible) };
+        public override ReturnType[] LeftSlotValueTypes => new ReturnType[] { typeof(IDivisible) };
 
-        public override Type[] GetValidRightReferenceSlotTypes(Type leftSlotType)
+        public override ReturnType[] GetValidRightReferenceSlotTypes(ReturnType leftSlotType)
         {
-            if (VariableValue.ByType.TryGetValue(leftSlotType, out VariableValue value) && value is IDivisible divisible)
+            if (VariableValue.ByType.TryGetValue(leftSlotType.Type, out VariableValue value) && value is IDivisible divisible)
                 return divisible.ValidDivideTypes;
             return null;
         }
-        public override Type[] GetValidRightConstantSlotTypes(Type leftSlotType) => new[] { leftSlotType };
+        public override Type[] GetValidRightConstantSlotTypes(ReturnType leftSlotType) => new[] { leftSlotType.Type };
 
         public override VariableValue GetValue(ComponentSystem system, VariableValue left, VariableValue right, List<Error> errors)
         {

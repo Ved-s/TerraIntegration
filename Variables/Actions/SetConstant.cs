@@ -31,6 +31,6 @@ namespace TerraIntegration.Variables.Actions
                 loc.Value.ComponentData.Component?.OnVariableChanged(loc.Value.ComponentPos, loc.Value.Slot);
             }
         }
-        public override Type[] GetValidRightSlotTypes(Type leftSlotType) => new[] { leftSlotType };
+        public override ReturnType[] GetValidRightSlotTypes(ReturnType leftSlotType) => new ReturnType[] { leftSlotType };
     }
 }

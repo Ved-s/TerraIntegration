@@ -69,15 +69,15 @@ namespace TerraIntegration.Templates
             ActionVarSlot.Left.Set(-75, .5f);
             ActionVarSlot.VariableChanged = var =>
             {
-                if (var?.Var is null)
+                if (var?.Var?.VariableReturnType is null)
                 {
                     RightSlot.ValidRefTypes = null;
                     RightSlot.ValidConstTypes = null;
                 }
                 else
                 {
-                    RightSlot.ValidRefTypes = GetValidRightReferenceSlotTypes(var.Var.VariableReturnType);
-                    RightSlot.ValidConstTypes = GetValidRightConstantSlotTypes(var.Var.VariableReturnType);
+                    RightSlot.ValidRefTypes = GetValidRightReferenceSlotTypes(var.Var.VariableReturnType.Value);
+                    RightSlot.ValidConstTypes = GetValidRightConstantSlotTypes(var.Var.VariableReturnType.Value);
                 }
             };
 
@@ -128,9 +128,9 @@ namespace TerraIntegration.Templates
 
         public virtual ActionWithReferenceConst CreateVariable(ValueOrRef right) => this.NewInstance();
 
-        public virtual Type[] GetValidRightReferenceSlotTypes(Type leftSlotType) => GetValidRightSlotTypes(leftSlotType);
-        public virtual Type[] GetValidRightConstantSlotTypes(Type leftSlotType) => GetValidRightSlotTypes(leftSlotType);
-        public virtual Type[] GetValidRightSlotTypes(Type leftSlotType) => null;
+        public virtual ReturnType[] GetValidRightReferenceSlotTypes(ReturnType leftSlotType) => GetValidRightSlotTypes(leftSlotType);
+        public virtual Type[] GetValidRightConstantSlotTypes(ReturnType leftSlotType) => GetValidRightSlotTypes(leftSlotType).Select(rt => rt.Type).ToArray();
+        public virtual ReturnType[] GetValidRightSlotTypes(ReturnType leftSlotType) => null;
 
         public abstract void Execute(Point16 pos, Variable var, VariableValue refValue, ComponentSystem system, List<Error> errors);
     }

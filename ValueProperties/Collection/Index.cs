@@ -13,15 +13,15 @@ namespace TerraIntegration.ValueProperties.Collection
 {
     public class Index : DoubleReferenceVariableWithConst
     {
-        public override Type[] LeftSlotValueTypes => new[] { typeof(ICollection) };
+        public override ReturnType[] LeftSlotValueTypes => new ReturnType[] { typeof(ICollection) };
         public override string TypeName => "index";
         public override string TypeDefaultDisplayName => "Index";
         public override string TypeDefaultDescription => "Gets value from collection at specified index";
 
         List<VariableValue> ValueList;
 
-        public override Type[] GetValidRightConstantSlotTypes(Type leftSlotType) => new[] { typeof(Integer) };
-        public override Type[] GetValidRightReferenceSlotTypes(Type leftSlotType) => new[] { typeof(INumeric) };
+        public override Type[] GetValidRightConstantSlotTypes(ReturnType leftSlotType) => new[] { typeof(Integer) };
+        public override ReturnType[] GetValidRightReferenceSlotTypes(ReturnType leftSlotType) => new ReturnType[] { typeof(INumeric) };
 
         public override DoubleReferenceVariableWithConst CreateVariable(Variable left, ValueOrRef right)
         {

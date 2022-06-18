@@ -15,15 +15,17 @@ namespace TerraIntegration.Values
     public class CollectionList : VariableValue, Interfaces.ICollection
     {
         public override string TypeName => "colList";
-        public override string TypeDefaultDisplayName => $"{TypeToName<Interfaces.ICollection>()} of {TypeToName(CollectionType, true)}";
-        public Type CollectionType { get; private set; }
+        public override string TypeDefaultDisplayName => $"{TypeToName<Interfaces.ICollection>()} of {CollectionType.ToStringName(true)}";
+        public ReturnType CollectionType { get; private set; }
 
         public IEnumerable<VariableValue> Enumerable { get; private set; }
+
+        public override bool HideInProgrammer => true;
 
         List<string> Strings;
 
         public CollectionList() { }
-        public CollectionList(IEnumerable<VariableValue> enumerable, Type collectionType)
+        public CollectionList(IEnumerable<VariableValue> enumerable, ReturnType collectionType)
         {
             Enumerable = enumerable;
             CollectionType = collectionType;
@@ -46,7 +48,7 @@ namespace TerraIntegration.Values
 
         protected override void SaveCustomData(BinaryWriter writer)
         {
-            writer.Write(TypeToString(CollectionType) ?? "");
+            writer.Write(CollectionType.ToTypeString() ?? "");
 
             List<VariableValue> ienum = new(Enumerable);
 

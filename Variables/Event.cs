@@ -19,7 +19,7 @@ namespace TerraIntegration.Variables
         public override string TypeDefaultDisplayName => "Event";
         public override string TypeDefaultDescription => "An event that will trigger all\nsubscribers for this event in system";
 
-        public override Type VariableReturnType => null;
+        public override ReturnType? VariableReturnType => null;
 
         public override SpriteSheetPos SpriteSheetPos => new(BasicSheet, 3, 0);
 

@@ -11,7 +11,7 @@ namespace TerraIntegration.Interfaces.Math
 {
     public interface IModulable : IValueInterface
     {
-        public Type[] ValidModuloTypes { get; }
+        public ReturnType[] ValidModuloTypes { get; }
         public VariableValue Modulo(VariableValue value, List<Error> errors, TypeIdentity id);
     }
 }

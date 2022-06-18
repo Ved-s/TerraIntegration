@@ -14,11 +14,11 @@ namespace TerraIntegration.Interfaces
     {
         public IEnumerable<VariableValue> Enumerate(ComponentSystem system, List<Error> errors);
 
-        public Type CollectionType { get; }
+        public ReturnType CollectionType { get; }
 
-        public static Type TryGetCollectionType(Type collection) 
+        public static ReturnType TryGetCollectionType(Type collection) 
         {
-            if (collection is null) return null;
+            if (collection is null) return typeof(VariableValue);
 
             Type interf;
             if (collection.IsGenericType && collection.GetGenericTypeDefinition() == typeof(ICollection<>))
@@ -28,21 +28,27 @@ namespace TerraIntegration.Interfaces
                 (t, _) => t.IsGenericType && t.GetGenericTypeDefinition() == typeof(ICollection<>), null)
                 .FirstOrDefault();
 
-            return interf?.GetGenericArguments().FirstOrDefault();
+            return interf?.GetGenericArguments().FirstOrDefault() ?? typeof(VariableValue);
         }
 
-        public static Type TryGetCollectionType(Variable var)
+        public static ReturnType? TryGetCollectionType(Variable var)
         {
             if (var is Constant @const)
             {
                 if (@const.Value is ICollection collection)
                 {
-                    Type t = collection.CollectionType;
-                    if (t != typeof(VariableValue)) 
+                    ReturnType t = collection.CollectionType;
+                    if (t.Type != typeof(VariableValue)) 
                         return t;
                 }
             }
-            return TryGetCollectionType(var.VariableReturnType);
+
+            if (var.VariableReturnType?.Type == typeof(ICollection))
+            {
+                return var.VariableReturnType.Value.SubType.FirstOrDefault();
+            }
+
+            return TryGetCollectionType(var.VariableReturnType?.Type);
         }
 
         public static Type OfType(Type valueType)
@@ -53,6 +59,6 @@ namespace TerraIntegration.Interfaces
 
     public interface ICollection<T> : ICollection
     {
-        Type ICollection.CollectionType => typeof(T);
+        ReturnType ICollection.CollectionType => typeof(T);
     }
 }

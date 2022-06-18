@@ -62,21 +62,21 @@ namespace TerraIntegration.Templates
             ActionVarSlot.Left.Set(-75, .5f);
             ActionVarSlot.VariableChanged = var =>
             {
-                if (var?.Var is null || ReferenceSlot?.Var?.Var is not null && ReferenceSlot.Var.Var.VariableReturnType != var.Var.VariableReturnType)
+                if (var?.Var is null || ReferenceSlot?.Var?.Var is not null && !ReferenceSlot.Var.Var.VariableReturnType.MatchNull(var.Var.VariableReturnType))
                     ReferenceSlot.Var = null;
 
-                if (var?.Var is null)
+                if (var?.Var?.VariableReturnType is null)
                 {
                     ReferenceSlot.VariableValidator = (var) => false;
                     ReferenceSlot.HoverText = null;
                 }
                 else
                 {
-                    Type[] types = GetValidReferenceSlotTypes(var.Var.VariableReturnType);
+                    ReturnType[] types = GetValidReferenceSlotTypes(var.Var.VariableReturnType.Value);
 
                     ReferenceSlot.HoverText = var?.Var is null ? null :
-                        string.Join(", ", types.Select(t => VariableValue.TypeToName(t, true)));
-                    ReferenceSlot.VariableValidator = var => var?.VariableReturnType is not null && types.Any(t => var.VariableReturnType.IsAssignableTo(t));
+                        string.Join(", ", types.Select(t => t.ToStringName(true)));
+                    ReferenceSlot.VariableValidator = var => var?.VariableReturnType is not null && types.Any(t => var.VariableReturnType.Value.Match(t));
                 }
             };
 
@@ -96,7 +96,7 @@ namespace TerraIntegration.Templates
 
                 DisplayOnly = true,
 
-                VariableValidator = var => ActionVarSlot?.Var?.Var is not null && var.VariableReturnType == ActionVarSlot.Var.Var.VariableReturnType
+                VariableValidator = var => ActionVarSlot?.Var?.Var is not null && var.VariableReturnType.MatchNull(ActionVarSlot.Var.Var.VariableReturnType)
             });
         }
         public override ActionVariable WriteActionvariable()
@@ -130,7 +130,7 @@ namespace TerraIntegration.Templates
 
         public virtual ActionWithReference CreateVariable(Variable refVar) => this.NewInstance();
 
-        public abstract Type[] GetValidReferenceSlotTypes(Type leftSlotType);
+        public abstract ReturnType[] GetValidReferenceSlotTypes(ReturnType leftSlotType);
         public abstract void Execute(Point16 pos, Variable var, VariableValue refValue, ComponentSystem system, List<Error> errors);
     }
 }

@@ -11,23 +11,23 @@ namespace TerraIntegration.ValueProperties.Collection
 {
     public class Take : DoubleReferenceVariableWithConst
     {
-        public override Type[] LeftSlotValueTypes => new[] { typeof(ICollection) };
+        public override ReturnType[] LeftSlotValueTypes => new ReturnType[] { typeof(ICollection) };
         public override string TypeName => "take";
         public override string TypeDefaultDisplayName => "Take";
         public override string TypeDefaultDescription => "Gets specified amount of values from start collection";
 
-        public Type CollectionType => collectionType ??= ICollection.TryGetCollectionType(VariableReturnType);
+        public ReturnType CollectionType => collectionType ??= ICollection.TryGetCollectionType(VariableReturnType?.Type);
 
-        private Type collectionType;
+        private ReturnType? collectionType;
 
-        public override Type[] GetValidRightConstantSlotTypes(Type leftSlotType) => new[] { typeof(Integer) };
-        public override Type[] GetValidRightReferenceSlotTypes(Type leftSlotType) => new[] { typeof(INumeric) };
+        public override Type[] GetValidRightConstantSlotTypes(ReturnType leftSlotType) => new[] { typeof(Integer) };
+        public override ReturnType[] GetValidRightReferenceSlotTypes(ReturnType leftSlotType) => new ReturnType[] { typeof(INumeric) };
 
         public override DoubleReferenceVariableWithConst CreateVariable(Variable left, ValueOrRef right)
         {
             return new Take
             {
-                VariableReturnType = ICollection.OfType(ICollection.TryGetCollectionType(left) ?? typeof(VariableValue)),
+                VariableReturnType = ICollection.OfType(ICollection.TryGetCollectionType(left)?.Type ?? typeof(VariableValue)),
             };
         }
 

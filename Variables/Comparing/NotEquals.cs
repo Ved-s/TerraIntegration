@@ -19,11 +19,11 @@ namespace TerraIntegration.Variables.Comparing
 
         public override SpriteSheetPos SpriteSheetPos => new(ComparingSheet, 1, 0);
 
-        public override Type[] LeftSlotValueTypes => new[] { typeof(IEquatable) };
+        public override ReturnType[] LeftSlotValueTypes => new ReturnType[] { typeof(IEquatable) };
 
-        public override Type VariableReturnType => typeof(Values.Boolean);
+        public override ReturnType? VariableReturnType => typeof(Values.Boolean);
 
-        public override Type[] GetValidRightSlotTypes(Type leftSlotType)
+        public override ReturnType[] GetValidRightSlotTypes(ReturnType leftSlotType)
         {
             return new[] { leftSlotType };
         }

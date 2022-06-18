@@ -20,7 +20,7 @@ namespace TerraIntegration.ComponentProperties.Display
 
         public override SpriteSheetPos SpriteSheetPos => new(1, 0);
 
-        public override Type VariableReturnType => typeof(Integer);
+        public override ReturnType? VariableReturnType => typeof(Integer);
 
         public override VariableValue GetProperty(Components.Display component, Point16 pos, List<Error> errors)
         {

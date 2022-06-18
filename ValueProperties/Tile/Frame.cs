@@ -16,7 +16,7 @@ namespace TerraIntegration.ValueProperties.Tile
 
         public override SpriteSheetPos SpriteSheetPos => new(TileSheet, 3, 0);
 
-        public override Type VariableReturnType => typeof(Integer);
+        public override ReturnType? VariableReturnType => typeof(Integer);
 
         public override VariableValue GetProperty(ComponentSystem system, VariableValue value, List<Error> errors)
         {
@@ -37,7 +37,7 @@ namespace TerraIntegration.ValueProperties.Tile
 
         public override SpriteSheetPos SpriteSheetPos => new(TileSheet, 0, 1);
 
-        public override Type VariableReturnType => typeof(Integer);
+        public override ReturnType? VariableReturnType => typeof(Integer);
 
         public override VariableValue GetProperty(ComponentSystem system, VariableValue value, List<Error> errors)
         {
@@ -58,7 +58,7 @@ namespace TerraIntegration.ValueProperties.Tile
 
         public override SpriteSheetPos SpriteSheetPos => new(TileSheet, 1, 1);
 
-        public override Type VariableReturnType => typeof(Integer);
+        public override ReturnType? VariableReturnType => typeof(Integer);
 
         public override VariableValue GetProperty(ComponentSystem system, VariableValue value, List<Error> errors)
         {

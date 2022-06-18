@@ -11,7 +11,7 @@ namespace TerraIntegration.Interfaces.Math
 {
     public interface IMultipliable : IValueInterface
     {
-        public Type[] ValidMultiplyTypes { get; }
+        public ReturnType[] ValidMultiplyTypes { get; }
         public VariableValue Multiply(VariableValue value, List<Error> errors, TypeIdentity id);
     }
 }

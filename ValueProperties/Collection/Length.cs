@@ -19,7 +19,7 @@ namespace TerraIntegration.ValueProperties.Collection
         public override string PropertyDisplay => "Length";
         public override string PropertyDescription => "Retutns length of the collection";
 
-        public override Type VariableReturnType => typeof(Integer);
+        public override ReturnType? VariableReturnType => typeof(Integer);
 
         public override SpriteSheetPos SpriteSheetPos => new(BasicSheet, 3, 1);
 

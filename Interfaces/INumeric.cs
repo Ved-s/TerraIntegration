@@ -18,7 +18,7 @@ namespace TerraIntegration.Interfaces
         public long NumericMin { get; }
         public byte BitWidth { get; }
 
-        Type[] IMathOperable.ValidMathValueTypes => new[] { typeof(INumeric), typeof(IDecimal) };
+        ReturnType[] IMathOperable.ValidMathValueTypes => new ReturnType[] { typeof(INumeric), typeof(IDecimal) };
 
         public VariableValue GetFromNumeric(long value, List<Error> errors) 
         {

@@ -18,7 +18,7 @@ namespace TerraIntegration.ComponentProperties.TileReader
 
         public override SpriteSheetPos SpriteSheetPos => new(2, 0);
 
-        public override Type VariableReturnType => typeof(Wall);
+        public override ReturnType? VariableReturnType => typeof(Wall);
 
         public override VariableValue GetProperty(Components.TileReader component, Point16 pos, List<Error> errors)
         {

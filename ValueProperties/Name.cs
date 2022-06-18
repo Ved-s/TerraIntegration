@@ -23,7 +23,7 @@ namespace TerraIntegration.ComponentProperties.TileReader
 
         public override Type[] ValueTypes => new[] { typeof(INamed) };
 
-        public override Type VariableReturnType => typeof(Values.String);
+        public override ReturnType? VariableReturnType => typeof(Values.String);
 
         public override VariableValue GetProperty(ComponentSystem system, VariableValue value, List<Error> errors)
         {

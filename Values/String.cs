@@ -29,7 +29,7 @@ namespace TerraIntegration.Values
         public override SpriteSheetPos SpriteSheetPos => new(BasicSheet, 2, 1);
 
         public string Value { get; set; }
-        public Type[] ValidAddTypes => new[] { typeof(IToString) };
+        public ReturnType[] ValidAddTypes => new ReturnType[] { typeof(IToString) };
 
         public UIPanel Interface { get; set; }
         public bool HasComplexInterface => false;

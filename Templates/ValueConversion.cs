@@ -22,7 +22,7 @@ namespace TerraIntegration.Templates
         public override object[] DisplayNameFormatters => new[] { VariableValue.TypeToName(ConvertTo, true) };
         public override object[] DescriptionFormatters => new[] { VariableValue.TypeToName(ConvertTo, true) };
 
-        public override Type VariableReturnType => ConvertTo;
+        public override ReturnType? VariableReturnType => ConvertTo;
         public override Type[] ValueTypes => ConvertFrom;
         public override string PropertyName
         {
