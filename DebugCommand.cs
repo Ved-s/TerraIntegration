@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using TerraIntegration.Basic;
 using TerraIntegration.Components;
+using TerraIntegration.Stats;
 using Terraria;
 using Terraria.Localization;
 using Terraria.ModLoader;
@@ -43,7 +44,7 @@ namespace TerraIntegration
                     ToDoCommand(caller);
                     return;
                 case "stats":
-                    Statistics.Visible = !Statistics.Visible;
+                    StatInfo.Visible = !StatInfo.Visible;
                     return;
                 case "comdbg":
                     ComponentWorld.Instance.ComponentDebug = !ComponentWorld.Instance.ComponentDebug;
@@ -66,7 +67,7 @@ namespace TerraIntegration
             switch (sub)
             {
                 case "stats":
-                    Statistics.Visible = !Statistics.Visible;
+                    StatInfo.Visible = !StatInfo.Visible;
                     return;
                 case "comdbg":
                     ComponentWorld.Instance.ComponentDebug = !ComponentWorld.Instance.ComponentDebug;

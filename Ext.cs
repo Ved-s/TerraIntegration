@@ -93,5 +93,13 @@ namespace TerraIntegration
 
         public static bool MatchNull(this ReturnType? returnType, ReturnType? type)
             => returnType.HasValue && returnType.Value.Match(type);
+
+        public static T AggregateOrDefault<T>(this IEnumerable<T> ienum, Func<T, T, T> func) 
+        {
+            if (ienum.Any())
+                return ienum.Aggregate(func);
+
+            return default;
+        }
     }
 }

@@ -9,6 +9,7 @@ using System.Diagnostics;
 using System.Linq;
 using TerraIntegration.Basic;
 using TerraIntegration.DataStructures;
+using TerraIntegration.Stats;
 using TerraIntegration.UI;
 using TerraIntegration.Utilities;
 using Terraria;
@@ -26,7 +27,7 @@ namespace TerraIntegration
 
         public ShortGuids Guids { get; } = new(2);
 
-        public Dictionary<Point16, ComponentData> ComponentData = new();
+        private GrowingList<ComponentData> ComponentData = new();
         public Dictionary<Point16, Component> ComponentUpdates = new();
 
         public uint UpdateCounter = 0;
@@ -45,110 +46,205 @@ namespace TerraIntegration
 
         public T GetData<T>(Point16 pos, Component c = null, bool resolveSubTiles = true) where T : ComponentData, new()
         {
-            if (ComponentData.TryGetValue(pos, out ComponentData data) && data is not null)
+            Statistics.ComponentDatasRequested.Increase();
+            Statistics.ComponentDataRequests.Start();
+            try
             {
-                if (data is SubTileComponentData subTile)
+                if (TryFindData(pos, out ComponentData data) && data is not null)
                 {
-                    if (!subTile.CheckValid())
-                        RemoveAll(pos);
-                    else if (resolveSubTiles)
-                        return GetData<T>(subTile.MainTilePos, c, resolveSubTiles);
+                    if (data is SubTileComponentData subTile)
+                    {
+                        if (!subTile.CheckValid())
+                            RemoveAll(pos);
+                        else if (resolveSubTiles)
+                            return GetData<T>(subTile.MainTilePos, c, resolveSubTiles);
+                    }
+
+                    if (data is T tdata)
+                        return tdata;
                 }
 
-                if (data is T tdata)
-                    return tdata;
+                RemoveAll(pos);
+
+                if (c is null)
+                {
+                    Tile t = Main.tile[pos.X, pos.Y];
+                    if (!Component.ByTileType.TryGetValue(t.TileType, out c))
+                        return null;
+                }
+
+                return InitData<T>(pos, c, data);
             }
-
-            RemoveAll(pos);
-
-            if (c is null)
+            finally
             {
-                Tile t = Main.tile[pos.X, pos.Y];
-                if (!Component.ByTileType.TryGetValue(t.TileType, out c))
-                    return null;
+                Statistics.ComponentDataRequests.Stop();
             }
-
-            T newData = new();
-            newData.Init(c, pos);
-            if (data is not null)
-                data.CopyTo(newData);
-
-            ComponentData[pos] = newData;
-            return newData;
         }
         public ComponentData GetData(Point16 pos, Component c = null, bool resolveSubTiles = true)
         {
-            if (ComponentData.TryGetValue(pos, out ComponentData data) && data is not null)
+            Statistics.ComponentDatasRequested.Increase();
+            Statistics.ComponentDataRequests.Start();
+            try
             {
-                if (data is SubTileComponentData subTile)
+                if (TryFindData(pos, out ComponentData data) && data is not null)
                 {
-                    if (!subTile.CheckValid())
-                        RemoveAll(pos);
-                    else if (resolveSubTiles)
-                        return GetData(subTile.MainTilePos, c, resolveSubTiles);
+                    if (data is SubTileComponentData subTile)
+                    {
+                        if (!subTile.CheckValid())
+                            RemoveAll(pos);
+                        else if (resolveSubTiles)
+                            return GetData(subTile.MainTilePos, c, resolveSubTiles);
+                    }
+
+                    return data;
                 }
 
-                return data;
-            }
+                if (c is null)
+                {
+                    Tile t = Main.tile[pos.X, pos.Y];
+                    if (!Component.ByTileType.TryGetValue(t.TileType, out c))
+                        return null;
+                }
 
-            if (c is null)
+                return InitData(pos, c);
+            }
+            finally
             {
-                Tile t = Main.tile[pos.X, pos.Y];
-                if (!Component.ByTileType.TryGetValue(t.TileType, out c))
-                    return null;
+                Statistics.ComponentDataRequests.Stop();
             }
-
-            ComponentData newData = new();
-            newData.Init(c, pos);
-            ComponentData[pos] = newData;
-            return newData;
         }
 
         public T GetDataOrNull<T>(Point16 pos, bool resolveSubTiles = true) where T : ComponentData
         {
-            if (ComponentData.TryGetValue(pos, out ComponentData data) && data is T t)
+            Statistics.ComponentDatasRequested.Increase();
+            Statistics.ComponentDataRequests.Start();
+            try
             {
-                if (data is SubTileComponentData subTile)
+                if (TryFindData(pos, out ComponentData data) && data is T t)
                 {
-                    if (!subTile.CheckValid())
-                        RemoveAll(pos);
-                    else if (resolveSubTiles)
-                        return GetDataOrNull<T>(subTile.MainTilePos, resolveSubTiles);
-                }
+                    if (data is SubTileComponentData subTile)
+                    {
+                        if (!subTile.CheckValid())
+                            RemoveAll(pos);
+                        else if (resolveSubTiles)
+                            return GetDataOrNull<T>(subTile.MainTilePos, resolveSubTiles);
+                    }
 
-                return t;
+                    return t;
+                }
+                return null;
             }
-            return null;
+            finally
+            {
+                Statistics.ComponentDataRequests.Stop();
+            }
         }
         public ComponentData GetDataOrNull(Point16 pos, bool resolveSubTiles = true)
         {
-            if (ComponentData.TryGetValue(pos, out ComponentData data))
+            Statistics.ComponentDatasRequested.Increase();
+            Statistics.ComponentDataRequests.Start();
+            try
             {
-                if (data is SubTileComponentData subTile)
+                if (TryFindData(pos, out ComponentData data))
                 {
-                    if (!subTile.CheckValid())
-                        RemoveAll(pos);
-                    else if (resolveSubTiles)
-                        return GetDataOrNull(subTile.MainTilePos, resolveSubTiles);
+                    if (data is SubTileComponentData subTile)
+                    {
+                        if (!subTile.CheckValid())
+                            RemoveAll(pos);
+                        else if (resolveSubTiles)
+                            return GetDataOrNull(subTile.MainTilePos, resolveSubTiles);
+                    }
+
+                    return data;
                 }
 
-                return data;
+                return null;
             }
-
-            return null;
+            finally
+            {
+                Statistics.ComponentDataRequests.Stop();
+            }
         }
 
-        public void InitData(Point16 pos, Component c)
+        public ComponentData InitData(Point16 pos, Component c)
         {
             ComponentData newData = new();
             newData.Init(c, pos);
-            ComponentData[pos] = newData;
+
+            int index = FindFreeDataIndex();
+            ComponentData[index] = newData;
+
+            Framing.GetTileSafely(pos).Get<ComponentDataIndex>().Index = index;
+
+            return newData;
         }
-        public void InitData<T>(Point16 pos, Component<T> c) where T : ComponentData, new()
+        public T InitData<T>(Point16 pos, Component c, ComponentData oldData = null) where T : ComponentData, new()
         {
             T newData = new();
             newData.Init(c, pos);
-            ComponentData[pos] = newData;
+            if (oldData is not null)
+                oldData.CopyTo(newData);
+
+            int index = FindFreeDataIndex();
+            ComponentData[index] = newData;
+
+            Framing.GetTileSafely(pos).Get<ComponentDataIndex>().Index = index;
+
+            return newData;
+        }
+
+        public bool TryFindData(Point16 pos, out ComponentData data)
+        {
+            ref ComponentDataIndex index = ref Framing.GetTileSafely(pos).Get<ComponentDataIndex>();
+
+            if (index.Index >= 0 && ComponentData[index.Index]?.Position == pos)
+            {
+                data = ComponentData[index.Index];
+                return true;
+            }
+
+            for (int i = 0; i < ComponentData.Count; i++)
+            {
+                ComponentData d = ComponentData[i];
+                if (d.Position == pos)
+                {
+                    index.Index = i;
+                    data = d;
+                    return true;
+                }
+            }
+            data = null;
+            return false;
+        }
+        public bool TryFindDataIndex(Point16 pos, out int index)
+        {
+            ref ComponentDataIndex ind = ref Framing.GetTileSafely(pos).Get<ComponentDataIndex>();
+
+            if (ind.Index >= 0 && ComponentData[ind.Index]?.Position == pos)
+            {
+                index = ind.Index;
+                return true;
+            }
+
+            for (int i = 0; i < ComponentData.Count; i++)
+            {
+                ComponentData d = ComponentData[i];
+                if (d is not null && d.Position == pos)
+                {
+                    ind.Index = i;
+                    index = i;
+                    return true;
+                }
+            }
+            index = -1;
+            return false;
+        }
+        public int FindFreeDataIndex()
+        {
+            for (int i = 0; i < ComponentData.Count; i++)
+                if (ComponentData[i] is null)
+                    return i;
+            return ComponentData.Count;
         }
 
         public void DefineMultitile(Rectangle tileRect)
@@ -169,24 +265,39 @@ namespace TerraIntegration
                     SubTileComponentData sub = new();
                     sub.Position = pos;
                     sub.MainTilePos = new(tileRect.X, tileRect.Y);
-                    ComponentData[pos] = sub;
+                    SetData(pos, sub);
                 }
+        }
+
+        public void SetData(Point16 pos, ComponentData data)
+        {
+            if (TryFindDataIndex(pos, out int index))
+            {
+                ComponentData[index].Destroy();
+                ComponentData[index] = null;
+            }
+
+            index = FindFreeDataIndex();
+            ComponentData[index] = data;
+            Framing.GetTileSafely(pos).Get<ComponentDataIndex>().Index = index;
         }
 
         public void RemoveAll(Point16 pos)
         {
             TileMimicking.MimicData.Remove(pos);
-            if (ComponentData.TryGetValue(pos, out ComponentData data) && data.Position == pos)
+            if (TryFindDataIndex(pos, out int dataIndex))
             {
-                data.Destroy(pos);
-                ComponentData.Remove(pos);
+                ComponentData[dataIndex].Destroy();
+                ComponentData[dataIndex] = null;
             }
             ComponentUpdates.Remove(pos);
+
+            Framing.GetTileSafely(pos).Get<ComponentDataIndex>().Index = -1;
         }
 
         public bool HasData(Point16 pos)
         {
-            if (ComponentData.TryGetValue(pos, out ComponentData data))
+            if (TryFindData(pos, out ComponentData data))
             {
                 if (data is SubTileComponentData subTile && !subTile.CheckValid())
                 {
@@ -200,12 +311,12 @@ namespace TerraIntegration
 
         public IEnumerable<ComponentData> EnumerateAllComponentData()
         {
-            foreach (var kvp in ComponentData)
+            foreach (var data in ComponentData)
             {
-                if (kvp.Value is SubTileComponentData)
+                if (data is SubTileComponentData)
                     continue;
 
-                yield return kvp.Value;
+                yield return data;
             }
         }
 
@@ -228,8 +339,7 @@ namespace TerraIntegration
 
         public override void PostUpdateEverything()
         {
-            Statistics.ResetUpdates();
-            Statistics.Start(Statistics.UpdateTime.FullUpdate);
+            Statistics.FullUpdate.Start();
 
             Stopwatch watch = new();
 
@@ -239,16 +349,16 @@ namespace TerraIntegration
                 if (data.UpdateFrequency == 0) continue;
                 if (UpdateCounter % data.UpdateFrequency == 0)
                 {
-                    Statistics.StartComponent(kvp.Value.TypeName);
+                    Statistics.GetComponent(kvp.Value.TypeName).Start();
 
                     //DateTime updateStart = DateTime.Now;
                     watch.Restart();
                     kvp.Value.OnUpdate(kvp.Key);
                     watch.Stop();
                     data.LastUpdateTime = watch.Elapsed;
-                    Statistics.UpdatedComponents++;
+                    Statistics.ComponentsUpdated.Increase();
 
-                    Statistics.StopComponent(kvp.Value.TypeName);
+                    Statistics.GetComponent(kvp.Value.TypeName).Stop();
                 }
 
             }
@@ -257,7 +367,7 @@ namespace TerraIntegration
             {
                 Point16 mouseWorldTile = (Point16)(Main.MouseWorld / 16);
 
-                if (ComponentData.TryGetValue(mouseWorldTile, out ComponentData cdata) && cdata.Component is not null)
+                if (TryFindData(mouseWorldTile, out ComponentData cdata) && cdata.Component is not null)
                 {
                     string hover = cdata.Component.GetHoverText(mouseWorldTile);
                     if (hover is not null)
@@ -279,7 +389,7 @@ namespace TerraIntegration
                 WireTrips.Remove(trip);
 
             UpdateCounter++;
-            Statistics.Stop(Statistics.UpdateTime.FullUpdate);
+            Statistics.FullUpdate.Stop();
         }
         public override void PostDrawTiles()
         {
@@ -287,7 +397,7 @@ namespace TerraIntegration
             {
                 Main.spriteBatch.Begin();
                 Rectangle screen = new(0, 0, Main.screenWidth, Main.screenHeight);
-                foreach (ComponentData data in ComponentData.Values)
+                foreach (ComponentData data in ComponentData)
                 {
                     Point tl = Util.WorldToScreen(data.Position).ToPoint();
                     Point br = Util.WorldToScreen(data.Position + data.Size).ToPoint();
@@ -313,7 +423,7 @@ namespace TerraIntegration
         public bool DrawUI()
         {
             ProgrammerInterface.Draw();
-            Statistics.Draw();
+            StatInfo.Draw();
             FloatingText.Draw(Main.spriteBatch);
 
             Point mouse = (Main.MouseWorld / 16).ToPoint();
@@ -396,7 +506,7 @@ namespace TerraIntegration
                     ComponentData data = Component.LoadTag(component, pos);
                     if (data is null || !Framing.GetTileSafely(pos).HasTile) continue;
 
-                    ComponentData[pos] = data;
+                    SetData(pos, data);
                 }
             }
         }
@@ -465,7 +575,7 @@ namespace TerraIntegration
             }
         }
 
-        internal void ResetHoverText() 
+        internal void ResetHoverText()
         {
             HoverText = null;
         }
@@ -474,7 +584,7 @@ namespace TerraIntegration
         {
             if (!HoverText.IsNullEmptyOrWhitespace())
                 HoverText += "\n" + text;
-            else 
+            else
                 HoverText = text;
         }
     }

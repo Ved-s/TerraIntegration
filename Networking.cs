@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using TerraIntegration.Basic;
 using TerraIntegration.Components;
 using TerraIntegration.DataStructures;
+using TerraIntegration.Stats;
 using TerraIntegration.Variables;
 using Terraria;
 using Terraria.ID;
@@ -122,7 +123,7 @@ namespace TerraIntegration
             if (Main.netMode == NetmodeID.SinglePlayer) return;
 
             if (TerraIntegration.DebugMode)
-				Statistics.LogMessage($"[Net] Sending {positions?.Count.ToString() ?? "all"} component data");
+				StatInfo.LogMessage($"[Net] Sending {positions?.Count.ToString() ?? "all"} component data");
 
             ComponentWorld world = ComponentWorld.Instance;
 
@@ -162,7 +163,7 @@ namespace TerraIntegration
 
             ushort count = reader.ReadUInt16();
             if (TerraIntegration.DebugMode)
-				Statistics.LogMessage($"[Net] Receiving {count} component data");
+				StatInfo.LogMessage($"[Net] Receiving {count} component data");
             for (int i = 0; i < count; i++)
             {
                 Point16 pos = new(reader.ReadInt16(), reader.ReadInt16());
@@ -174,7 +175,7 @@ namespace TerraIntegration
                     continue;
                 }
                 data.Component?.OnLoaded(pos);
-                world.ComponentData[pos] = data;
+                world.SetData(pos, data);
             }
         }
 
@@ -183,7 +184,7 @@ namespace TerraIntegration
             if (Main.netMode != NetmodeID.MultiplayerClient) return;
 
             if (TerraIntegration.DebugMode)
-				Statistics.LogMessage($"[Net] Sending {positions?.Count.ToString() ?? "all"} component data request");
+				StatInfo.LogMessage($"[Net] Sending {positions?.Count.ToString() ?? "all"} component data request");
 
             ModPacket pack = CreatePacket(NetMessageType.ComponentDataRequest);
             if (positions is null)
@@ -205,7 +206,7 @@ namespace TerraIntegration
         {
             ushort count = reader.ReadUInt16();
             if (TerraIntegration.DebugMode)
-				Statistics.LogMessage($"[Net] Receiving {(count == ushort.MaxValue ? "all" : count.ToString())} component data request");
+				StatInfo.LogMessage($"[Net] Receiving {(count == ushort.MaxValue ? "all" : count.ToString())} component data request");
             List<Point16> positions = null;
             if (count < ushort.MaxValue)
                 for (int i = 0; i < count; i++)
@@ -220,7 +221,7 @@ namespace TerraIntegration
                 throw new ArgumentNullException(nameof(component));
 
             if (TerraIntegration.DebugMode)
-				Statistics.LogMessage($"[Net] Sending {component} component packet at {pos}, type {messageType}");
+				StatInfo.LogMessage($"[Net] Sending {component} component packet at {pos}, type {messageType}");
 
             ModPacket pack = CreatePacket(NetMessageType.ComponentPacket);
             pack.Write(component);
@@ -238,7 +239,7 @@ namespace TerraIntegration
             long packetSize = LastPacketLength - (reader.BaseStream.Position - startPos);
 
             if (TerraIntegration.DebugMode)
-				Statistics.LogMessage($"[Net] Receiving {component} component packet{(pos == default? "" : $" at {pos}")}, type {type}");
+				StatInfo.LogMessage($"[Net] Receiving {component} component packet{(pos == default? "" : $" at {pos}")}, type {type}");
 
             if (!Component.ByTypeName.TryGetValue(component, out Component c))
             {
@@ -272,7 +273,7 @@ namespace TerraIntegration
                 throw new ArgumentNullException(nameof(variable));
 
             if (TerraIntegration.DebugMode)
-				Statistics.LogMessage($"[Net] Sending {variable} variable packet at {pos}, type {messageType}");
+				StatInfo.LogMessage($"[Net] Sending {variable} variable packet at {pos}, type {messageType}");
 
             ModPacket pack = CreatePacket(NetMessageType.VariablePacket);
             pack.Write(variable);
@@ -288,7 +289,7 @@ namespace TerraIntegration
             Point16 pos = new(reader.ReadInt16(), reader.ReadInt16());
 
             if (TerraIntegration.DebugMode)
-				Statistics.LogMessage($"[Net] Receivnig {variable} variable packet at {pos}, type {type}");
+				StatInfo.LogMessage($"[Net] Receivnig {variable} variable packet at {pos}, type {type}");
 
             if (!Variable.ByTypeName.TryGetValue(variable, out Variable v))
             {
@@ -303,7 +304,7 @@ namespace TerraIntegration
             if (Main.netMode == NetmodeID.SinglePlayer) return;
 
             if (TerraIntegration.DebugMode)
-				Statistics.LogMessage($"[Net] Sending variable at {pos}, slot {slot}");
+				StatInfo.LogMessage($"[Net] Sending variable at {pos}, slot {slot}");
 
             ComponentWorld world = ComponentWorld.Instance;
             ComponentData data = world.GetDataOrNull(pos);
@@ -328,7 +329,7 @@ namespace TerraIntegration
             string slot = reader.ReadString();
 
             if (TerraIntegration.DebugMode)
-				Statistics.LogMessage($"[Net] Receiving variable at {pos}, slot {slot}");
+				StatInfo.LogMessage($"[Net] Receiving variable at {pos}, slot {slot}");
 
             Variable v = Variable.LoadData(reader);
 
@@ -341,7 +342,7 @@ namespace TerraIntegration
             if (Main.netMode == NetmodeID.SinglePlayer) return;
 
             if (TerraIntegration.DebugMode)
-				Statistics.LogMessage($"[Net] Sending component frequency at {pos}");
+				StatInfo.LogMessage($"[Net] Sending component frequency at {pos}");
 
             ComponentWorld world = ComponentWorld.Instance;
             ComponentData data = world.GetDataOrNull(pos);
@@ -361,7 +362,7 @@ namespace TerraIntegration
             ushort freq = reader.ReadUInt16();
 
             if (TerraIntegration.DebugMode)
-				Statistics.LogMessage($"[Net] Receiving component frequency at {pos}");
+				StatInfo.LogMessage($"[Net] Receiving component frequency at {pos}");
 
             ComponentData data = world.GetDataOrNull(pos);
             if (data is null) return;
@@ -411,7 +412,7 @@ namespace TerraIntegration
             else
             {
                 if (TerraIntegration.DebugMode)
-				Statistics.LogMessage("[Net] " + string.Format(format, args));
+				StatInfo.LogMessage("[Net] " + string.Format(format, args));
                 Mod.Logger.WarnFormat(format, args);
             }
         }

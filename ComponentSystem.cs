@@ -5,6 +5,7 @@ using System.Linq;
 using TerraIntegration.Basic;
 using TerraIntegration.Components;
 using TerraIntegration.DataStructures;
+using TerraIntegration.Stats;
 using TerraIntegration.Values;
 using TerraIntegration.Variables;
 using Terraria;
@@ -203,8 +204,8 @@ namespace TerraIntegration
         }
         public Variable GetVariable(Guid varId, List<Error> errors)
         {
-            Statistics.VariableRequests++;
-            Statistics.Start(Statistics.UpdateTime.VariableRequests);
+            Statistics.VariablesRequested.Increase();
+            Statistics.VariableRequests.Start();
 
             bool needsCleaning = false;
 
@@ -273,13 +274,13 @@ namespace TerraIntegration
                 if (needsCleaning)
                     CleanSystem();
 
-                Statistics.Stop(Statistics.UpdateTime.VariableRequests);
+                Statistics.VariableRequests.Stop();
             }
         }
         public Component GetComponent(Point16 pos, string type, List<Error> errors)
         {
-            Statistics.ComponentRequests++;
-            Statistics.Start(Statistics.UpdateTime.ComponentRequests);
+            Statistics.ComponentsRequested.Increase();
+            Statistics.ComponentRequests.Start();
             try
             {
                 if (AllComponents.TryGetValue(pos, out Component c))
@@ -298,7 +299,7 @@ namespace TerraIntegration
             }
             finally
             {
-                Statistics.Stop(Statistics.UpdateTime.ComponentRequests);
+                Statistics.ComponentRequests.Stop();
             }
         }
 

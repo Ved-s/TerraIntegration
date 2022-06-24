@@ -5,6 +5,7 @@ using System.Reflection;
 using TerraIntegration.Basic;
 using TerraIntegration.Components;
 using TerraIntegration.DataStructures;
+using TerraIntegration.Stats;
 using TerraIntegration.Utilities;
 using TerraIntegration.Values;
 using TerraIntegration.Variables;
@@ -57,11 +58,14 @@ namespace TerraIntegration
 
             VariableRenderer.TypeSpritesheetOverrides[typeof(Interfaces.ICollection)] = new(VariableValue.BasicSheet, 0, 2);
             VariableRenderer.TypeSpritesheetOverrides[typeof(Interfaces.ICollection<>)] = new(VariableValue.BasicSheet, 0, 2);
+
+            Statistics.Load();
         }
         public override void Unload()
         {
             Unregister();
             VariableRenderer.Unload();
+            StatInfo.Unload();
         }
 
         private static void Unregister()

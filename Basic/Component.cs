@@ -6,6 +6,7 @@ using System.Linq;
 using TerraIntegration.Basic;
 using TerraIntegration.ComponentProperties;
 using TerraIntegration.DataStructures;
+using TerraIntegration.Stats;
 using TerraIntegration.UI;
 using TerraIntegration.Variables;
 using Terraria;
@@ -203,7 +204,7 @@ namespace TerraIntegration.Basic
             data.UpdateFrequency = rate;
 
             if (TerraIntegration.DebugMode)
-                Statistics.LogMessage($"Set updates to {rate} at {pos} for {data.Component?.TypeName}");
+                StatInfo.LogMessage($"Set updates to {rate} at {pos} for {data.Component?.TypeName}");
 
             Networking.SendComponentFrequency(pos);
 
@@ -439,7 +440,7 @@ namespace TerraIntegration.Basic
         public virtual void CustomInit(Component c) { }
         public virtual void Loaded() { }
 
-        internal void Destroy(Point16 pos)
+        internal void Destroy()
         {
             if (this is SubTileComponentData || Networking.Client)
                 return;
@@ -447,7 +448,7 @@ namespace TerraIntegration.Basic
             foreach (Items.Variable v in Variables.Values)
                 if (v is not null)
                 {
-                    Util.DropItemInWorld(v.Item, pos.X * 16, pos.Y * 16);
+                    Util.DropItemInWorld(v.Item, Position.X * 16, Position.Y * 16);
                 }
             Variables.Clear();
         }
