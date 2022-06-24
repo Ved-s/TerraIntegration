@@ -1,5 +1,4 @@
 Collection of T
-	Contains(T) -> Boolean
 	First(Function(T -> Boolean)?) -> T or Null
 	Any(Function(T -> Boolean)?) -> Boolean
 	Skip(Integer) -> Collection of T
@@ -8,5 +7,3 @@ Collection of T
 	IndexOf(T) -> Integer
 	
 Functions with args
-
-Text describing what's wrong when trying to write variable
