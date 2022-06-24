@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using TerraIntegration.Basic;
+using TerraIntegration.Values;
 
 namespace TerraIntegration.DataStructures
 {
@@ -12,17 +13,20 @@ namespace TerraIntegration.DataStructures
     {
         public HashSet<string> Names { get; set; } = new();
         public HashSet<Type> Types { get; set; } = new();
+        bool MatchSpecial { get; set; } = false;
 
-        public static VariableMatch OfType<TVariable>() where TVariable : Variable
+        public static VariableMatch OfType<TVariable>(bool matchSpecial) where TVariable : Variable
         {
             VariableMatch match = new();
             match.Types.Add(typeof(TVariable));
+            match.MatchSpecial = matchSpecial;
             return match;
         }
-        public static VariableMatch OfType(Type type)
+        public static VariableMatch OfType(Type type, bool matchSpecial)
         {
             VariableMatch match = new();
             match.Types.Add(type);
+            match.MatchSpecial = matchSpecial;
             return match;
         }
         public static VariableMatch OfTypeName(string typeName)
@@ -51,6 +55,14 @@ namespace TerraIntegration.DataStructures
         public bool Match(Variable var)
         {
             Type varType = var.GetType();
+
+            if (MatchSpecial && var.VariableReturnType.HasValue 
+                && var.VariableReturnType.Value.Match(typeof(SpecialValue))
+                && Types.Any(t => var.VariableReturnType.Value.Match(SpecialValue.ReturnTypeOf(t))))
+            {
+                return true;
+            }
+
             return Names.Contains(var.TypeName) || Types.Any(t => varType.IsAssignableTo(t));
         }
         public IEnumerable<Variable> Matches(IEnumerable<Variable> variables)

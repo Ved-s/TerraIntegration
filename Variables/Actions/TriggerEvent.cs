@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using TerraIntegration.Basic;
 using TerraIntegration.DataStructures;
 
@@ -10,7 +6,7 @@ namespace TerraIntegration.Variables.Actions
 {
     public class TriggerEvent : ActionVariable
     {
-        public override VariableMatch Variables => VariableMatch.OfType<Event>();
+        public override VariableMatch Variables => VariableMatch.OfType<Event>(true);
         public override bool NeedsSaveTag => true;
         public override bool HasComplexInterface => false;
 
@@ -22,8 +18,7 @@ namespace TerraIntegration.Variables.Actions
 
         public override void Execute(Point16 pos, Variable var, ComponentSystem system, List<Error> errors)
         {
-            if (var is Event evt)
-                evt.Trigger(pos, system);
+            Event.Trigger(var, pos, system, errors);
         }
     }
 }

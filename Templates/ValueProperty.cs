@@ -48,7 +48,7 @@ namespace TerraIntegration.Templates
         public sealed override string TypeDefaultDescription => PropertyDescription;
         public sealed override string TypeDefaultDisplayName => PropertyDisplay;
 
-        public override ReturnType[] ReferenceReturnTypes => ValueTypes.Cast<ReturnType>().ToArray();
+        public override ReturnType[] ReferenceReturnTypes => ValueTypes.Select(v => new ReturnType(v)).ToArray();
         public override IEnumerable<Type> RelatedTypes => ValueTypes;
         public override bool VisibleInProgrammerVariables => false;
 

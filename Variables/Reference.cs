@@ -29,7 +29,7 @@ namespace TerraIntegration.Variables
 
         public override VariableValue GetValue(VariableValue value, ComponentSystem system, List<Error> errors)
         {
-            SetReturnTypeCache(value.GetType());
+            SetReturnTypeCache(value.GetReturnType());
             return value;
         }
 

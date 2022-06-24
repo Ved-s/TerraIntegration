@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using TerraIntegration.DataStructures;
 using TerraIntegration.UI;
+using TerraIntegration.Values;
 using Terraria.GameContent.UI.Elements;
 using Terraria.ModLoader.IO;
 
@@ -19,7 +20,7 @@ namespace TerraIntegration.Basic
         public abstract VariableMatch Variables { get; }
         public abstract bool NeedsSaveTag { get; }
 
-        public sealed override ReturnType? VariableReturnType => null;
+        public sealed override ReturnType? VariableReturnType => SpecialValue.ReturnTypeOf(GetType());
         public override string DefaultItemName => "Action";
         public override string ItemNameLocalizationKey => "Mods.TerraIntegration.ItemNames.Action";
 
@@ -56,7 +57,7 @@ namespace TerraIntegration.Basic
         public virtual TagCompound SaveActionTag() => null;
         public virtual ActionVariable LoadActionTag(TagCompound data) => this.NewInstance();
 
-        public sealed override VariableValue GetValue(ComponentSystem system, List<Error> errors) => null;
+        public sealed override VariableValue GetValue(ComponentSystem system, List<Error> errors) => new SpecialValue(this);
 
         protected override void SaveCustomData(BinaryWriter writer)
         {

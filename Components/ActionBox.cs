@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using TerraIntegration.Basic;
 using TerraIntegration.DataStructures;
 using TerraIntegration.UI;
+using TerraIntegration.Values;
 using Terraria;
 using Terraria.GameContent.UI.Elements;
 using Terraria.ModLoader;
@@ -25,7 +26,7 @@ namespace TerraIntegration.Components
         public string SlotIds = "0123";
         public UIComponentVariable[] Slots;
 
-        public ActionBox() 
+        public ActionBox()
         {
             VariableInfo = new ComponentVariableInfo[]
             {
@@ -59,7 +60,7 @@ namespace TerraIntegration.Components
                 {
                     Left = new(totWidth / 2 - (totWidth - x), .5f),
 
-                    VariableValidator = var => var is ActionVariable,
+                    VariableValidator = var => var is ActionVariable || var.VariableReturnType.MatchNull(SpecialValue.ReturnTypeOf<ActionVariable>()),
                     VariableSlot = SlotIds[i].ToString()
                 });
                 x += 52;
@@ -92,7 +93,17 @@ namespace TerraIntegration.Components
                 foreach (char id in SlotIds)
                 {
                     string sid = id.ToString();
-                    if (data.TryGetVariable(sid, out Variable var) && var is ActionVariable action)
+
+                    Variable var = data.GetVariable(sid);
+                    if (var is null)
+                        continue;
+
+                    if (var is not ActionVariable && var.VariableReturnType.MatchNull(SpecialValue.ReturnTypeOf<ActionVariable>()))
+                    {
+                        var = (var.GetValue(data.System, data.LastErrors) as SpecialValue)?.GetVariable(data.System, data.LastErrors);
+                    }
+
+                    if (var is ActionVariable action)
                     {
                         action.Execute(pos, data.System, data.LastErrors);
                     }

@@ -40,6 +40,7 @@ namespace TerraIntegration.DataStructures
         public bool Match(ReturnType? returnType)
         {
             return returnType.HasValue 
+                && returnType.Value.Type is not null
                 && returnType.Value.Type.IsAssignableTo(Type) 
                 && (SubType is null 
                     || returnType.Value.SubType is null 
@@ -48,7 +49,7 @@ namespace TerraIntegration.DataStructures
 
         bool MatchSubtypes(ReturnType[] sub)
         {
-            return SubType.Zip(sub).All((t) => t.First.Match(t.Second));
+            return SubType.Zip(sub).All((t) => t.Second.Match(t.First));
         }
 
         public IEnumerable<ReturnType> GetAllTypes()
@@ -64,7 +65,19 @@ namespace TerraIntegration.DataStructures
 
         public string ToStringName(bool colored)
         {
-            return $"{VariableValue.TypeToName(Type, colored)}{(SubType?.Length is not null and > 0 ? " of " + string.Join(", ", SubType.Select(t => t.ToStringName(colored))) : null)}";
+            string type = VariableValue.TypeToName(Type, colored);
+            if (type is null)
+                return null;
+
+            if (SubType?.Length is null or 0)
+                return type;
+
+            if (VariableValue.ByType.TryGetValue(Type, out VariableValue value))
+            {
+                return type + value.FormatReturnSubtypes(SubType, colored);
+            }
+
+            return $"{type}{(SubType?.Length is not null and > 0 ? " of " + string.Join(", ", SubType.Select(t => t.ToStringName(colored))) : null)}";
         }
         public string ToTypeString()
         {
@@ -72,7 +85,7 @@ namespace TerraIntegration.DataStructures
 
             if (SubType?.Length is not null and > 0)
             {
-                type += ";" + SubType.Select(sub => sub.ToTypeString().Replace(";", "\\;"));
+                type += ";" + string.Join(';', SubType.Select(sub => sub.ToTypeString().Replace(";", "\\;")));
             }
             return type;
         }

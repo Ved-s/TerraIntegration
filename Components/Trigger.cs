@@ -10,6 +10,8 @@ using System.Threading.Tasks;
 using TerraIntegration.Basic;
 using TerraIntegration.DataStructures;
 using TerraIntegration.UI;
+using TerraIntegration.Values;
+using TerraIntegration.Variables;
 using Terraria;
 using Terraria.Audio;
 using Terraria.Enums;
@@ -65,7 +67,7 @@ namespace TerraIntegration.Components
 
             Variable act = td.GetVariable("act");
 
-            if (td.Value is not null && act is Variables.Event evt)
+            if (td.Value is not null)
             {
                 bool oldValue = td.Value.Value;
                 switch (td.Mode)
@@ -73,7 +75,9 @@ namespace TerraIntegration.Components
                     case 0 when newValue && !oldValue:
                     case 1 when !newValue && oldValue:
                     case 2 when newValue != oldValue:
-                        evt.Trigger(pos, td.System);
+                        td.LastErrors.Clear();
+                        Event.Trigger(act, pos, td.System, td.LastErrors);
+                        td.SyncErrors();
                         break;
                 }
             }
@@ -137,7 +141,7 @@ namespace TerraIntegration.Components
                 Top = new(-21, .5f),
                 Left = new(24, .5f),
 
-                VariableValidator = (var) => var is Variables.Event,
+                VariableValidator = (var) => var is Event || var.VariableReturnType.MatchNull(SpecialValue.ReturnTypeOf<Event>()),
                 HoverText = "Event to trigger"
             });
 

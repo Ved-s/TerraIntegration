@@ -19,7 +19,7 @@ namespace TerraIntegration.Variables
         public override string TypeDefaultDisplayName => "Event";
         public override string TypeDefaultDescription => "An event that will trigger all\nsubscribers for this event in system";
 
-        public override ReturnType? VariableReturnType => null;
+        public override ReturnType? VariableReturnType => SpecialValue.ReturnTypeOf<Event>();
 
         public override SpriteSheetPos SpriteSheetPos => new(BasicSheet, 3, 0);
 
@@ -30,10 +30,12 @@ namespace TerraIntegration.Variables
 
         public override VariableValue GetValue(ComponentSystem system, List<Error> errors)
         {
-            return null;
+            return new SpecialValue(this);
         }
 
-        public void Trigger(Point16 pos, ComponentSystem system)
+
+
+        private void Trigger(Point16 pos, ComponentSystem system)
         {
             if (TriggeredPoints.Contains(pos)) return;
             TriggeredPoints.Add(pos);
@@ -72,6 +74,34 @@ namespace TerraIntegration.Variables
         public Variable WriteVariable()
         {
             return new Event();
+        }
+
+        public static bool Trigger(Variable var, Point16 pos, ComponentSystem system, List<Error> errors)
+        {
+            if (var is null)
+                return false;
+
+            if (var is Event evt)
+            {
+                evt.Trigger(pos, system);
+                return true;
+            }
+
+            if (var.VariableReturnType.MatchNull(SpecialValue.ReturnTypeOf<Event>()))
+            {
+                SpecialValue spec = var.GetValue(system, errors) as SpecialValue;
+                if (spec is null)
+                    return false;
+
+                evt = spec.GetVariable(system, errors) as Event;
+                if (evt is null)
+                    return false;
+
+                evt.Trigger(pos, system);
+                return true;
+            }
+
+            return false;
         }
     }
 }

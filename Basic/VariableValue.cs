@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.IO;
 using System.Linq;
 using TerraIntegration.DataStructures;
@@ -42,6 +43,8 @@ namespace TerraIntegration.Basic
         public virtual string DisplayNameLocalizationKey => "Mods.TerraIntegration.Names.Values." + TypeName;
 
         public virtual DisplayedValue Display(ComponentSystem system) => null;
+
+        public virtual bool ShouldDisplayReturnType(Variable var) => true;
 
         public static void SaveData(VariableValue value, BinaryWriter writer)
         {
@@ -106,6 +109,11 @@ namespace TerraIntegration.Basic
         protected virtual void SaveCustomData(BinaryWriter writer) { }
         protected virtual VariableValue LoadCustomData(BinaryReader reader) { return (VariableValue)Activator.CreateInstance(GetType()); }
 
+        public virtual string FormatReturnSubtypes(ReturnType[] subTypes, bool colored)
+{
+            return " of " + string.Join(", ", subTypes.Select(t => t.ToStringName(colored)));
+        }
+
         public bool HasProperties()
         {
             Type type = GetType();
@@ -150,7 +158,7 @@ namespace TerraIntegration.Basic
             if (ByType.TryGetValue(type, out VariableValue val))
             {
                 if (colored)
-                    return Util.ColorTag(val.TypeColor, val.TypeDefaultDisplayName);
+                    return Util.ColorTag(val.TypeColor, val.TypeDisplayName);
 
                 return val.TypeDefaultDisplayName;
             }

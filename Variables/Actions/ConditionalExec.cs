@@ -6,12 +6,13 @@ using System.Threading.Tasks;
 using TerraIntegration.Basic;
 using TerraIntegration.DataStructures;
 using TerraIntegration.Templates;
+using TerraIntegration.Values;
 
 namespace TerraIntegration.Variables.Actions
 {
     public class ConditionalExec : ActionWithReference
     {
-        public override VariableMatch Variables => VariableMatch.OfType<ActionVariable>();
+        public override VariableMatch Variables => VariableMatch.OfType<ActionVariable>(true);
 
         public override string TypeName => "condExec";
         public override string TypeDefaultDisplayName => "Conditional exec";
@@ -23,7 +24,12 @@ namespace TerraIntegration.Variables.Actions
 
         public override void Execute(Point16 pos, Variable var, VariableValue refValue, ComponentSystem system, List<Error> errors)
         {
-            if (var is ActionVariable action && refValue is Values.Boolean b && b.Value)
+            if (refValue is not Values.Boolean b || !b.Value)
+                return;
+
+            ActionVariable action = SpecialValue.GetVariableOrNull<ActionVariable>(var, system, errors);
+
+            if (action is not null)
                 action.Execute(pos, system, errors);
         }
 

@@ -71,8 +71,9 @@ namespace TerraIntegration.Components
             Point16 pos = new(i, j);
 
             ComponentData data = GetData(pos);
-            if (data.GetVariable(OnSignalVariableSlot) is Event ev)
-                ev.Trigger(pos, data.System);
+            data.LastErrors.Clear();
+            Event.Trigger(data.GetVariable(OnSignalVariableSlot), pos, data.System, data.LastErrors);
+            data.SyncErrors();
         }
     }
 }
