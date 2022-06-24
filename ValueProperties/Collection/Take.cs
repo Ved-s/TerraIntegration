@@ -15,6 +15,8 @@ namespace TerraIntegration.ValueProperties.Collection
         public override string TypeName => "take";
         public override string TypeDefaultDisplayName => "Take";
         public override string TypeDefaultDescription => "Gets specified amount of values from start collection";
+        
+        public override SpriteSheetPos SpriteSheetPos => new(CollectionSheet, 3, 0);
 
         public ReturnType CollectionType => collectionType ??= ICollection.TryGetCollectionType(VariableReturnType?.Type);
 

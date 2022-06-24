@@ -18,6 +18,8 @@ namespace TerraIntegration.ValueProperties.Collection
         public override string TypeDefaultDisplayName => "Index";
         public override string TypeDefaultDescription => "Gets value from collection at specified index";
 
+        public override SpriteSheetPos SpriteSheetPos => new(CollectionSheet, 1, 0);
+
         List<VariableValue> ValueList;
 
         public override Type[] GetValidRightConstantSlotTypes(ReturnType leftSlotType) => new[] { typeof(Integer) };
