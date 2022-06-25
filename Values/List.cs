@@ -145,7 +145,7 @@ namespace TerraIntegration.Values
         private void AddEntry(Terraria.UI.UIMouseEvent evt, Terraria.UI.UIElement listeningElement)
         {
             ValueVariablePair current = NewValueSwitch.Current.Value;
-            Type entryType = current.ValueType;
+            Type entryType = current.ValueType?.Type;
 
             IProgrammable owner;
             if (current.VariableType == "ref")

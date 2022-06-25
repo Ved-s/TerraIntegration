@@ -92,6 +92,9 @@ namespace TerraIntegration.DataStructures
         public static Error ExpectedValue(Type valueType, TypeIdentity id)
             => new("ExpectedValue", id.ToString(), VariableValue.TypeToName(valueType, false) ?? "null");
 
+        public static Error ExpectedValue(ReturnType valueType, TypeIdentity id)
+            => new("ExpectedValue", id.ToString(), valueType.ToStringName(false) ?? "null");
+
         public static Error ExpectedValues(IEnumerable<Type> valueTypes, TypeIdentity id)
         {
             if (valueTypes is null) throw new ArgumentNullException(nameof(valueTypes));
@@ -126,5 +129,11 @@ namespace TerraIntegration.DataStructures
 
         public static Error IndexOutOfBounds(int index, TypeIdentity id, int length)
             => new("IndexOutOfBounds", index, id.ToString(), length);
+
+        public static Error FunctionArgumentNotSet(Guid argId)
+            => new("FunctionArgumentNotSet", ComponentWorld.Instance.Guids.GetShortGuid(argId));
+
+        public static Error FunctionExpectedArgsAmount(Guid funcId, int expected, int got)
+            => new("FunctionExpectedArgsAmount", ComponentWorld.Instance.Guids.GetShortGuid(funcId), expected, got);
     }
 }

@@ -142,7 +142,7 @@ namespace TerraIntegration.Components
             if (!data.HasVariable(DisplayVariableSlot))
             {
                 data.DisplayValue = null;
-                SyncValue(Util.EnumOne(data));
+                SyncValue(Util.Enum(data));
                 return;
             }
             data.LastErrors.Clear();
@@ -161,7 +161,7 @@ namespace TerraIntegration.Components
 
             else
                 data.DisplayValue = value.Display(data.System);
-            SyncValue(Util.EnumOne(data));
+            SyncValue(Util.Enum(data));
         }
         public override void OnSystemUpdate(Point16 pos)
         {

@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using TerraIntegration.Basic;
 using TerraIntegration.Components;
 using TerraIntegration.DataStructures;
-using TerraIntegration.Templates;
 using TerraIntegration.Values;
 using TerraIntegration.Variables;
 
@@ -112,10 +111,7 @@ namespace TerraIntegration.Templates
 
         public virtual bool AppliesTo(VariableValue value) => true;
     }
-}
 
-namespace TerraIntegration.Basic.References
-{
     public abstract class ValueProperty<TValue> : ValueProperty where TValue : VariableValue
     {
         public sealed override Type[] ValueTypes => new[] { typeof(TValue) };

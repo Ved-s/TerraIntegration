@@ -19,6 +19,8 @@ namespace TerraIntegration.Values
         public ReturnType[] VariableSubTypes { get; set; }
         public Guid VariableId { get; set; }
 
+        public override bool HideInProgrammer => true;
+
         public SpecialValue() { }
         public SpecialValue(Variable var, params ReturnType[] subTypes) 
         {

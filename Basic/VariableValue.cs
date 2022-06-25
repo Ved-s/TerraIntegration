@@ -237,6 +237,8 @@ namespace TerraIntegration.Basic
         public override Color TypeColor => Color.Red;
         public override DisplayedValue Display(ComponentSystem system) => new ColorTextDisplay("Unloaded", TypeColor);
 
+        public override bool HideInProgrammer => true;
+
         public string ValueType { get; private set; }
         public byte[] Data { get; private set; }
 

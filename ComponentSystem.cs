@@ -23,12 +23,13 @@ namespace TerraIntegration
         public static HashSet<int> CableWalls = new();
 
         public HashSet<WorldPoint> AllPoints { get; } = new();
-        HashSet<Point16> datas = new();
         public Dictionary<Point16, Component> AllComponents { get; } = new();
         public Dictionary<Point16, Component> ComponentsWithVariables { get; } = new();
         public Dictionary<string, Dictionary<Point16, Component>> ComponentsByType { get; } = new();
 
         public Dictionary<Guid, (Point16 pos, string slot)> VariableCache { get; } = new();
+
+        public Dictionary<Guid, VariableValue> FunctionArguments { get; } = new();
 
         private HashSet<Guid> GetVariableSet = new();
 

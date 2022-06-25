@@ -101,5 +101,15 @@ namespace TerraIntegration
 
             return default;
         }
+
+        public static int IndexOf<T>(this IEnumerable<T> ienum, Func<T, bool> predicate)
+        {
+            int index = 0;
+            foreach (T item in ienum)
+                if (predicate(item))
+                    return index;
+                else index++;
+            return -1;
+        }
     }
 }

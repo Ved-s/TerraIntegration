@@ -6,9 +6,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using TerraIntegration.Basic;
+using TerraIntegration.DataStructures;
 using TerraIntegration.Utilities;
 using TerraIntegration.Values;
 using TerraIntegration.Variables;
+using Terraria;
 using Terraria.Audio;
 using Terraria.ID;
 using Terraria.ModLoader;
@@ -48,11 +50,18 @@ namespace TerraIntegration.UI
             if (Current is null && SwitchValues?.Length is not null and > 0)
                 Index = 0;
 
-
             ValueVariablePair? pair = Current;
+
+            if (pair is not null && pair.Value.AllowVarClick && pair.Value.ValueType is null)
+            {
+                int ind = SwitchValues.IndexOf(v => !v.AllowVarClick || v.ValueType.HasValue);
+                if (ind >= 0)
+                    Index = ind;
+            }
+
             CalculatedStyle style = GetDimensions();
 
-            VariableRenderer.DrawVariableOverlay(spriteBatch, true, pair?.ValueType, pair?.VariableType, style.Position(), style.Size(), Color.White, 0f, Vector2.Zero);
+            VariableRenderer.DrawVariableOverlay(spriteBatch, true, pair?.ValueType?.Type, pair?.VariableType, style.Position(), style.Size(), Color.White, 0f, Vector2.Zero);
         }
 
         public override void Update(GameTime gameTime)
@@ -68,7 +77,7 @@ namespace TerraIntegration.UI
                     && Variable.ByTypeName.TryGetValue(cur.Value.VariableType, out Variable var) ?
                     var.TypeDisplayName : null;
 
-                string value = cur.Value.ValueType is not null ? VariableValue.TypeToName(cur.Value.ValueType, true) : null;
+                string value = cur.Value.ValueType is not null ? cur.Value.ValueType.Value.ToStringName(true) : null;
 
                 if (variable is not null || value is not null || cur.Value.HoverText is not null)
                 {
@@ -83,6 +92,11 @@ namespace TerraIntegration.UI
                     else
                         hover = value;
 
+                    hover += "\nClick to switch types";
+
+                    if (SwitchValues.Any(v => v.AllowVarClick))
+                        hover += "\nClick with variable to set type";
+
                     ComponentWorld.Instance.AddHoverText(hover);
                 }
             }
@@ -91,6 +105,22 @@ namespace TerraIntegration.UI
         public override void Click(UIMouseEvent evt)
         {
             base.Click(evt);
+
+            if (Main.mouseItem?.ModItem is Items.Variable var && SwitchValues.Any(v => v.AllowVarClick) && var.Var?.VariableReturnType is not null)
+            {
+                int freeIndex = SwitchValues.IndexOf(v => v.AllowVarClick && !v.ValueType.HasValue && (v.VariableType is null || v.VariableType == var.Var.TypeName));
+                if (freeIndex < 0)
+                    freeIndex = SwitchValues.IndexOf(v => v.AllowVarClick && (v.VariableType is null || v.VariableType == var.Var.TypeName));
+
+                if (freeIndex >= 0)
+                {
+                    ValueVariablePair pair = SwitchValues[freeIndex];
+                    pair.ValueType = var.Var.VariableReturnType;
+                    SwitchValues[freeIndex] = pair;
+                    Index = freeIndex;
+                    return;
+                }
+            }
 
             if (SwitchValues?.Length is not null and > 1)
             {
@@ -114,5 +144,5 @@ namespace TerraIntegration.UI
         }
     }
 
-    public record struct ValueVariablePair(Type ValueType, string VariableType, string HoverText = null);
+    public record struct ValueVariablePair(ReturnType? ValueType, string VariableType, string HoverText = null, bool AllowVarClick = false);
 }

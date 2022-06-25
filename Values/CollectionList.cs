@@ -102,5 +102,10 @@ namespace TerraIntegration.Values
                 Strings.Clear();
             }
         }
+
+        public override ReturnType GetReturnType()
+        {
+            return new ReturnType(typeof(Interfaces.ICollection), CollectionType);
+        }
     }
 }

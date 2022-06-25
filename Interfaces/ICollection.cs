@@ -33,6 +33,9 @@ namespace TerraIntegration.Interfaces
 
         public static ReturnType? TryGetCollectionType(Variable var)
         {
+            if (var is null)
+                return null;
+
             if (var is Constant @const)
             {
                 if (@const.Value is ICollection collection)

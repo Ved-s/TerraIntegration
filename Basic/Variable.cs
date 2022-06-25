@@ -60,6 +60,7 @@ namespace TerraIntegration.Basic
             }
             set => SetReturnTypeCache(value);
         }
+        public virtual bool ShowReturnType => true;
 
         public virtual IEnumerable<Type> RelatedTypes => null;
         public virtual bool VisibleInProgrammerVariables => true;

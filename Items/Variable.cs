@@ -64,9 +64,9 @@ namespace TerraIntegration.Items
 
             string returns = null;
 
-            if (Var.VariableReturnType is null
+            if (Var.ShowReturnType && (Var.VariableReturnType is null
                 || !VariableValue.ByType.TryGetValue(Var.VariableReturnType.Value.Type, out VariableValue value) 
-                || value.ShouldDisplayReturnType(Var))
+                || value.ShouldDisplayReturnType(Var)))
             {
                 returns = Var.VariableReturnType?.ToStringName(true);
             }

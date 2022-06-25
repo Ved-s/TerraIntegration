@@ -92,7 +92,7 @@ namespace TerraIntegration.UI
                 Height = new(32, 0),
                 Top = new(4, 0),
                 Left = new(-16, .5f),
-                CurrentValueChanged = (val) => SetType(val?.ValueType)
+                CurrentValueChanged = (val) => SetType(val?.ValueType?.Type)
             });
             SetType(null);
         }

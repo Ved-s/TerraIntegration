@@ -173,9 +173,22 @@ namespace TerraIntegration
 			return text ?? "";
         }
 
-		public static IEnumerable<T> EnumOne<T>(T obj)
+		public static IEnumerable<T> Enum<T>(T obj0)
 		{
-			yield return obj;
+			yield return obj0;
+		}
+
+		public static IEnumerable<T> Enum<T>(T obj0, T obj1)
+		{
+			yield return obj0;
+			yield return obj1;
+		}
+
+		public static IEnumerable<T> Enum<T>(T obj0, T obj1, T obj2)
+		{
+			yield return obj0;
+			yield return obj1;
+			yield return obj2;
 		}
 
 		public static Item TryGetItemFromPlayerInventory(Func<Item, bool> matcher, int amount = 1)
