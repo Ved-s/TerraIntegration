@@ -466,7 +466,7 @@ namespace TerraIntegration.UI
                     || (!v.HasProperties() && v is not IProgrammable)) continue;
 
                 VariablesList.Add(CreateVariableButton(
-                    v.TypeDefaultDisplayName,
+                    v.TypeDisplayName,
                     v.TypeColor,
                     kvp.Key,
                     "const",

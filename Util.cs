@@ -127,6 +127,13 @@ namespace TerraIntegration
 			return a is null && b is null;
 		}
 
+		public static bool ObjectsNullEqual<T>(T a, T b, Func<T, T, bool> comparer)
+		{
+			if (a is not null && b is not null)
+				return comparer(a, b);
+			return a is null && b is null;
+		}
+
 		public static T CreateModItem<T>(int stack = 1) where T : ModItem 
 		{
 			Item item = new();

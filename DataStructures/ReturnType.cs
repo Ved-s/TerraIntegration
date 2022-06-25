@@ -39,6 +39,9 @@ namespace TerraIntegration.DataStructures
 
         public bool Match(ReturnType? returnType)
         {
+            if (returnType?.Type == typeof(VariableValue))
+                return true;
+
             return returnType.HasValue 
                 && returnType.Value.Type is not null
                 && returnType.Value.Type.IsAssignableTo(Type) 
@@ -127,13 +130,23 @@ namespace TerraIntegration.DataStructures
         public override bool Equals(object obj)
         {
             return obj is ReturnType type &&
-                   EqualityComparer<Type>.Default.Equals(Type, type.Type) &&
-                   EqualityComparer<ReturnType[]>.Default.Equals(SubType, type.SubType);
+                   Util.ObjectsNullEqual(Type, type.Type) &&
+                   Util.ObjectsNullEqual(SubType, type.SubType, (a, b) => a.Length == b.Length && a.SequenceEqual(b));
         }
 
         public override int GetHashCode()
         {
-            return HashCode.Combine(Type, SubType);
+            int hash = Type?.GetHashCode() ?? 13888956;
+
+            if (SubType is not null)
+            {
+                hash = HashCode.Combine(hash, SubType.Length);
+
+                foreach (ReturnType t in SubType)
+                    hash = HashCode.Combine(hash, t.GetHashCode());
+            }
+
+            return hash;
         }
 
         public static implicit operator ReturnType(Type type) => new(type);

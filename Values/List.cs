@@ -258,6 +258,19 @@ namespace TerraIntegration.Values
             SoundEngine.PlaySound(SoundID.MenuTick);
         }
 
+        public override string FormatReturnType(ReturnType type, bool colored)
+        {
+            if (type.SubType?.Length is null or 0 || type.SubType[0].Type == typeof(VariableValue))
+                return Util.ColorTag(TypeColor, TypeDisplayName);
+
+            return $"{Util.ColorTag(TypeColor, TypeDisplayName)} of {type.SubType[0].ToStringName(colored)}";
+        }
+
+        public override ReturnType GetReturnType()
+        {
+            return new(typeof(List), CollectionType);
+        }
+
         protected override void SaveCustomData(BinaryWriter writer)
         {
             writer.Write(CollectionType.ToTypeString());

@@ -87,22 +87,25 @@ namespace TerraIntegration.Variables
                 if (!type.Match(valueType))
                 {
                     errors.Add(Errors.ExpectedValue(type, TypeIdentity));
-                    SetValues.Clear();
+                    foreach (var k in SetValues.Keys)
+                        SetValues[k] = null;
+         
                     return null;
                 }
                 SetValues[id] = value;
             }
 
             foreach (var kvp in SetValues)
-            {
-                system.FunctionArguments[kvp.Key] = kvp.Value;
-            }
+                if (kvp.Value is not null)
+                    system.FunctionArguments[kvp.Key] = kvp.Value;
+                
 
             VariableValue result = system.GetVariableValue(ReturnValueID, errors);
 
-            foreach (var kvp in SetValues)
+            foreach (var k in SetValues.Keys)
             {
-                system.FunctionArguments.Remove(kvp.Key);
+                system.FunctionArguments[k] = null;
+                SetValues[k] = null;
             }
 
             return result;
@@ -190,7 +193,7 @@ namespace TerraIntegration.Variables
                     return null;
                 }
 
-            return new Function 
+            return new Function
             {
                 ReturnType = ReturnValueSlot.Var.Var.VariableReturnType,
                 ArgTypes = Args.Select(a => a.Slot.Var.Var.VariableReturnType.Value).ToArray(),

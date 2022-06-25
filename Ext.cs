@@ -111,5 +111,12 @@ namespace TerraIntegration
                 else index++;
             return -1;
         }
+
+        public static IEnumerable<(T1, T2)> CombineGrid<T1, T2>(this IEnumerable<T1> i1, IEnumerable<T2> i2)
+        {
+            foreach (T1 t1 in i1)
+                foreach (T2 t2 in i2)
+                    yield return (t1, t2);
+        }
     }
 }
