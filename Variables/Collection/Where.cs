@@ -59,7 +59,7 @@ namespace TerraIntegration.Variables.Collection
                     Result.Add(value);
             }
 
-            return Result.ToCollectionValue();
+            return Result.ToCollectionValue(CollectionType);
         }
     }
 }

@@ -19,7 +19,8 @@ namespace TerraIntegration.Variables
     public class Function : Variable, IProgrammable
     {
         public override string TypeName => "func";
-        public override string TypeDefaultDisplayName => "Function";
+        public override string TypeDefaultDisplayName => "{0}Function{1}";
+        public override object[] DisplayNameFormatters => GetFormat(ReturnType, ArgTypes, true);
 
         public override ReturnType? VariableReturnType => ReturnTypeOf(ReturnType, ArgTypes);
         public override bool ShowReturnType => false;
@@ -328,15 +329,28 @@ namespace TerraIntegration.Variables
 
         public override void ModifyTooltips(List<TooltipLine> tooltips)
         {
-            if (ReturnType is not null)
-                tooltips.Add(new(Mod, "TIFuncRetType", $"[c/aaaa00:Return type:] {ReturnType.Value.ToStringName(true)}"));
-            if (ArgTypes?.Length is not null and > 0)
-                tooltips.Add(new(Mod, "TIFuncArgType", $"[c/aaaa00:Argument types:] {string.Join(", ", ArgTypes.Select(arg => arg.ToStringName(true)))}"));
-
             if (ReturnValueID != default)
                 tooltips.Add(new(Mod, "TIFuncRetId", $"[c/aaaa00:Return id:] {World.Guids.GetShortGuid(ReturnValueID)}"));
             if (ArgIDs?.Length is not null and > 0)
                 tooltips.Add(new(Mod, "TIFuncArgId", $"[c/aaaa00:Argument ids:] {string.Join(", ", ArgIDs.Select(arg => World.Guids.GetShortGuid(arg)))}"));
+        }
+
+        public override string FormatSpecialType(ReturnType[] types, bool colored)
+        {
+            ReturnType? retType = types?.Length is null or 0 ? null : types[0];
+
+            return Util.GetLangText(DisplayNameLocalizationKey, TypeDefaultDisplayName, GetFormat(retType, types?.Skip(1), colored));
+        }
+
+        string[] GetFormat(ReturnType? returnValueType, IEnumerable<ReturnType> args, bool colored)
+        {
+            if (returnValueType is null)
+                return new[] { "", "" };
+
+            string argStr = args is null ? "" : string.Join(", ", args.Select(t => t.ToStringName(colored)));
+            string @return = returnValueType.Value.ToStringName(colored) + " ";
+
+            return new[] { @return, $"({argStr})" };
         }
 
         class Argument

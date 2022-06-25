@@ -29,11 +29,24 @@ namespace TerraIntegration.Values
             VariableId = var.Id;
         }
 
-        public override string FormatReturnSubtypes(ReturnType[] subTypes, bool colored)
+        public override string FormatReturnType(ReturnType type, bool colored)
         {
-            string sub = subTypes[0].SubType is null ? null : string.Join(", ", subTypes[0].SubType.Select(t => t.ToStringName(colored)));
+            if (type.SubType?.Length is null or 0)
+                return null;
 
-            string name = Variable.ByType.TryGetValue(subTypes[0].Type, out Variable var) ? var.TypeDisplayName : "Unregistered";
+            type = type.SubType[0];
+
+            if (Variable.ByType.TryGetValue(type.Type, out Variable var))
+            {
+                string varFormat = var.FormatSpecialType(type.SubType, colored);
+                if (varFormat is not null)
+                    return varFormat;
+            }
+            else var = null;
+
+            string sub = type.SubType is null ? null : string.Join(", ", type.SubType.Select(t => t.ToStringName(colored)));
+
+            string name = var is not null ? var.TypeDisplayName : "Unregistered";
 
             return " " + name + (sub.IsNullEmptyOrWhitespace() ? "" : " of " + sub);
         }

@@ -336,6 +336,7 @@ namespace TerraIntegration.Basic
         public ModPacket CreatePacket(Point16 pos, ushort messageType) => Networking.CreateVariablePacket(TypeName, pos, messageType);
 
         public virtual void ModifyTooltips(List<TooltipLine> tooltips) { }
+        public virtual string FormatSpecialType(ReturnType[] types, bool colored) => null;
 
         public Variable Clone()
         {

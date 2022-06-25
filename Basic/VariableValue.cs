@@ -109,10 +109,7 @@ namespace TerraIntegration.Basic
         protected virtual void SaveCustomData(BinaryWriter writer) { }
         protected virtual VariableValue LoadCustomData(BinaryReader reader) { return (VariableValue)Activator.CreateInstance(GetType()); }
 
-        public virtual string FormatReturnSubtypes(ReturnType[] subTypes, bool colored)
-{
-            return " of " + string.Join(", ", subTypes.Select(t => t.ToStringName(colored)));
-        }
+        public virtual string FormatReturnType(ReturnType type, bool colored) => null;
 
         public bool HasProperties()
         {

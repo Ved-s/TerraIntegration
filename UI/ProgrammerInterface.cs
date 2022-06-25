@@ -456,11 +456,13 @@ namespace TerraIntegration.UI
 
             Select(null);
 
+            string search = VariablesSearch.CurrentString.ToLower();
+
             foreach (var kvp in VariableValue.ByType)
             {
                 VariableValue v = kvp.Value;
                 if (v.HideInProgrammer 
-                    || !v.TypeName.ToLower().Contains(VariablesSearch.CurrentString.ToLower())
+                    || (!v.TypeName.ToLower().Contains(search) && !v.TypeDisplayName.ToLower().Contains(search) )
                     || (!v.HasProperties() && v is not IProgrammable)) continue;
 
                 VariablesList.Add(CreateVariableButton(
@@ -499,6 +501,8 @@ namespace TerraIntegration.UI
                 if (CurrentValue is not null)
                     related.Add(typeof(Constant));
 
+                string search = PropertiesSearch.CurrentString.ToLower();
+
                 foreach (var (type, var) in Variable
                     .GetRelated(related)
                     .OrderBy(
@@ -508,7 +512,7 @@ namespace TerraIntegration.UI
                     v => v.Item1 == CurrentType && v.Item2 is not ValueConversion,
                     v => v.Item2 is not ValueConversion))
                 {
-                    if (!var.TypeDisplayName.ToLower().Contains(PropertiesSearch.CurrentString.ToLower())
+                    if ((!var.TypeName.ToLower().Contains(search) && !var.TypeDisplayName.ToLower().Contains(search))
                         || CurrentValue is not null && var is ValueProperty prop && !prop.AppliesTo(CurrentValue)
                         || var is not IProgrammable owner) continue;
 
