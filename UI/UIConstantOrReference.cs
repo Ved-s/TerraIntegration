@@ -109,7 +109,6 @@ namespace TerraIntegration.UI
 
             if (RefSlot is not null)
             {
-                if (valueType is null) return;
                 RemoveChild(RefSlot);
                 RefSlot = null;
             }

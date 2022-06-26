@@ -26,6 +26,8 @@ namespace TerraIntegration.Templates
         public virtual string LeftSlotDescription => null;
         public virtual string RightSlotDescription => null;
 
+        public virtual bool RightSlotOptional => false;
+
         public abstract ReturnType[] LeftSlotValueTypes { get; }
         public virtual UIDrawing CenterDrawing => new UIDrawing()
         {
@@ -43,7 +45,7 @@ namespace TerraIntegration.Templates
 
         private ReturnType[] ValidRightTypes;
         private Dictionary<ReturnType, ReturnType[]> ValidTypesCache = new();
-        private HashSet<(ReturnType, ReturnType)> ValidTypePairs = new();
+        private HashSet<(ReturnType, ReturnType?)> ValidTypePairs = new();
 
         public void SetupInterface()
         {
@@ -54,7 +56,7 @@ namespace TerraIntegration.Templates
 
                 DisplayOnly = true,
                 VariableValidator = (var) => LeftSlotValueTypes is not null && LeftSlotValueTypes.Any(t => t.Match(var.VariableReturnType)),
-                HoverText = TypeListWithDescription(LeftSlotValueTypes, LeftSlotDescription),
+                HoverText = TypeListWithDescription(LeftSlotValueTypes, LeftSlotDescription, false),
 
                 VariableChanged = (var) =>
                 {
@@ -77,7 +79,7 @@ namespace TerraIntegration.Templates
                     if (RightSlot.Var is not null && !ValidRightTypes.Any(t => t.Match(RightSlot.Var.Var.VariableReturnType)))
                         RightSlot.Var = null;
 
-                    RightSlot.HoverText = TypeListWithDescription(ValidRightTypes, RightSlotDescription);
+                    RightSlot.HoverText = TypeListWithDescription(ValidRightTypes, RightSlotDescription, RightSlotOptional);
                 }
             });
 
@@ -103,28 +105,29 @@ namespace TerraIntegration.Templates
 
         public Variable WriteVariable()
         {
-            if (LeftSlot?.Var?.Var is null || RightSlot?.Var?.Var is null)
+            if (LeftSlot is not null && LeftSlot.Var?.Var is null)
             {
-                if (LeftSlot is not null && LeftSlot.Var?.Var is null) 
-                    LeftSlot.NewFloatingText(TerraIntegration.Localize("ProgrammingErrors.NoVariable"), Color.Red);
-
-                if (RightSlot is not null && RightSlot.Var?.Var is null)
-                    RightSlot.NewFloatingText(TerraIntegration.Localize("ProgrammingErrors.NoVariable"), Color.Red);
-
+                LeftSlot.NewFloatingText(TerraIntegration.Localize("ProgrammingErrors.NoVariable"), Color.Red);
                 return null;
             }
 
-            DoubleReferenceVariable doubleRef = CreateVariable(LeftSlot.Var.Var, RightSlot.Var.Var);
+            if (!RightSlotOptional && RightSlot is not null && RightSlot.Var?.Var is null)
+            {
+                RightSlot.NewFloatingText(TerraIntegration.Localize("ProgrammingErrors.NoVariable"), Color.Red);
+                return null;
+            }
+
+            DoubleReferenceVariable doubleRef = CreateVariable(LeftSlot.Var.Var, RightSlot?.Var?.Var);
 
             if (doubleRef is null) return null;
 
             doubleRef.LeftId = LeftSlot.Var.Var.Id;
-            doubleRef.RightId = RightSlot.Var.Var.Id;
+            doubleRef.RightId = RightSlot?.Var?.Var?.Id ?? default;
 
             return doubleRef;
         }
 
-        public string TypeListWithDescription(IEnumerable<ReturnType> types, string description)
+        public string TypeListWithDescription(IEnumerable<ReturnType> types, string description, bool optional)
         {
             if (types is null) return description;
 
@@ -133,17 +136,20 @@ namespace TerraIntegration.Templates
             if (description is not null)
                 result += "\n" + description;
 
+            if (optional)
+                result = "[Optional] " + result;
+
             return result;
         }
 
         public override VariableValue GetValue(ComponentSystem system, List<Error> errors)
         {
             VariableValue left = system.GetVariableValue(LeftId, errors);
-            VariableValue right = system.GetVariableValue(RightId, errors);
+            VariableValue right = RightId == default ? null : system.GetVariableValue(RightId, errors);
 
-            if (left is null || right is null) return null;
+            if (left is null || (!RightSlotOptional && right is null)) return null;
             ReturnType leftType = left.GetReturnType();
-            ReturnType rightType = right.GetReturnType();
+            ReturnType? rightType = right?.GetReturnType();
 
             if (!ValidTypePairs.Contains((leftType, rightType)))
             {
@@ -152,19 +158,20 @@ namespace TerraIntegration.Templates
                     errors.Add(Errors.ExpectedValues(LeftSlotValueTypes, TypeIdentity));
                     return null;
                 }
-
-                if (!ValidTypesCache.TryGetValue(leftType, out ReturnType[] validRightTypes))
+                if (rightType is not null)
                 {
-                    validRightTypes = GetValidRightSlotTypes(leftType);
-                    ValidTypesCache[leftType] = validRightTypes;
-                }
+                    if (!ValidTypesCache.TryGetValue(leftType, out ReturnType[] validRightTypes))
+                    {
+                        validRightTypes = GetValidRightSlotTypes(leftType);
+                        ValidTypesCache[leftType] = validRightTypes;
+                    }
 
-                if (validRightTypes is not null && !validRightTypes.Any(t => t.Match(rightType)))
-                {
-                    errors.Add(Errors.ExpectedValues(validRightTypes, TypeIdentity));
-                    return null;
+                    if (validRightTypes is not null && !validRightTypes.Any(t => t.Match(rightType)))
+                    {
+                        errors.Add(Errors.ExpectedValues(validRightTypes, TypeIdentity));
+                        return null;
+                    }
                 }
-
                 ValidTypePairs.Add((leftType, rightType));
             }
 
@@ -211,6 +218,8 @@ namespace TerraIntegration.Templates
         {
             if (LeftId != default && RightId != default)
                 tooltips.Add(new(Mod, "TIDRefIds", $"[c/aaaa00:Referenced IDs:] {World.Guids.GetShortGuid(LeftId)}, {World.Guids.GetShortGuid(RightId)}"));
+            else if (LeftId != default)
+                tooltips.Add(new(Mod, "TIDRefIds", $"[c/aaaa00:Referenced ID:] {World.Guids.GetShortGuid(LeftId)}"));
         }
 
         public abstract VariableValue GetValue(ComponentSystem system, VariableValue left, VariableValue right, List<Error> errors);

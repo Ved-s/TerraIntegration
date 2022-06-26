@@ -206,7 +206,7 @@ namespace TerraIntegration
             for (int i = 0; i < ComponentData.Count; i++)
             {
                 ComponentData d = ComponentData[i];
-                if (d.Position == pos)
+                if (d is not null && d.Position == pos)
                 {
                     index.Index = i;
                     data = d;
@@ -313,7 +313,7 @@ namespace TerraIntegration
         {
             foreach (var data in ComponentData)
             {
-                if (data is SubTileComponentData)
+                if (data is null or SubTileComponentData)
                     continue;
 
                 yield return data;

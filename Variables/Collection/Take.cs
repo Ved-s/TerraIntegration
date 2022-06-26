@@ -7,7 +7,7 @@ using TerraIntegration.Interfaces;
 using TerraIntegration.Templates;
 using TerraIntegration.Values;
 
-namespace TerraIntegration.ValueProperties.Collection
+namespace TerraIntegration.Variables.Collection
 {
     public class Take : DoubleReferenceVariableWithConst
     {
@@ -16,11 +16,9 @@ namespace TerraIntegration.ValueProperties.Collection
         public override string TypeDefaultDisplayName => "Take";
         public override string TypeDefaultDescription => "Gets specified amount of values from start collection";
         
-        public override SpriteSheetPos SpriteSheetPos => new(CollectionSheet, 3, 0);
+        public override SpriteSheetPos SpriteSheetPos => new(CollectionSheet, 2, 0);
 
-        public ReturnType CollectionType => collectionType ??= ICollection.TryGetCollectionType(VariableReturnType?.Type);
-
-        private ReturnType? collectionType;
+        public ReturnType CollectionType => VariableReturnType?.SubType?.Length is null or 0 ? typeof(VariableValue) : VariableReturnType.Value.SubType[0];
 
         public override Type[] GetValidRightConstantSlotTypes(ReturnType leftSlotType) => new[] { typeof(Integer) };
         public override ReturnType[] GetValidRightReferenceSlotTypes(ReturnType leftSlotType) => new ReturnType[] { typeof(INumeric) };
@@ -29,7 +27,7 @@ namespace TerraIntegration.ValueProperties.Collection
         {
             return new Take
             {
-                VariableReturnType = ICollection.OfType(ICollection.TryGetCollectionType(left)?.Type ?? typeof(VariableValue)),
+                VariableReturnType = new(typeof(ICollection), ICollection.TryGetCollectionType(left) ?? new ReturnType(typeof(VariableValue)))
             };
         }
 

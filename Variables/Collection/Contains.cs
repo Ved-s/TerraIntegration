@@ -7,7 +7,7 @@ using TerraIntegration.Interfaces;
 using TerraIntegration.Templates;
 using TerraIntegration.Values;
 
-namespace TerraIntegration.ValueProperties.Collection
+namespace TerraIntegration.Variables.Collection
 {
     public class Contains : DoubleReferenceVariableWithConst
     {
@@ -15,6 +15,8 @@ namespace TerraIntegration.ValueProperties.Collection
         public override string TypeName => "contains";
         public override string TypeDefaultDisplayName => "Contains";
         public override string TypeDefaultDescription => "Returns True if collection contains specified value";
+
+        public override SpriteSheetPos SpriteSheetPos => new(CollectionSheet, 1, 2);
 
         public override ReturnType? VariableReturnType => typeof(Values.Boolean);
 

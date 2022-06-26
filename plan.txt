@@ -1,9 +1,2 @@
 Collection of T
-	First(Function(T -> Boolean)?) -> T or Null
-	Any(Function(T -> Boolean)?) -> Boolean
-	Skip(Integer) -> Collection of T
-	Where(Function(T -> Boolean)) -> Collection of T
-	Select(Function(T -> Any)) -> Collection of T
 	IndexOf(T) -> Integer
-	
-Functions with args

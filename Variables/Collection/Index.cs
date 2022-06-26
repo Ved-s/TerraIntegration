@@ -9,7 +9,7 @@ using TerraIntegration.Interfaces;
 using TerraIntegration.Templates;
 using TerraIntegration.Values;
 
-namespace TerraIntegration.ValueProperties.Collection
+namespace TerraIntegration.Variables.Collection
 {
     public class Index : DoubleReferenceVariableWithConst
     {

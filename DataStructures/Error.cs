@@ -135,5 +135,8 @@ namespace TerraIntegration.DataStructures
 
         public static Error FunctionExpectedArgsAmount(Guid funcId, int expected, int got)
             => new("FunctionExpectedArgsAmount", ComponentWorld.Instance.Guids.GetShortGuid(funcId), expected, got);
+
+        public static Error NoFilterMatches(Guid varId)
+            => new("NoFilterMatches", ComponentWorld.Instance.Guids.GetShortGuid(varId));
     }
 }

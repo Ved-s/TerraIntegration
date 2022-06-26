@@ -142,7 +142,7 @@ namespace TerraIntegration
                     allValues++;
                     if (val.Texture is null && !val.SpriteSheetPos.HasValue)
                         valueTextures.Add(val.TypeName);
-                    if (val.TypeDescription is null)
+                    if (val.TypeDescription.IsNullEmptyOrWhitespace() && !val.HideInProgrammer)
                         valueDescriptions.Add(val.TypeName);
                 }
 
@@ -152,7 +152,7 @@ namespace TerraIntegration
                     allVariables++;
                     if (var.Texture is null && !var.SpriteSheetPos.HasValue)
                         variableTextures.Add(var.TypeName);
-                    if (var.TypeDescription is null)
+                    if (var.TypeDescription.IsNullEmptyOrWhitespace())
                         variableDescriptions.Add(var.TypeName);
                 }
 
@@ -160,7 +160,7 @@ namespace TerraIntegration
                 if (com.TypeName != "unloaded")
                 {
                     allComponents++;
-                    if (com.TypeDescription is null)
+                    if (com.TypeDescription.IsNullEmptyOrWhitespace())
                         componentDescriptions.Add(com.TypeName);
                 }
 

@@ -192,7 +192,7 @@ namespace TerraIntegration.Templates
 
         public abstract VariableValue GetValue(ComponentSystem system, VariableValue left, VariableValue right, List<Error> errors);
         public virtual ReturnType[] GetValidRightReferenceSlotTypes(ReturnType leftSlotType) => GetValidRightSlotTypes(leftSlotType);
-        public virtual Type[] GetValidRightConstantSlotTypes(ReturnType leftSlotType) => GetValidRightSlotTypes(leftSlotType).Select(t => t.Type).ToArray();
+        public virtual Type[] GetValidRightConstantSlotTypes(ReturnType leftSlotType) => GetValidRightSlotTypes(leftSlotType)?.Select(t => t.Type)?.ToArray();
         public virtual ReturnType[] GetValidRightSlotTypes(ReturnType leftSlotType) => null;
 
         public virtual DoubleReferenceVariableWithConst CreateVariable(Variable left, ValueOrRef right)

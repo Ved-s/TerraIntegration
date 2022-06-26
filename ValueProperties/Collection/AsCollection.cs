@@ -18,6 +18,9 @@ namespace TerraIntegration.ValueProperties.Collection
         public override Type[] ValueTypes => new[] { typeof(ICollection) };
         public override string PropertyName => "asCollection";
         public override string PropertyDisplay => "As Collection";
+        public override string PropertyDescription => "Converts value to collection";
+
+        public override SpriteSheetPos SpriteSheetPos => new(CollectionSheet, 2, 2);
 
         public override ReferenceVariable CreateVariable(Variable var)
         {

@@ -11,11 +11,14 @@ using TerraIntegration.Values;
 
 namespace TerraIntegration.Variables.Collection
 {
-    public class Where : DoubleReferenceVariable
+    public class Filter : DoubleReferenceVariable
     {
         public override ReturnType[] LeftSlotValueTypes => new ReturnType[] { typeof(ICollection) };
         public override string TypeName => "where";
-        public override string TypeDefaultDisplayName => "Where";
+        public override string TypeDefaultDisplayName => "Filter";
+        public override string TypeDefaultDescription => "Filter collection with function matcher";
+
+        public override SpriteSheetPos SpriteSheetPos => new(CollectionSheet, 0, 1);
 
         public ReturnType CollectionType => VariableReturnType?.SubType?.Length is null or 0 ? typeof(VariableValue) : VariableReturnType.Value.SubType[0];
 
@@ -29,7 +32,7 @@ namespace TerraIntegration.Variables.Collection
 
         public override DoubleReferenceVariable CreateVariable(Variable left, Variable right)
         {
-            return new Where
+            return new Filter
             {
                 VariableReturnType = new(typeof(ICollection), ICollection.TryGetCollectionType(left) ?? typeof(VariableValue))
             };
