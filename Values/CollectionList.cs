@@ -18,7 +18,7 @@ namespace TerraIntegration.Values
         public override string TypeDefaultDisplayName => $"{TypeToName<Interfaces.ICollection>()} of {CollectionType.ToStringName(true)}";
         public ReturnType CollectionType { get; private set; }
 
-        public override SpriteSheetPos SpriteSheetPos => new(BasicSheet, 0, 2);
+        public override SpriteSheetPos SpriteSheetPos => new(ValueSheet, 0, 2);
 
         public IEnumerable<VariableValue> Enumerable { get; private set; }
 

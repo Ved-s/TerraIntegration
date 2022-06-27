@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using TerraIntegration.Basic;
 using TerraIntegration.DataStructures;
-using TerraIntegration.Values;
+using TerraIntegration.Values.Objects;
 using TerraIntegration.Variables;
 
 namespace TerraIntegration.ComponentProperties.TileReader

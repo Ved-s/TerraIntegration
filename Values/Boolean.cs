@@ -27,7 +27,7 @@ namespace TerraIntegration.Values
 
         public override Color TypeColor => Color.CadetBlue;
 
-        public override SpriteSheetPos SpriteSheetPos => new(BasicSheet, 1, 0);
+        public override SpriteSheetPos SpriteSheetPos => new(ValueSheet, 1, 0);
 
         public bool Value { get; set; }
         public UIPanel Interface { get; set; }

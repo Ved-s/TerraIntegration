@@ -43,7 +43,7 @@ namespace TerraIntegration.Components
             {
                 new()
                 {
-                    AcceptVariableReturnTypes = new[] { typeof(Values.Tile) },
+                    AcceptVariableReturnTypes = new[] { typeof(Values.Objects.Tile) },
                     VariableName = "Tile",
                     VariableSlot = "camoTile"
                 }
@@ -137,7 +137,7 @@ namespace TerraIntegration.Components
             if (data.TryGetVariable("camoTile", out Variable var))
             {
                 data.LastErrors.Clear();
-                Values.Tile tile = var.GetValue(data.System, data.LastErrors) as Values.Tile;
+                Values.Objects.Tile tile = var.GetValue(data.System, data.LastErrors) as Values.Objects.Tile;
                 var.SetLastValue(tile, data.System);
 
                 TileMimic mimic = null;

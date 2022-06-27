@@ -11,7 +11,7 @@ using Terraria.GameContent.UI.Elements;
 using Terraria.ID;
 using Terraria.ModLoader;
 
-namespace TerraIntegration.Values
+namespace TerraIntegration.Values.Objects
 {
     public class Tile : VariableValue, INamed, ITyped, IProgrammable
     {
@@ -21,7 +21,7 @@ namespace TerraIntegration.Values
 
         public override Color TypeColor => Microsoft.Xna.Framework.Color.SaddleBrown;
 
-        public override SpriteSheetPos SpriteSheetPos => new(BasicSheet, 2, 2);
+        public override SpriteSheetPos SpriteSheetPos => new(ObjectSheet, 0, 0);
 
         public int TileType { get; set; }
         public int TileFrameX { get; set; }

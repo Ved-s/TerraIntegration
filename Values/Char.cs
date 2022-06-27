@@ -26,7 +26,7 @@ namespace TerraIntegration.Values
 
         public override Color TypeColor => Color.LightPink;
 
-        public override SpriteSheetPos SpriteSheetPos => new(BasicSheet, 3, 0);
+        public override SpriteSheetPos SpriteSheetPos => new(ValueSheet, 3, 0);
 
         public char Value { get; set; }
         public UIPanel Interface { get; set; }

@@ -25,7 +25,7 @@ namespace TerraIntegration.Values
 
         public override Color TypeColor => Color.Green;
 
-        public override SpriteSheetPos SpriteSheetPos => new(BasicSheet, 1, 1);
+        public override SpriteSheetPos SpriteSheetPos => new(ValueSheet, 1, 1);
 
         public float Value { get; set; }
         public UIPanel Interface { get; set; }

@@ -13,7 +13,7 @@ namespace TerraIntegration.Values
         public override string TypeName => "special";
         public override string TypeDefaultDisplayName => "Variable";
 
-        public override SpriteSheetPos SpriteSheetPos => new(BasicSheet, 0, 3);
+        public override SpriteSheetPos SpriteSheetPos => new(ValueSheet, 2, 2);
 
         public Type VariableType { get; set; }
         public ReturnType[] VariableSubTypes { get; set; }

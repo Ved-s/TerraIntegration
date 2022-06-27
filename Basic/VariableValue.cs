@@ -14,7 +14,8 @@ namespace TerraIntegration.Basic
 {
     public abstract class VariableValue : ITypedObject
     {
-        public readonly static SpriteSheet BasicSheet = new("TerraIntegration/Assets/Values/basic", new(32, 32));
+        public readonly static SpriteSheet ValueSheet = new("TerraIntegration/Assets/Values/value", new(32, 32));
+        public readonly static SpriteSheet ObjectSheet = new("TerraIntegration/Assets/Values/object", new(32, 32));
 
         public static readonly Dictionary<string, VariableValue> ByTypeName = new();
         public static readonly Dictionary<Type, VariableValue> ByType = new();

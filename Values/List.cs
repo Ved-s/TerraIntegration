@@ -27,7 +27,7 @@ namespace TerraIntegration.Values
 
         public override Color TypeColor => new(120, 120, 120);
 
-        public override SpriteSheetPos SpriteSheetPos => new(BasicSheet, 0, 2);
+        public override SpriteSheetPos SpriteSheetPos => new(ValueSheet, 0, 2);
 
         public ReturnType CollectionType { get; set; } = typeof(VariableValue);
 

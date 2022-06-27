@@ -6,7 +6,7 @@ using TerraIntegration.Templates;
 
 namespace TerraIntegration.ValueProperties.Tile
 {
-    public class TileSlope : ValueProperty<Values.Tile>
+    public class TileSlope : ValueProperty<Values.Objects.Tile>
     {
         public override string PropertyName => "slope";
         public override string PropertyDisplay => "Slope type";
@@ -17,7 +17,7 @@ namespace TerraIntegration.ValueProperties.Tile
 
         public override ReturnType? VariableReturnType => typeof(Values.Byte);
 
-        public override VariableValue GetProperty(ComponentSystem system, Values.Tile value, List<Error> errors)
+        public override VariableValue GetProperty(ComponentSystem system, Values.Objects.Tile value, List<Error> errors)
             => new Values.Byte(value.Slope);
     }
 }

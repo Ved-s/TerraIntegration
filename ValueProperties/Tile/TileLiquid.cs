@@ -9,7 +9,7 @@ using TerraIntegration.Templates;
 
 namespace TerraIntegration.ValueProperties.Tile
 {
-    public class TileLiquid : ValueProperty<Values.Tile>
+    public class TileLiquid : ValueProperty<Values.Objects.Tile>
     {
         public override string PropertyName => "liquid";
         public override string PropertyDisplay => "Liquid level";
@@ -20,7 +20,7 @@ namespace TerraIntegration.ValueProperties.Tile
 
         public override ReturnType? VariableReturnType => typeof(Values.Byte);
 
-        public override VariableValue GetProperty(ComponentSystem system, Values.Tile value, List<Error> errors)
+        public override VariableValue GetProperty(ComponentSystem system, Values.Objects.Tile value, List<Error> errors)
             => new Values.Byte(value.Liquid);
     }
 }

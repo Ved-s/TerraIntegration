@@ -24,7 +24,7 @@ namespace TerraIntegration.Values
         public override string TypeDefaultDisplayName => "Double";
         public override string TypeDefaultDescription => "Double-presition floating point number";
 
-        public override SpriteSheetPos SpriteSheetPos => new(BasicSheet, 0, 1);
+        public override SpriteSheetPos SpriteSheetPos => new(ValueSheet, 0, 1);
 
         public override Color TypeColor => Color.Lime;
 

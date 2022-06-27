@@ -9,7 +9,7 @@ using TerraIntegration.Templates;
 
 namespace TerraIntegration.ValueProperties.Tile
 {
-    public class TileActuated : ValueProperty<Values.Tile>
+    public class TileActuated : ValueProperty<Values.Objects.Tile>
     {
         public override string PropertyName => "actuated";
         public override string PropertyDisplay => "Is actuated";
@@ -19,11 +19,11 @@ namespace TerraIntegration.ValueProperties.Tile
 
         public override SpriteSheetPos SpriteSheetPos => new(TileSheet, 2, 1);
 
-        public override VariableValue GetProperty(ComponentSystem system, Values.Tile value, List<Error> errors)
+        public override VariableValue GetProperty(ComponentSystem system, Values.Objects.Tile value, List<Error> errors)
             => new Values.Boolean(value.Actuated);
     }
 
-    public class TileActuator : ValueProperty<Values.Tile>
+    public class TileActuator : ValueProperty<Values.Objects.Tile>
     {
         public override string PropertyName => "actuator";
         public override string PropertyDisplay => "Has actuator";
@@ -33,11 +33,11 @@ namespace TerraIntegration.ValueProperties.Tile
 
         public override SpriteSheetPos SpriteSheetPos => new(TileSheet, 3, 1);
 
-        public override VariableValue GetProperty(ComponentSystem system, Values.Tile value, List<Error> errors)
+        public override VariableValue GetProperty(ComponentSystem system, Values.Objects.Tile value, List<Error> errors)
             => new Values.Boolean(value.Actuator);
     }
 
-    public class TileWireRed : ValueProperty<Values.Tile>
+    public class TileWireRed : ValueProperty<Values.Objects.Tile>
     {
         public override string PropertyName => "wireRed";
         public override string PropertyDisplay => "Has red wire";
@@ -47,11 +47,11 @@ namespace TerraIntegration.ValueProperties.Tile
 
         public override SpriteSheetPos SpriteSheetPos => new(TileSheet, 0, 2);
 
-        public override VariableValue GetProperty(ComponentSystem system, Values.Tile value, List<Error> errors)
+        public override VariableValue GetProperty(ComponentSystem system, Values.Objects.Tile value, List<Error> errors)
             => new Values.Boolean(value.RedWire);
     }
 
-    public class TileWireGreen : ValueProperty<Values.Tile>
+    public class TileWireGreen : ValueProperty<Values.Objects.Tile>
     {
         public override string PropertyName => "wireGreen";
         public override string PropertyDisplay => "Has green wire";
@@ -62,11 +62,11 @@ namespace TerraIntegration.ValueProperties.Tile
 
         public override SpriteSheetPos SpriteSheetPos => new(TileSheet, 1, 2);
 
-        public override VariableValue GetProperty(ComponentSystem system, Values.Tile value, List<Error> errors)
+        public override VariableValue GetProperty(ComponentSystem system, Values.Objects.Tile value, List<Error> errors)
             => new Values.Boolean(value.GreenWire);
     }
 
-    public class TileWireBlue : ValueProperty<Values.Tile>
+    public class TileWireBlue : ValueProperty<Values.Objects.Tile>
     {
         public override string PropertyName => "wireBlue";
         public override string PropertyDisplay => "Has blue wire";
@@ -77,11 +77,11 @@ namespace TerraIntegration.ValueProperties.Tile
 
         public override SpriteSheetPos SpriteSheetPos => new(TileSheet, 2, 2);
 
-        public override VariableValue GetProperty(ComponentSystem system, Values.Tile value, List<Error> errors)
+        public override VariableValue GetProperty(ComponentSystem system, Values.Objects.Tile value, List<Error> errors)
             => new Values.Boolean(value.BlueWire);
     }
 
-    public class TileWireYellow : ValueProperty<Values.Tile>
+    public class TileWireYellow : ValueProperty<Values.Objects.Tile>
     {
         public override string PropertyName => "wireYellow";
         public override string PropertyDisplay => "Has yellow wire";
@@ -92,7 +92,7 @@ namespace TerraIntegration.ValueProperties.Tile
 
         public override SpriteSheetPos SpriteSheetPos => new(TileSheet, 3, 2);
 
-        public override VariableValue GetProperty(ComponentSystem system, Values.Tile value, List<Error> errors)
+        public override VariableValue GetProperty(ComponentSystem system, Values.Objects.Tile value, List<Error> errors)
             => new Values.Boolean(value.YellowWire);
     }
 }

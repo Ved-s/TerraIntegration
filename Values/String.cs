@@ -26,7 +26,7 @@ namespace TerraIntegration.Values
 
         public override Color TypeColor => Color.OrangeRed;
 
-        public override SpriteSheetPos SpriteSheetPos => new(BasicSheet, 2, 1);
+        public override SpriteSheetPos SpriteSheetPos => new(ValueSheet, 2, 1);
 
         public string Value { get; set; }
         public ReturnType[] ValidAddTypes => new ReturnType[] { typeof(IToString) };

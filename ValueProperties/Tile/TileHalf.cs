@@ -6,7 +6,7 @@ using TerraIntegration.Templates;
 
 namespace TerraIntegration.ValueProperties.Tile
 {
-    public class TileHalf : ValueProperty<Values.Tile>
+    public class TileHalf : ValueProperty<Values.Objects.Tile>
     {
         public override string PropertyName => "half";
         public override string PropertyDisplay => "Is half block";
@@ -17,7 +17,7 @@ namespace TerraIntegration.ValueProperties.Tile
 
         public override ReturnType? VariableReturnType => typeof(Values.Boolean);
 
-        public override VariableValue GetProperty(ComponentSystem system, Values.Tile value, List<Error> errors)
+        public override VariableValue GetProperty(ComponentSystem system, Values.Objects.Tile value, List<Error> errors)
             => new Values.Boolean(value.HalfBlock);
     }
 }

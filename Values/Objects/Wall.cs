@@ -10,7 +10,7 @@ using Terraria.GameContent.UI.Elements;
 using Terraria.ID;
 using Terraria.ModLoader;
 
-namespace TerraIntegration.Values
+namespace TerraIntegration.Values.Objects
 {
     public class Wall : VariableValue, INamed, ITyped, IProgrammable
     {
@@ -20,7 +20,7 @@ namespace TerraIntegration.Values
 
         public override Color TypeColor => Microsoft.Xna.Framework.Color.Brown;
         
-        public override SpriteSheetPos SpriteSheetPos => new(BasicSheet, 3, 2);
+        public override SpriteSheetPos SpriteSheetPos => new(ObjectSheet, 1, 0);
 
         public int WallType { get; set; }
         public int WallFrameX { get; set; }

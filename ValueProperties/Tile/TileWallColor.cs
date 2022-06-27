@@ -7,12 +7,13 @@ using TerraIntegration.Basic;
 using TerraIntegration.DataStructures;
 using TerraIntegration.Templates;
 using TerraIntegration.Values;
+using TerraIntegration.Values.Objects;
 
 namespace TerraIntegration.ValueProperties.Tile
 {
     public class TileWallColor : ValueProperty
     {
-        public override Type[] ValueTypes => new[] { typeof(Values.Tile), typeof(Wall) };
+        public override Type[] ValueTypes => new[] { typeof(Values.Objects.Tile), typeof(Wall) };
         public override string PropertyName => "tileWallColor";
         public override string PropertyDisplay => "Color";
 
@@ -25,7 +26,7 @@ namespace TerraIntegration.ValueProperties.Tile
         public override VariableValue GetProperty(ComponentSystem system, VariableValue value, List<Error> errors)
         {
             byte col;
-            if (value is Values.Tile tile)
+            if (value is Values.Objects.Tile tile)
                 col = tile.Color;
             else col = (value as Wall).Color;
 
