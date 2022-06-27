@@ -16,6 +16,8 @@ namespace TerraIntegration.UI
 {
     public class ComponentInterface : ILoadable
     {
+        public static ComponentInterface Instance => ModContent.GetInstance<ComponentInterface>();
+
         public UserInterface Interface = new();
         public PositionedComponent InterfaceComponent;
         public Vector2 InterfaceOffset = default;
@@ -27,24 +29,24 @@ namespace TerraIntegration.UI
         public void Load(Mod mod)
         {
             Tabs.Add(new ComponentUITab("Interface",
-                    () => InterfaceComponent.Component.HasCustomInterface,
+                    c => c.Component.HasCustomInterface,
                     SetupInterface));
 
             Tabs.Add(new ComponentUITab("Properties",
-                () => InterfaceComponent.Component.HasProperties(),
+                c => c.Component.HasProperties(),
                 SetupProperties));
 
             Tabs.Add(new ComponentUITab("Variables",
-                () => InterfaceComponent.Component.VariableInfo?.Length is not null and > 0,
+                c => c.Component.VariableInfo?.Length is not null and > 0,
                 SetupVariables));
 
             Tabs.Add(new ComponentUITab("Description",
-                () => !InterfaceComponent.Component.TypeDescription.IsNullEmptyOrWhitespace(),
+                c => !c.Component.TypeDescription.IsNullEmptyOrWhitespace(),
                 SetupDescription));
 
             Tabs.Add(new ComponentUITab("Config",
-                () => InterfaceComponent.Component.DefaultUpdateFrequency > 0
-                && InterfaceComponent.Component.ConfigurableFrequency,
+                c => c.Component.DefaultUpdateFrequency > 0
+                && c.Component.ConfigurableFrequency,
                 SetupComponentConfig));
         }
         public void Unload()
@@ -292,7 +294,7 @@ namespace TerraIntegration.UI
             for (int i = 0; i < Tabs.Count; i++)
             {
                 ComponentUITab tab = Tabs[i];
-                if (!tab.IsAvailable())
+                if (!tab.IsAvailable(InterfaceComponent))
                     continue;
 
                 int tabind = i;
@@ -336,7 +338,7 @@ namespace TerraIntegration.UI
             int tabs = 0;
             for (int i = 0; i < Tabs.Count; i++)
             {
-                if (Tabs[i].IsAvailable())
+                if (Tabs[i].IsAvailable(InterfaceComponent))
                     tabs++;
             }
             return tabs;
@@ -359,10 +361,10 @@ namespace TerraIntegration.UI
             s.PaddingRight = 0;
             s.PaddingBottom = 0;
 
-            if (CurrentTab >= Tabs.Count || !Tabs[CurrentTab].IsAvailable())
+            if (CurrentTab >= Tabs.Count || !Tabs[CurrentTab].IsAvailable(InterfaceComponent))
                 for (int i = 0; i < Tabs.Count; i++)
                 {
-                    if (Tabs[i].IsAvailable())
+                    if (Tabs[i].IsAvailable(InterfaceComponent))
                     {
                         CurrentTab = i;
                         break;

@@ -592,10 +592,10 @@ namespace TerraIntegration
     public class ComponentUITab
     {
         public string Name { get; set; }
-        public Func<bool> IsAvailable { get; set; }
+        public Func<PositionedComponent, bool> IsAvailable { get; set; }
         public Action<Vector2> Setup { get; set; }
 
-        public ComponentUITab(string name, Func<bool> isAvailable, Action<Vector2> setup)
+        public ComponentUITab(string name, Func<PositionedComponent, bool> isAvailable, Action<Vector2> setup)
         {
             Name = name;
             IsAvailable = isAvailable;

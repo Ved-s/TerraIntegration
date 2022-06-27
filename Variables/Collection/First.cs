@@ -1,14 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using TerraIntegration.Basic;
 using TerraIntegration.DataStructures;
 using TerraIntegration.Interfaces;
 using TerraIntegration.Templates;
 using TerraIntegration.Values;
-using TerraIntegration.Variables;
 
 namespace TerraIntegration.Variables.Collection
 {
@@ -49,7 +45,7 @@ namespace TerraIntegration.Variables.Collection
             {
                 result = collection.Enumerate(system, errors).FirstOrDefault();
             }
-            else 
+            else
             {
                 Function func = spec?.GetVariable<Function>(system, errors, TypeIdentity);
                 if (func is null)

@@ -63,7 +63,6 @@ namespace TerraIntegration.Basic
         public virtual SpriteSheet DefaultPropertySpriteSheet { get; set; } = null;
         public virtual Point DefaultPropertySpriteSheetPos => default;
 
-        public virtual bool HasInterface => HasCustomInterface || VariableInfo?.Length is not null and > 0 || HasProperties();
         public virtual bool HasCustomInterface => false;
         public virtual Vector2 InterfaceOffset
         {
@@ -90,7 +89,8 @@ namespace TerraIntegration.Basic
 
         public override bool RightClick(int i, int j)
         {
-            if (HasInterface)
+            PositionedComponent com = new(new(i, j), this);
+            if (ComponentInterface.Instance.Tabs.Any(t => t.IsAvailable(com)))
             {
                 Point16 pos = new(i, j);
                 pos = GetInterfaceTarget(pos);
