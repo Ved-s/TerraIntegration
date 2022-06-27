@@ -25,9 +25,9 @@ namespace TerraIntegration.Basic
         public static readonly Dictionary<Type, Variable> ByType = new();
         public static readonly Dictionary<string, Variable> ByTypeName = new();
 
-        public virtual string Texture => null;
-        public virtual SpriteSheet DefaultSpriteSheet => null;
-        public virtual SpriteSheetPos SpriteSheetPos => default;
+        public virtual string Texture { get; set; }
+        public virtual SpriteSheet DefaultSpriteSheet { get; set; }
+        public virtual SpriteSheetPos SpriteSheetPos { get; set; }
 
         public string Name { get; set; }
         public Guid Id { get; set; } = Guid.NewGuid();

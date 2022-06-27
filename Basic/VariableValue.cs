@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using TerraIntegration.DataStructures;
 using TerraIntegration.DisplayedValues;
+using TerraIntegration.Interfaces;
 using TerraIntegration.Templates;
 using TerraIntegration.Variables;
 using Terraria.ModLoader;
@@ -211,6 +212,8 @@ namespace TerraIntegration.Basic
             return null;
         }
 
+        public virtual void OnRegister() { }
+
         public static void Register(VariableValue v)
         {
             if (v?.TypeName is null) return;
@@ -219,6 +222,8 @@ namespace TerraIntegration.Basic
             ByType[v.GetType()] = v;
 
             ValueProperty.ValueRegistered();
+
+            v.OnRegister();
         }
         internal static void Unregister()
         {

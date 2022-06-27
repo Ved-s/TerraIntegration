@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using TerraIntegration.Basic;
 using TerraIntegration.Components;
 using TerraIntegration.DataStructures;
+using TerraIntegration.Interfaces;
 using TerraIntegration.Values;
 using TerraIntegration.Variables;
 
@@ -42,7 +43,7 @@ namespace TerraIntegration.Templates
 
         public abstract string PropertyName { get; }
         public abstract string PropertyDisplay { get; }
-        public virtual string PropertyDescription => null;
+        public virtual string PropertyDescription { get; set; }
 
         public sealed override string TypeDefaultDescription => PropertyDescription;
         public sealed override string TypeDefaultDisplayName => PropertyDisplay;
@@ -117,6 +118,21 @@ namespace TerraIntegration.Templates
         public sealed override Type[] ValueTypes => new[] { typeof(TValue) };
 
         public abstract VariableValue GetProperty(ComponentSystem system, TValue value, List<Error> errors);
+
+        public override VariableValue GetProperty(ComponentSystem system, VariableValue value, List<Error> errors)
+        {
+            return GetProperty(system, value as TValue, errors);
+        }
+    }
+
+    public abstract class ValueProperty<TValue, TReturn> : ValueProperty
+        where TValue : VariableValue
+        where TReturn : VariableValue
+    {
+        public sealed override Type[] ValueTypes => new[] { typeof(TValue) };
+        public override ReturnType? VariableReturnType => typeof(TReturn);
+
+        public abstract TReturn GetProperty(ComponentSystem system, TValue value, List<Error> errors);
 
         public override VariableValue GetProperty(ComponentSystem system, VariableValue value, List<Error> errors)
         {

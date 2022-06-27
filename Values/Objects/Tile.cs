@@ -6,6 +6,7 @@ using TerraIntegration.DataStructures;
 using TerraIntegration.DisplayedValues;
 using TerraIntegration.Interfaces;
 using TerraIntegration.UI;
+using TerraIntegration.ValueProperties;
 using TerraIntegration.Variables;
 using Terraria.GameContent.UI.Elements;
 using Terraria.ID;
@@ -92,6 +93,15 @@ namespace TerraIntegration.Values.Objects
         public Tile(int type)
         {
             TileType = type;
+        }
+
+        public override void OnRegister()
+        {
+            //AutoProperty<Tile, Boolean>.Register(new("actuated", "Is actuated", (sys, tile, err) => new(tile.Actuated)) 
+            //{
+            //    PropertyDescription = "Returns whether this tile is actuated",
+            //    SpriteSheetPos = new(Variable.TileSheet, 2, 1)
+            //});
         }
 
         public override DisplayedValue Display(ComponentSystem system)

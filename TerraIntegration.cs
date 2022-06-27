@@ -31,7 +31,7 @@ namespace TerraIntegration
             Assembly asm = Assembly.GetExecutingAssembly();
             foreach (Type t in asm.GetTypes())
             {
-                if (t.IsAbstract) continue;
+                if (t.IsAbstract || t.IsGenericTypeDefinition) continue;
 
                 if (t.GetCustomAttribute<AutoloadAttribute>()?.Value == false)
                     continue;
