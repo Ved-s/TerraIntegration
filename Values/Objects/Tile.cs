@@ -95,15 +95,6 @@ namespace TerraIntegration.Values.Objects
             TileType = type;
         }
 
-        public override void OnRegister()
-        {
-            //AutoProperty<Tile, Boolean>.Register(new("actuated", "Is actuated", (sys, tile, err) => new(tile.Actuated)) 
-            //{
-            //    PropertyDescription = "Returns whether this tile is actuated",
-            //    SpriteSheetPos = new(Variable.TileSheet, 2, 1)
-            //});
-        }
-
         public override DisplayedValue Display(ComponentSystem system)
         {
             if (TileType < 0) return null;
