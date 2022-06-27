@@ -185,14 +185,14 @@ namespace TerraIntegration.Variables
         {
             if (ReturnValueSlot?.Var is null)
             {
-                ReturnValueSlot?.NewFloatingText("No variable here", Color.Red);
+                ReturnValueSlot?.NewFloatingText(TerraIntegration.Localize("ProgrammingErrors.NoVariable"), Color.Red);
                 return null;
             }
 
             foreach (Argument arg in Args)
                 if (arg.Slot.Var?.Var?.VariableReturnType is null)
                 {
-                    arg.Slot?.NewFloatingText("No argument", Color.Red);
+                    arg.Slot?.NewFloatingText(TerraIntegration.Localize("ProgrammingErrors.NoVariable"), Color.Red);
                     return null;
                 }
 

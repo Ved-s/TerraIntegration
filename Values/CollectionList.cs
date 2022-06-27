@@ -29,7 +29,7 @@ namespace TerraIntegration.Values
         public CollectionList() { }
         public CollectionList(IEnumerable<VariableValue> enumerable, ReturnType collectionType)
         {
-            Enumerable = enumerable;
+            Enumerable = enumerable.ToArray();
             CollectionType = collectionType;
         }
 

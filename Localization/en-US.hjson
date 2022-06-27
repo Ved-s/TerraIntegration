@@ -13,7 +13,10 @@
 		ExpectedVariables:			"{0} expected variables {1}",
 		ValueTooBigForType:			"{0} is too big for {1}",
 		ValueTooSmallForType:		"{0} is too small for {1}",
-		IndexOutOfBounds:           "Index {0} for {1} is out of bounds of collection with length {2}"
+		IndexOutOfBounds:           "Index {0} for {1} is out of bounds of collection with length {2}",
+		FunctionArgumentNotSet:     "Argument {0} is not set",
+		FunctionExpectedArgsAmount: "Function {0} expected {1} args, got {2}",
+		NoFilterMatches:            "Variable {0}: filter matched no values"
 	},
 	ProgrammingErrors: {
 		CannotParseValue: "Cannot parse {0}",
