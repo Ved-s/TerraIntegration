@@ -88,9 +88,9 @@ namespace TerraIntegration
             return boolean is null ? null : new Values.Boolean(boolean.Value);
         }
 
-        public static CollectionList ToCollectionValue<T>(this IEnumerable<T> ienum, ReturnType collectionType) where T : VariableValue
+        public static CollectionList ToCollectionValue<T>(this IEnumerable<T> ienum, ReturnType? collectionType = null) where T : VariableValue
         {
-            return ienum is null ? null : new CollectionList(ienum, collectionType);
+            return ienum is null ? null : new CollectionList(ienum, collectionType ?? typeof(T));
         }
 
         public static bool MatchNull(this ReturnType? returnType, Type type)

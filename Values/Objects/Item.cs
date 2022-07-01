@@ -1,17 +1,15 @@
 ﻿using Microsoft.Xna.Framework;
 using System.IO;
 using TerraIntegration.Basic;
+using TerraIntegration.DisplayedValues;
 using TerraIntegration.Interfaces;
 using TerraIntegration.UI;
-using TerraIntegration.ValueProperties;
 using TerraIntegration.Variables;
+using Terraria;
 using Terraria.GameContent.UI;
 using Terraria.GameContent.UI.Elements;
-using Terraria.ModLoader;
-using Terraria.ModLoader.IO;
 using Terraria.ID;
-using Terraria;
-using TerraIntegration.DisplayedValues;
+using Terraria.ModLoader.IO;
 
 namespace TerraIntegration.Values.Objects
 {
@@ -30,7 +28,7 @@ namespace TerraIntegration.Values.Objects
         public bool HasComplexInterface => false;
 
         public Item() { }
-        public Item(Terraria.Item item) 
+        public Item(Terraria.Item item)
         {
             ItemObj = item;
         }
@@ -60,8 +58,8 @@ namespace TerraIntegration.Values.Objects
             {
                 return new(255, (byte)(Main.masterColor * 200f), 0);
             }
-			return ItemRarity.GetColor(item.rare);
-		}
+            return ItemRarity.GetColor(item.rare);
+        }
 
         public override bool Equals(VariableValue value)
         {
@@ -73,7 +71,7 @@ namespace TerraIntegration.Values.Objects
 
         public void SetupInterface()
         {
-            Interface.Append(Slot = new() 
+            Interface.Append(Slot = new()
             {
                 Top = new(-21, .5f),
                 Left = new(-21, .5f),

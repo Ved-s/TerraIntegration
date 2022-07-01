@@ -15,6 +15,7 @@ namespace TerraIntegration.Basic
         public abstract string Type { get; }
 
         public abstract string HoverText { get; }
+        public virtual string ShortHoverText => HoverText.Replace('\n', ' ');
 
         public abstract void Draw(Rectangle screenRect, SpriteBatch spriteBatch);
 

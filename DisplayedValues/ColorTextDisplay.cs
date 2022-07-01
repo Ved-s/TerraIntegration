@@ -24,12 +24,16 @@ namespace TerraIntegration.DisplayedValues
         public virtual Vector2 TextAlign { get; set; } = new(.5f);
 
         public override string HoverText => Color == Color.White ? Text : Util.ColorTag(Color, Text);
+        public override string ShortHoverText => ShortText ?? base.ShortHoverText;
+
+        string ShortText;
 
         public ColorTextDisplay() { }
-        public ColorTextDisplay(string text, Color color)
+        public ColorTextDisplay(string text, Color color, string shortText = null)
         {
             Text = text;
             Color = color;
+            ShortText = shortText;
         }
 
         public override void Draw(Rectangle screenRect, SpriteBatch spriteBatch)

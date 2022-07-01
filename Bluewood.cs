@@ -122,6 +122,11 @@ namespace TerraIntegration
             return base.Shake(x, y, ref createLeaves);
         }
 
+        public override bool TryGenerate(int x, int y)
+        {
+            return Main.rand.NextBool(5) && TreeGrowing.GrowTree(x, y, GetTreeSettings());
+        }
+
         public void PlaceSap(int x, int y, int side, byte color) 
         {
             Tile t = Main.tile[x, y];

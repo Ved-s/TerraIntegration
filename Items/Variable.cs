@@ -80,9 +80,9 @@ namespace TerraIntegration.Items
 
             if (Var.ShowLastValue && Var.LastValue is not null && Var.LastSystem is not null)
             {
-                string text = Var.LastValue.Display(Var.LastSystem)?.HoverText;
+                string text = Var.LastValue.Display(Var.LastSystem)?.ShortHoverText;
                 if (text is not null)
-                    tooltips.Add(new(Mod, "TIVarLastVal", "[c/aaaa00:Last Value:] " + text.Replace('\n', ' ')));
+                    tooltips.Add(new(Mod, "TIVarLastVal", "[c/aaaa00:Last Value:] " + text));
             }
 
             if (Var.TypeDescription is not null)

@@ -75,7 +75,7 @@ namespace TerraIntegration.UI
 
             Errors.Clear();
             ComponentSystem system = null;//Component.GetData().System;
-            string value = Property.GetProperty(Component, Errors)?.Display(system)?.HoverText;
+            string value = Property.GetProperty(Component, Errors)?.Display(system)?.ShortHoverText;
 
             if (value is null)
                 TextName.Text = Property.TypeDisplayName;
@@ -102,7 +102,7 @@ namespace TerraIntegration.UI
             Rectangle hitbox = new((int)pos.X, (int)pos.Y, (int)size, (int)size);
             if (hitbox.Contains(Main.MouseScreen.ToPoint())) 
             {
-                string returns = VariableValue.TypeToName(Property.VariableReturnType?.Type, true);
+                string returns = Property.VariableReturnType?.ToStringName(true);
 
                 ComponentWorld.Instance.AddHoverText(
                     $"[c/aaaa00:Type:] {Property.TypeDisplayName}" +

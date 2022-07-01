@@ -532,48 +532,47 @@ namespace TerraIntegration
             spriteBatch.Draw(HighlightTexture, position, null, Color.White * (var.Highlight / 255f), 0f, Vector2.Zero, hlScale, SpriteEffects.None, 0);
         }
 
-        public override void PostWorldGen()
-        {
-            Bluewood tree = ModContent.GetInstance<Bluewood>();
-            HashSet<Point> foundValidTrees = new();
+        //public override void PostWorldGen()
+        //{
+        //    Bluewood tree = ModContent.GetInstance<Bluewood>();
+        //    HashSet<Point> foundValidTrees = new();
 
+        //    for (int i = 1; i < Main.maxTilesX - 1; i++)
+        //        for (int j = 1; j < Main.worldSurface; j++)
+        //            if (TileID.Sets.IsATreeTrunk[Main.tile[i, j].TileType])
+        //            {
+        //                TreeTileInfo info = TreeTileInfo.GetInfo(i, j);
+        //                if (!info.IsCenter) continue;
 
-            for (int i = 1; i < Main.maxTilesX - 1; i++)
-                for (int j = 1; j < Main.worldSurface; j++)
-                    if (TileID.Sets.IsATreeTrunk[Main.tile[i, j].TileType])
-                    {
-                        TreeTileInfo info = TreeTileInfo.GetInfo(i, j);
-                        if (!info.IsCenter) continue;
+        //                TreeStats stats = TreeGrowing.GetTreeStats(i, j);
 
-                        TreeStats stats = TreeGrowing.GetTreeStats(i, j);
+        //                if (stats.Bottom.Y > 0)
+        //                    j = stats.Bottom.Y;
 
-                        if (stats.Bottom.Y > 0)
-                            j = stats.Bottom.Y;
+        //                if (!tree.ValidGroundType(stats.GroundType)) continue;
 
-                        if (!tree.ValidGroundType(stats.GroundType)) continue;
+        //                foundValidTrees.Add(stats.Bottom);
+        //            }
+        //    int treesToSpawn = Main.maxTilesX / 200;
 
-                        foundValidTrees.Add(stats.Bottom);
-                    }
-            int treesToSpawn = Main.maxTilesX / 200;
+        //    treesToSpawn = Math.Max(5, Math.Min(treesToSpawn, foundValidTrees.Count / 5));
 
-            treesToSpawn = Math.Max(5, Math.Min(treesToSpawn, foundValidTrees.Count / 5));
+        //    List<Point> validTrees = new(foundValidTrees);
 
-            List<Point> validTrees = new(foundValidTrees);
+        //    while (treesToSpawn > 0 && validTrees.Count > 0)
+        //    {
+        //        int index = WorldGen.genRand.Next(validTrees.Count);
+        //        Point pos = validTrees[index];
 
-            while (treesToSpawn > 0 && validTrees.Count > 0)
-            {
-                int index = WorldGen.genRand.Next(validTrees.Count);
-                Point pos = validTrees[index];
+        //        foreach (PositionedTreeTile tile in TreeGrowing.EnumerateTreeTiles(pos.X, pos.Y))
+        //            Main.tile[tile.Pos.X, tile.Pos.Y].ClearTile();
 
-                foreach (PositionedTreeTile tile in TreeGrowing.EnumerateTreeTiles(pos.X, pos.Y))
-                    Main.tile[tile.Pos.X, tile.Pos.Y].ClearTile();
+        //        if (TreeGrowing.GrowTree(pos.X, pos.Y + 1, tree.GetTreeSettings()))
+        //            treesToSpawn--;
 
-                if (TreeGrowing.GrowTree(pos.X, pos.Y + 1, tree.GetTreeSettings()))
-                    treesToSpawn--;
-
-                validTrees.RemoveAt(index);
-            }
-        }
+        //        validTrees.RemoveAt(index);
+        //    }
+        //}
 
         internal void ResetHoverText()
         {

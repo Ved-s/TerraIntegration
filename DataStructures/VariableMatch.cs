@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using TerraIntegration.Basic;
 using TerraIntegration.Values;
 
@@ -11,6 +8,10 @@ namespace TerraIntegration.DataStructures
 {
     public struct VariableMatch
     {
+        public VariableMatch()
+        {
+        }
+
         public HashSet<string> Names { get; set; } = new();
         public HashSet<Type> Types { get; set; } = new();
         bool MatchSpecial { get; set; } = false;

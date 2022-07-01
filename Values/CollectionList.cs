@@ -92,7 +92,11 @@ namespace TerraIntegration.Values
 
                 string delim = anyLong ? ",\n " : ", ";
 
-                return new ColorTextDisplay($"[{(anyLong? "\n" : "")} {string.Join(delim, Strings)}{(anyLong ? "\n" : " ")}]", Color.White)
+                string longText = $"[{(anyLong ? "\n" : "")} {string.Join(delim, Strings)}{(anyLong ? "\n" : " ")}]";
+                int shortCount = anyLong ? 2 : 5;
+                string shortText = $"[ {string.Join(", ", Strings.Take(shortCount))}{(Strings.Count > shortCount? "..." : "")} ]";
+
+                return new ColorTextDisplay(longText, Color.White, shortText)
                 {
                     TextAlign = new(0, .5f)
                 };

@@ -10,5 +10,9 @@ namespace TerraIntegration.DataStructures
     public struct ComponentDataIndex : ITileData
     {
         public int Index = -1;
+
+        public ComponentDataIndex()
+        {
+        }
     }
 }
