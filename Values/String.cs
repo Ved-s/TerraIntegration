@@ -9,7 +9,8 @@ using TerraIntegration.Basic;
 using TerraIntegration.DataStructures;
 using TerraIntegration.DisplayedValues;
 using TerraIntegration.Interfaces;
-using TerraIntegration.Interfaces.Math;
+using TerraIntegration.Interfaces.Value;
+using TerraIntegration.Interfaces.Value.Math;
 using TerraIntegration.Items;
 using TerraIntegration.UI;
 using TerraIntegration.Variables;
@@ -18,7 +19,7 @@ using Terraria.ModLoader;
 
 namespace TerraIntegration.Values
 {
-    public class String : VariableValue, IToString, IAddable, Interfaces.ICollection<Char>, IEquatable, IProgrammable
+    public class String : VariableValue, IToString, IAddable, Interfaces.Value.ICollection<Char>, IEquatable, IProgrammable
     {
         public override string TypeName => "str";
         public override string TypeDefaultDisplayName => "String";

@@ -3,7 +3,7 @@ using System.IO;
 using TerraIntegration.Basic;
 using TerraIntegration.DisplayedValues;
 using TerraIntegration.Interfaces;
-using TerraIntegration.UI;
+using TerraIntegration.Interfaces.Value;
 using TerraIntegration.Variables;
 using Terraria;
 using Terraria.GameContent.UI;

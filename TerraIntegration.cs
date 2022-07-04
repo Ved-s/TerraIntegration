@@ -57,8 +57,8 @@ namespace TerraIntegration
                 }
             }
 
-            VariableRenderer.TypeSpritesheetOverrides[typeof(Interfaces.ICollection)] = new(VariableValue.ValueSheet, 0, 2);
-            VariableRenderer.TypeSpritesheetOverrides[typeof(Interfaces.ICollection<>)] = new(VariableValue.ValueSheet, 0, 2);
+            VariableRenderer.TypeSpritesheetOverrides[typeof(Interfaces.Value.ICollection)] = new(VariableValue.ValueSheet, 0, 2);
+            VariableRenderer.TypeSpritesheetOverrides[typeof(Interfaces.Value.ICollection<>)] = new(VariableValue.ValueSheet, 0, 2);
 
             Statistics.Load();
         }

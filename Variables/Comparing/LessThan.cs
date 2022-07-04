@@ -5,7 +5,6 @@ using System.Text;
 using System.Threading.Tasks;
 using TerraIntegration.Basic;
 using TerraIntegration.DataStructures;
-using TerraIntegration.Interfaces;
 using TerraIntegration.Templates;
 using TerraIntegration.Values;
 
@@ -19,7 +18,7 @@ namespace TerraIntegration.Variables.Comparing
 
         public override SpriteSheetPos SpriteSheetPos => new(ComparingSheet, 2, 1);
 
-        public override ReturnType[] LeftSlotValueTypes => new ReturnType[] { typeof(Interfaces.IComparable) };
+        public override ReturnType[] LeftSlotValueTypes => new ReturnType[] { typeof(Interfaces.Value.IComparable) };
 
         public override ReturnType? VariableReturnType => typeof(Values.Boolean);
 
@@ -30,7 +29,7 @@ namespace TerraIntegration.Variables.Comparing
 
         public override VariableValue GetValue(ComponentSystem system, VariableValue left, VariableValue right, List<Error> errors)
         {
-            Interfaces.IComparable comparable = left as Interfaces.IComparable;
+            Interfaces.Value.IComparable comparable = left as Interfaces.Value.IComparable;
             return new Values.Boolean(comparable.LessThan(right));
         }
     }

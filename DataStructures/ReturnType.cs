@@ -14,7 +14,7 @@ namespace TerraIntegration.DataStructures
 
         public static Dictionary<Type, Func<Type, IEnumerable<ReturnType>>> CustomTypeSelectors { get; } = new()
         {
-            [typeof(Interfaces.ICollection)] = (type) => Util.Enum(Interfaces.ICollection.TryGetCollectionType(type))
+            [typeof(Interfaces.Value.ICollection)] = (type) => Util.Enum(Interfaces.Value.ICollection.TryGetCollectionType(type))
         };
 
         public Type Type { get; } = typeof(VariableValue);

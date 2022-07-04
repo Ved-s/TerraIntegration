@@ -4,10 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace TerraIntegration.Interfaces
+namespace TerraIntegration.Interfaces.Value
 {
-    public interface IToString : IValueInterface
+    public interface INamed : IValueInterface
     {
-        string ToString();
+        string Name { get; }
     }
 }

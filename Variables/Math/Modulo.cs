@@ -6,7 +6,7 @@ using System.Linq;
 using TerraIntegration.Basic;
 using TerraIntegration.DataStructures;
 using TerraIntegration.Interfaces;
-using TerraIntegration.Interfaces.Math;
+using TerraIntegration.Interfaces.Value.Math;
 using TerraIntegration.Templates;
 using TerraIntegration.UI;
 using TerraIntegration.Values;

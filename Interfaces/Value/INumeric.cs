@@ -5,11 +5,11 @@ using System.Text;
 using System.Threading.Tasks;
 using TerraIntegration.Basic;
 using TerraIntegration.DataStructures;
-using TerraIntegration.Interfaces.Math;
+using TerraIntegration.Interfaces.Value.Math;
 using TerraIntegration.Values;
 using Terraria.ModLoader;
 
-namespace TerraIntegration.Interfaces
+namespace TerraIntegration.Interfaces.Value
 {
     public interface INumeric : IMathOperable, IComparable, IValueInterface
     {
@@ -20,7 +20,7 @@ namespace TerraIntegration.Interfaces
 
         ReturnType[] IMathOperable.ValidMathValueTypes => new ReturnType[] { typeof(INumeric), typeof(IDecimal) };
 
-        public VariableValue GetFromNumeric(long value, List<Error> errors) 
+        public VariableValue GetFromNumeric(long value, List<Error> errors)
         {
             if (!CheckNumericValue(value, errors)) return null;
             return FromNumericChecked(value, errors);
@@ -58,7 +58,7 @@ namespace TerraIntegration.Interfaces
         }
 
         [NoJIT]
-        VariableValue ISubtractable.Subtract(VariableValue value, List<Error> errors, TypeIdentity id) 
+        VariableValue ISubtractable.Subtract(VariableValue value, List<Error> errors, TypeIdentity id)
         {
             long val;
 

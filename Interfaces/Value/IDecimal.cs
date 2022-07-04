@@ -2,11 +2,11 @@
 using System.Collections.Generic;
 using TerraIntegration.Basic;
 using TerraIntegration.DataStructures;
-using TerraIntegration.Interfaces.Math;
+using TerraIntegration.Interfaces.Value.Math;
 using TerraIntegration.Values;
 using Terraria.ModLoader;
 
-namespace TerraIntegration.Interfaces
+namespace TerraIntegration.Interfaces.Value
 {
     public interface IDecimal : IMathOperable, IComparable, IValueInterface
     {

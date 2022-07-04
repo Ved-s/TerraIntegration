@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using TerraIntegration.Basic;
 using TerraIntegration.DataStructures;
+using TerraIntegration.Interfaces;
 using TerraIntegration.UI;
 using Terraria.GameContent.UI.Elements;
 

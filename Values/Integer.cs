@@ -7,12 +7,13 @@ using System.Text.RegularExpressions;
 using TerraIntegration.Basic;
 using TerraIntegration.DataStructures;
 using TerraIntegration.DisplayedValues;
-using TerraIntegration.Interfaces;
-using TerraIntegration.Interfaces.Math;
+using TerraIntegration.Interfaces.Value.Math;
+using TerraIntegration.Interfaces.Value;
 using TerraIntegration.UI;
 using TerraIntegration.Variables;
 using Terraria.GameContent.UI.Elements;
 using Terraria.ModLoader;
+using TerraIntegration.Interfaces;
 
 namespace TerraIntegration.Values
 {

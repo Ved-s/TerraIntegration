@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using TerraIntegration.Basic;
 using TerraIntegration.Values;
 
-namespace TerraIntegration.Interfaces
+namespace TerraIntegration.Interfaces.Value
 {
     public interface IComparable : IEquatable
     {

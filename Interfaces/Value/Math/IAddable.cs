@@ -7,7 +7,7 @@ using TerraIntegration.Basic;
 using TerraIntegration.DataStructures;
 using TerraIntegration.Values;
 
-namespace TerraIntegration.Interfaces.Math
+namespace TerraIntegration.Interfaces.Value.Math
 {
     public interface IAddable : IValueInterface
     {

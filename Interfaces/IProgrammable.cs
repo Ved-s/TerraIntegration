@@ -8,14 +8,14 @@ using TerraIntegration.DataStructures;
 using TerraIntegration.Variables;
 using Terraria.GameContent.UI.Elements;
 
-namespace TerraIntegration.UI
+namespace TerraIntegration.Interfaces
 {
     public interface IProgrammable
     {
         UIPanel Interface { get; set; }
         bool HasComplexInterface { get; }
 
-        public void SetupInterfaceIfNeeded() 
+        public void SetupInterfaceIfNeeded()
         {
             if (Interface is null)
             {

@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using TerraIntegration.Basic;
 using TerraIntegration.Components;
 using TerraIntegration.DataStructures;
+using TerraIntegration.Interfaces;
 using TerraIntegration.UI;
 using TerraIntegration.Values;
 using Terraria.GameContent.UI.Elements;

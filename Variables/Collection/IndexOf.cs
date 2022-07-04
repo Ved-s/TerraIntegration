@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using TerraIntegration.Basic;
 using TerraIntegration.DataStructures;
-using TerraIntegration.Interfaces;
+using TerraIntegration.Interfaces.Value;
 using TerraIntegration.Templates;
 using TerraIntegration.Values;
 

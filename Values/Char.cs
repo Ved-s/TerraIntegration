@@ -9,6 +9,7 @@ using TerraIntegration.Basic;
 using TerraIntegration.DataStructures;
 using TerraIntegration.DisplayedValues;
 using TerraIntegration.Interfaces;
+using TerraIntegration.Interfaces.Value;
 using TerraIntegration.Items;
 using TerraIntegration.UI;
 using TerraIntegration.Variables;

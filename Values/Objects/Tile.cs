@@ -5,7 +5,7 @@ using TerraIntegration.Basic;
 using TerraIntegration.DataStructures;
 using TerraIntegration.DisplayedValues;
 using TerraIntegration.Interfaces;
-using TerraIntegration.UI;
+using TerraIntegration.Interfaces.Value;
 using TerraIntegration.ValueProperties;
 using TerraIntegration.Variables;
 using Terraria.GameContent.UI.Elements;

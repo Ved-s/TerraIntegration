@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using TerraIntegration.DataStructures;
 
-namespace TerraIntegration.Interfaces.Math
+namespace TerraIntegration.Interfaces.Value.Math
 {
     public interface IMathOperable : IAddable, ISubtractable, IMultipliable, IDivisible, IModulable
     {

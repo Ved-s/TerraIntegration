@@ -4,7 +4,7 @@ using System.Reflection;
 using TerraIntegration.Basic;
 using TerraIntegration.DataStructures;
 using TerraIntegration.Interfaces;
-using TerraIntegration.UI;
+using TerraIntegration.Interfaces.Value;
 using TerraIntegration.Variables;
 using Terraria.GameContent.UI.Elements;
 using Terraria.ID;

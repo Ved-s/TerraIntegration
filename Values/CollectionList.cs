@@ -12,10 +12,10 @@ using TerraIntegration.DisplayedValues;
 
 namespace TerraIntegration.Values
 {
-    public class CollectionList : VariableValue, Interfaces.ICollection
+    public class CollectionList : VariableValue, Interfaces.Value.ICollection
     {
         public override string TypeName => "colList";
-        public override string TypeDefaultDisplayName => $"{TypeToName<Interfaces.ICollection>()} of {CollectionType.ToStringName(true)}";
+        public override string TypeDefaultDisplayName => $"{TypeToName<Interfaces.Value.ICollection>()} of {CollectionType.ToStringName(true)}";
         public ReturnType CollectionType { get; private set; }
 
         public override SpriteSheetPos SpriteSheetPos => new(ValueSheet, 0, 2);
@@ -109,7 +109,7 @@ namespace TerraIntegration.Values
 
         public override ReturnType GetReturnType()
         {
-            return new ReturnType(typeof(Interfaces.ICollection), CollectionType);
+            return new ReturnType(typeof(Interfaces.Value.ICollection), CollectionType);
         }
     }
 }

@@ -8,7 +8,7 @@ using TerraIntegration.DataStructures;
 using TerraIntegration.Values;
 using TerraIntegration.Variables;
 
-namespace TerraIntegration.Interfaces
+namespace TerraIntegration.Interfaces.Value
 {
     public interface ICollection : IValueInterface
     {
@@ -16,7 +16,7 @@ namespace TerraIntegration.Interfaces
 
         public ReturnType CollectionType { get; }
 
-        public static ReturnType TryGetCollectionType(Type collection) 
+        public static ReturnType TryGetCollectionType(Type collection)
         {
             if (collection is null) return typeof(VariableValue);
 
@@ -41,7 +41,7 @@ namespace TerraIntegration.Interfaces
                 if (@const.Value is ICollection collection)
                 {
                     ReturnType t = collection.CollectionType;
-                    if (t.Type != typeof(VariableValue)) 
+                    if (t.Type != typeof(VariableValue))
                         return t;
                 }
             }
