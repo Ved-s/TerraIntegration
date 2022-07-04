@@ -35,7 +35,7 @@ namespace TerraIntegration.Values.Objects
 
         public override DisplayedValue Display(ComponentSystem system)
         {
-            return new ColorTextDisplay(ItemObj.HoverName, GetRarityColor(ItemObj));
+            return new ItemDisplay(ItemObj);
         }
 
         protected override void SaveCustomData(BinaryWriter writer)
@@ -46,19 +46,6 @@ namespace TerraIntegration.Values.Objects
         protected override VariableValue LoadCustomData(BinaryReader reader)
         {
             return new Item(ItemIO.Receive(reader, true));
-        }
-
-        static Color GetRarityColor(Terraria.Item item)
-        {
-            if (item.expert || item.rare == ItemRarityID.Expert)
-            {
-                return new(Main.DiscoR, Main.DiscoG, Main.DiscoB);
-            }
-            else if (item.master || item.rare == ItemRarityID.Master)
-            {
-                return new(255, (byte)(Main.masterColor * 200f), 0);
-            }
-            return ItemRarity.GetColor(item.rare);
         }
 
         public override bool Equals(VariableValue value)

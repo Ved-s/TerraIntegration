@@ -35,7 +35,7 @@ namespace TerraIntegration.Templates
         }
         public override ActionVariable LoadActionData(BinaryReader reader)
         {
-            ActionWithReferenceConst awr = this.NewInstance();
+            ActionWithReferenceConst awr = (ActionWithReferenceConst)NewInstance();
             awr.RightValue = ValueOrRef.LoadData(reader);
             return awr;
         }
@@ -54,7 +54,7 @@ namespace TerraIntegration.Templates
         }
         public override ActionVariable LoadActionTag(TagCompound data)
         {
-            ActionWithReferenceConst awr = this.NewInstance();
+            ActionWithReferenceConst awr = (ActionWithReferenceConst)NewInstance();
 
             if (data.ContainsKey("rid"))
                 awr.RightValue = new(new Guid(data.GetByteArray("rid")));
@@ -126,7 +126,7 @@ namespace TerraIntegration.Templates
             Execute(pos, var, value, system, errors);
         }
 
-        public virtual ActionWithReferenceConst CreateVariable(ValueOrRef right) => this.NewInstance();
+        public virtual ActionWithReferenceConst CreateVariable(ValueOrRef right) => (ActionWithReferenceConst)NewInstance();
 
         public virtual ReturnType[] GetValidRightReferenceSlotTypes(ReturnType leftSlotType) => GetValidRightSlotTypes(leftSlotType);
         public virtual Type[] GetValidRightConstantSlotTypes(ReturnType leftSlotType) => GetValidRightSlotTypes(leftSlotType).Select(rt => rt.Type).ToArray();

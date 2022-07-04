@@ -106,10 +106,10 @@ namespace TerraIntegration.Basic
             return value;
         }
 
-        public virtual VariableValue GetFromCommand(CommandCaller caller, List<string> args) { return (VariableValue)Activator.CreateInstance(GetType()); }
+        public virtual VariableValue GetFromCommand(CommandCaller caller, List<string> args) { return NewInstance(); }
 
         protected virtual void SaveCustomData(BinaryWriter writer) { }
-        protected virtual VariableValue LoadCustomData(BinaryReader reader) { return (VariableValue)Activator.CreateInstance(GetType()); }
+        protected virtual VariableValue LoadCustomData(BinaryReader reader) { return NewInstance(); }
 
         public virtual string FormatReturnType(ReturnType type, bool colored) => null;
 
@@ -138,6 +138,7 @@ namespace TerraIntegration.Basic
                 && Equals(value);
         }
 
+        public VariableValue NewInstance() => (VariableValue)Activator.CreateInstance(GetType());
         public static TValue GetInstance<TValue>() where TValue : VariableValue
         {
             if (ByType.TryGetValue(typeof(TValue), out VariableValue v))

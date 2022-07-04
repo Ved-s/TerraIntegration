@@ -57,7 +57,7 @@ namespace TerraIntegration.Templates
             return null;
         }
 
-        public virtual ReferenceVariable CreateVariable(Variable var) => (ReferenceVariable)Activator.CreateInstance(GetType());
+        public virtual ReferenceVariable CreateVariable(Variable var) => (ReferenceVariable)NewInstance();
 
         public abstract VariableValue GetValue(VariableValue value, ComponentSystem system, List<Error> errors);
 
@@ -73,7 +73,7 @@ namespace TerraIntegration.Templates
         }
         protected override Variable LoadCustomData(BinaryReader reader)
         {
-            ReferenceVariable refvar = (ReferenceVariable)Activator.CreateInstance(GetType());
+            ReferenceVariable refvar = (ReferenceVariable)NewInstance();
 
             refvar.VariableId = new(reader.ReadBytes(16));
             return refvar;

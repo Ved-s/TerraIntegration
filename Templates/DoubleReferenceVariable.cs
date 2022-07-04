@@ -186,7 +186,7 @@ namespace TerraIntegration.Templates
         }
         protected override Variable LoadCustomData(BinaryReader reader)
         {
-            DoubleReferenceVariable doubleRef = (DoubleReferenceVariable)Activator.CreateInstance(GetType());
+            DoubleReferenceVariable doubleRef = (DoubleReferenceVariable)NewInstance();
 
             doubleRef.LeftId = new(reader.ReadBytes(16));
             doubleRef.RightId = new(reader.ReadBytes(16));
@@ -204,7 +204,7 @@ namespace TerraIntegration.Templates
         }
         protected override Variable LoadCustomTag(TagCompound data)
         {
-            DoubleReferenceVariable doubleRef = this.NewInstance();
+            DoubleReferenceVariable doubleRef = (DoubleReferenceVariable)NewInstance();
 
             if (data.ContainsKey("rid"))
                 doubleRef.RightId = new(data.GetByteArray("rid"));
@@ -226,6 +226,6 @@ namespace TerraIntegration.Templates
         public abstract VariableValue GetValue(ComponentSystem system, VariableValue left, VariableValue right, List<Error> errors);
         public abstract ReturnType[] GetValidRightSlotTypes(ReturnType leftSlotType);
 
-        public virtual DoubleReferenceVariable CreateVariable(Variable left, Variable right) => (DoubleReferenceVariable)Activator.CreateInstance(GetType());
+        public virtual DoubleReferenceVariable CreateVariable(Variable left, Variable right) => (DoubleReferenceVariable)NewInstance();
     }
 }

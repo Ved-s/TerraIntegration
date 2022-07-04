@@ -121,7 +121,7 @@ namespace TerraIntegration.Basic
         private VariableLocation? currentLocation;
 
         public abstract VariableValue GetValue(ComponentSystem system, List<Error> errors);
-        public virtual Variable GetFromCommand(CommandCaller caller, List<string> args) => (Variable)Activator.CreateInstance(GetType());
+        public virtual Variable GetFromCommand(CommandCaller caller, List<string> args) => (Variable)NewInstance();
 
         public static void SaveData(Variable var, BinaryWriter writer)
         {
@@ -315,7 +315,7 @@ namespace TerraIntegration.Basic
                 BinaryReader reader = new BinaryReader(ms);
                 newVar = var.LoadCustomData(reader);
             }
-            if (newVar is null) newVar = (Variable)Activator.CreateInstance(var.GetType());
+            if (newVar is null) newVar = var.NewInstance();
 
             World.Guids.AddToDictionary(id);
 
@@ -327,7 +327,7 @@ namespace TerraIntegration.Basic
         }
 
         protected virtual void SaveCustomData(BinaryWriter writer) { }
-        protected virtual Variable LoadCustomData(BinaryReader reader) => (Variable)Activator.CreateInstance(GetType());
+        protected virtual Variable LoadCustomData(BinaryReader reader) => NewInstance();
 
         protected virtual TagCompound SaveCustomTag() => null;
         protected virtual Variable LoadCustomTag(TagCompound data) => null;
@@ -379,6 +379,7 @@ namespace TerraIntegration.Basic
             LastSystem = system;
         }
 
+        public Variable NewInstance() => (Variable)Activator.CreateInstance(GetType());
         public static TVariable GetInstance<TVariable>() where TVariable : Variable
         {
             if (ByType.TryGetValue(typeof(TVariable), out Variable v))

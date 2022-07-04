@@ -54,7 +54,7 @@ namespace TerraIntegration.Basic
 
         public virtual ComponentProperty CreateVariable(PositionedComponent c)
         {
-            ComponentProperty pv = (ComponentProperty)Activator.CreateInstance(GetType());
+            ComponentProperty pv = (ComponentProperty)NewInstance();
             pv.ComponentPos = c.Pos;
             pv.BoundComponent = c.Component;
 
@@ -85,7 +85,7 @@ namespace TerraIntegration.Basic
         }
         protected override Variable LoadCustomData(BinaryReader reader)
         {
-            ComponentProperty pv = (ComponentProperty)Activator.CreateInstance(GetType());
+            ComponentProperty pv = (ComponentProperty)NewInstance();
 
             pv.ComponentPos = new(reader.ReadInt16(), reader.ReadInt16());
             return pv;
@@ -101,7 +101,7 @@ namespace TerraIntegration.Basic
         }
         protected override Variable LoadCustomTag(TagCompound data)
         {
-            ComponentProperty pv = (ComponentProperty)Activator.CreateInstance(GetType());
+            ComponentProperty pv = (ComponentProperty)NewInstance();
 
             Point16 pos = default;
 
@@ -180,7 +180,7 @@ namespace TerraIntegration.Basic
         }
 
         public abstract VariableValue GetProperty(TComponent component, Point16 pos, List<Error> errors);
-        public virtual ComponentProperty CreateVariable(TComponent component, Point16 pos) => (ComponentProperty)Activator.CreateInstance(GetType());
+        public virtual ComponentProperty CreateVariable(TComponent component, Point16 pos) => (ComponentProperty)NewInstance();
 
         public sealed override VariableValue GetProperty(PositionedComponent c, List<Error> errors)
         {

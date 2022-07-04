@@ -53,11 +53,6 @@ namespace TerraIntegration
                     yield return item;
         }
 
-        public static T NewInstance<T>(this T obj)
-        {
-            return (T)Activator.CreateInstance(obj.GetType());
-        }
-
         public static void Deconstruct(this Vector2 vec, out float x, out float y)
         {
             x = vec.X;

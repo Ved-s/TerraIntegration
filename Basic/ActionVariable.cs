@@ -50,13 +50,13 @@ namespace TerraIntegration.Basic
         }
         public abstract void Execute(Point16 pos, Variable var, ComponentSystem system, List<Error> errors);
         public virtual void SetupActionInterface() { }
-        public virtual ActionVariable WriteActionvariable() => this.NewInstance();
+        public virtual ActionVariable WriteActionvariable() => (ActionVariable)NewInstance();
 
         public virtual void SaveActionData(BinaryWriter writer) { }
-        public virtual ActionVariable LoadActionData(BinaryReader reader) => this.NewInstance();
+        public virtual ActionVariable LoadActionData(BinaryReader reader) => (ActionVariable)NewInstance();
 
         public virtual TagCompound SaveActionTag() => null;
-        public virtual ActionVariable LoadActionTag(TagCompound data) => this.NewInstance();
+        public virtual ActionVariable LoadActionTag(TagCompound data) => (ActionVariable)NewInstance();
 
         public sealed override VariableValue GetValue(ComponentSystem system, List<Error> errors) => new SpecialValue(this);
 
