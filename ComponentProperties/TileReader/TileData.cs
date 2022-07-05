@@ -23,9 +23,6 @@ namespace TerraIntegration.ComponentProperties.TileReader
         public override VariableValue GetProperty(Components.TileReader component, Point16 pos, List<Error> errors)
         {
             Terraria.Tile tile = component.GetTargetTile(pos);
-            if (!tile.HasTile)
-                return new Tile();
-
             return new Tile(tile);
         }
     }

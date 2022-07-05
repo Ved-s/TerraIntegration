@@ -108,6 +108,50 @@ namespace TerraIntegration.Values.Objects
                 PropertyDescription = "Returns whether this tile is actuated",
                 SpriteSheetPos = new(Variable.TileSheet, 2, 1)
             });
+            AutoProperty<Tile, Boolean>.Register(new("actuator", "Has actuator", (sys, v, err) => v.Actuator)
+            {
+                PropertyDescription = "Returns whether this tile has an actuator on it",
+                SpriteSheetPos = new(Variable.TileSheet, 3, 1)
+            });
+
+            AutoProperty<Tile, Boolean>.Register(new("wireRed", "Has red wire", (sys, v, err) => v.RedWire)
+            {
+                PropertyDescription = "Returns whether this tile has red wire on it",
+                SpriteSheetPos = new(Variable.TileSheet, 0, 2)
+            });
+            AutoProperty<Tile, Boolean>.Register(new("wireGreen", "Has green wire", (sys, v, err) => v.GreenWire)
+            {
+                PropertyDescription = "Returns whether this tile has green wire on it",
+                SpriteSheetPos = new(Variable.TileSheet, 1, 2)
+            });
+            AutoProperty<Tile, Boolean>.Register(new("wireBlue", "Has blue wire", (sys, v, err) => v.BlueWire)
+            {
+                PropertyDescription = "Returns whether this tile has blue wire on it",
+                SpriteSheetPos = new(Variable.TileSheet, 2, 2)
+            });
+            AutoProperty<Tile, Boolean>.Register(new("wireYellow", "Has yellow wire", (sys, v, err) => v.YellowWire)
+            {
+                PropertyDescription = "Returns whether this tile has yellow wire on it",
+                SpriteSheetPos = new(Variable.TileSheet, 3, 2)
+            });
+
+            AutoProperty<Tile, Boolean>.Register(new("half", "Is half block", (sys, v, err) => v.HalfBlock)
+            {
+                PropertyDescription = "Returns whether this tile is a half block",
+                SpriteSheetPos = new(Variable.TileSheet, 0, 3)
+            });
+
+            AutoProperty<Tile, Byte>.Register(new("liquid", "Liquid level", (sys, v, err) => v.Liquid)
+            {
+                PropertyDescription = "Returns liquid level in tile",
+                SpriteSheetPos = new(Variable.TileSheet, 2, 3)
+            });
+
+            AutoProperty<Tile, Byte>.Register(new("slope", "Slope type", (sys, v, err) => v.Slope)
+            {
+                PropertyDescription = "Returns tile slope type",
+                SpriteSheetPos = new(Variable.TileSheet, 1, 3)
+            });
         }
 
         public override bool Equals(VariableValue obj)
