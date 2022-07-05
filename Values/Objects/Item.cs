@@ -40,12 +40,21 @@ namespace TerraIntegration.Values.Objects
 
         protected override void SaveCustomData(BinaryWriter writer)
         {
-            ItemIO.Send(ItemObj, writer, true);
+            TagCompound tag = ItemIO.Save(ItemObj);
+            MemoryStream ms = new();
+            TagIO.ToStream(tag, ms);
+            writer.Write((int)ms.Position);
+            ms.Position = 0;
+            ms.CopyTo(writer.BaseStream);
         }
 
         protected override VariableValue LoadCustomData(BinaryReader reader)
         {
-            return new Item(ItemIO.Receive(reader, true));
+            int len = reader.ReadInt32();
+            byte[] bytes = reader.ReadBytes(len);
+            MemoryStream ms = new(bytes);
+            TagCompound tag = TagIO.FromStream(ms);
+            return new Item(ItemIO.Load(tag));
         }
 
         public override bool Equals(VariableValue value)

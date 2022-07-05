@@ -91,19 +91,28 @@ namespace TerraIntegration.Basic
                 return new UnloadedVariableValue(type, data);
             }
             long pos = reader.BaseStream.Position;
-            value = value.LoadCustomData(reader);
-            long diff = (reader.BaseStream.Position - pos) - length;
-            if (diff != 0)
+            try
             {
-                Mod m = value?.Mod ?? ModContent.GetInstance<TerraIntegration>();
+                value = value.LoadCustomData(reader);
+                long diff = (reader.BaseStream.Position - pos) - length;
+                if (diff != 0)
+                {
+                    Mod m = value?.Mod ?? ModContent.GetInstance<TerraIntegration>();
 
-                if (diff > 0) m.Logger.WarnFormat("Variable {0} data overread: {1} bytes", type, diff);
-                else m.Logger.WarnFormat("Variable {0} data underread: {1} bytes", type, -diff);
+                    if (diff > 0) m.Logger.WarnFormat("Variable {0} data overread: {1} bytes", type, diff);
+                    else m.Logger.WarnFormat("Variable {0} data underread: {1} bytes", type, -diff);
 
-                reader.BaseStream.Seek(pos + length, SeekOrigin.Begin);
+                    reader.BaseStream.Seek(pos + length, SeekOrigin.Begin);
+                }
+                return value;
             }
-
-            return value;
+            catch 
+            {
+                reader.BaseStream.Seek(pos, SeekOrigin.Begin);
+                byte[] data = reader.ReadBytes(length);
+                return new UnloadedVariableValue(type, data);
+            }
+            
         }
 
         public virtual VariableValue GetFromCommand(CommandCaller caller, List<string> args) { return NewInstance(); }
