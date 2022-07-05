@@ -379,7 +379,7 @@ namespace TerraIntegration.Basic
             LastSystem = system;
         }
 
-        public Variable NewInstance() => (Variable)Activator.CreateInstance(GetType());
+        public virtual Variable NewInstance() => (Variable)Activator.CreateInstance(GetType());
         public static TVariable GetInstance<TVariable>() where TVariable : Variable
         {
             if (ByType.TryGetValue(typeof(TVariable), out Variable v))

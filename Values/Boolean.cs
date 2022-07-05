@@ -93,5 +93,8 @@ namespace TerraIntegration.Values
         {
             return new Constant(new Boolean(InterfaceValue));
         }
+
+        public static implicit operator Boolean(bool value) => new(value);
+        public static explicit operator bool(Boolean value) => value.Value;
     }
 }

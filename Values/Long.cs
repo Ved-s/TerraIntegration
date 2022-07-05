@@ -110,5 +110,8 @@ namespace TerraIntegration.Values
                    TypeName == @long.TypeName &&
                    Value == @long.Value;
         }
+
+        public static implicit operator Long(long value) => new(value);
+        public static explicit operator long(Long value) => value.Value;
     }
 }

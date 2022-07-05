@@ -9,19 +9,19 @@ using TerraIntegration.Templates;
 
 namespace TerraIntegration.ValueProperties.Tile
 {
-    public class TileActuated : ValueProperty<Values.Objects.Tile>
-    {
-        public override string PropertyName => "actuated";
-        public override string PropertyDisplay => "Is actuated";
-        public override string PropertyDescription => "Returns whether this tile is actuated";
-
-        public override ReturnType? VariableReturnType => typeof(Values.Boolean);
-
-        public override SpriteSheetPos SpriteSheetPos => new(TileSheet, 2, 1);
-
-        public override VariableValue GetProperty(ComponentSystem system, Values.Objects.Tile value, List<Error> errors)
-            => new Values.Boolean(value.Actuated);
-    }
+    //public class TileActuated : ValueProperty<Values.Objects.Tile>
+    //{
+    //    public override string PropertyName => "actuated";
+    //    public override string PropertyDisplay => "Is actuated";
+    //    public override string PropertyDescription => "Returns whether this tile is actuated";
+    //
+    //    public override ReturnType? VariableReturnType => typeof(Values.Boolean);
+    //
+    //    public override SpriteSheetPos SpriteSheetPos => new(TileSheet, 2, 1);
+    //
+    //    public override VariableValue GetProperty(ComponentSystem system, Values.Objects.Tile value, List<Error> errors)
+    //        => new Values.Boolean(value.Actuated);
+    //}
 
     public class TileActuator : ValueProperty<Values.Objects.Tile>
     {

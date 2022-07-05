@@ -116,5 +116,8 @@ namespace TerraIntegration.Values
 
             return new Constant(new Char(InterfaceValue.CurrentString[0]));
         }
+
+        public static implicit operator Char(char value) => new(value);
+        public static explicit operator char(Char value) => value.Value;
     }
 }

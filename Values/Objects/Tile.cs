@@ -101,6 +101,15 @@ namespace TerraIntegration.Values.Objects
             return new TileDisplay((ushort)TileType, new(TileFrameX, TileFrameY), Color, Name);
         }
 
+        public override void OnRegister()
+        {
+            AutoProperty<Tile, Boolean>.Register(new("actuated", "Is actuated", (sys, v, err) => v.Actuated)
+            {
+                PropertyDescription = "Returns whether this tile is actuated",
+                SpriteSheetPos = new(Variable.TileSheet, 2, 1)
+            });
+        }
+
         public override bool Equals(VariableValue obj)
         {
             return obj is Tile tile &&

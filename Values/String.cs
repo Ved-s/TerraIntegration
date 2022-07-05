@@ -116,5 +116,8 @@ namespace TerraIntegration.Values
             foreach (char c in Value)
                 yield return new Char(c);
         }
+
+        public static implicit operator String(string value) => new(value);
+        public static explicit operator string(String value) => value.Value;
     }
 }

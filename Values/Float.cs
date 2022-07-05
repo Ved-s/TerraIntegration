@@ -124,5 +124,8 @@ namespace TerraIntegration.Values
         {
             return new Float((float)value);
         }
+
+        public static implicit operator Float(float value) => new(value);
+        public static explicit operator float(Float value) => value.Value;
     }
 }

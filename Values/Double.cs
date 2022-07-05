@@ -125,5 +125,8 @@ namespace TerraIntegration.Values
         {
             return new Double(value);
         }
+
+        public static implicit operator Double(double value) => new(value);
+        public static explicit operator double(Double value) => value.Value;
     }
 }
